@@ -1,0 +1,17 @@
+{
+  "errors": [],
+  "checks": [
+    "images decode offline",
+    "branch removed",
+    "frame animation advances",
+    "pause freezes frames",
+    "manual stepping",
+    "button states",
+    "8-frame one-shot button press animations",
+    "canvas mouse and emulated touch input",
+    "640x360 and 360x640 native canvas",
+    "390px viewport",
+    "reduced motion"
+  ],
+  "realPhoneTest": false
+}

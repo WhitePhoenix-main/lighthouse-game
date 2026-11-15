@@ -1,0 +1,166 @@
+{
+    "worldSize":  [
+                      640,
+                      640
+                  ],
+    "source":  "background.png",
+    "version":  1,
+    "layers":  [
+                   {
+                       "id":  "clouds-upper",
+                       "frameMs":  330,
+                       "frames":  8,
+                       "rect":  [
+                                    0,
+                                    0,
+                                    640,
+                                    100
+                                ],
+                       "phaseMs":  0,
+                       "file":  "clouds-upper.png"
+                   },
+                   {
+                       "id":  "clouds-lower",
+                       "frameMs":  360,
+                       "frames":  8,
+                       "rect":  [
+                                    0,
+                                    100,
+                                    640,
+                                    230
+                                ],
+                       "phaseMs":  330,
+                       "file":  "clouds-lower.png"
+                   },
+                   {
+                       "id":  "waves-upper",
+                       "frameMs":  180,
+                       "frames":  8,
+                       "rect":  [
+                                    0,
+                                    330,
+                                    640,
+                                    105
+                                ],
+                       "phaseMs":  0,
+                       "file":  "waves-upper.png"
+                   },
+                   {
+                       "id":  "waves-middle",
+                       "frameMs":  180,
+                       "frames":  8,
+                       "rect":  [
+                                    0,
+                                    435,
+                                    640,
+                                    105
+                                ],
+                       "phaseMs":  360,
+                       "file":  "waves-middle.png"
+                   },
+                   {
+                       "id":  "waves-lower",
+                       "frameMs":  180,
+                       "frames":  8,
+                       "rect":  [
+                                    0,
+                                    540,
+                                    640,
+                                    100
+                                ],
+                       "phaseMs":  720,
+                       "file":  "waves-lower.png"
+                   },
+                   {
+                       "id":  "grass-left",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    1,
+                                    444,
+                                    105,
+                                    52
+                                ],
+                       "phaseMs":  0,
+                       "file":  "grass-left.png"
+                   },
+                   {
+                       "id":  "grass-stone",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    140,
+                                    400,
+                                    55,
+                                    48
+                                ],
+                       "phaseMs":  210,
+                       "file":  "grass-stone.png"
+                   },
+                   {
+                       "id":  "grass-center",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    207,
+                                    388,
+                                    80,
+                                    81
+                                ],
+                       "phaseMs":  420,
+                       "file":  "grass-center.png"
+                   },
+                   {
+                       "id":  "grass-slope",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    258,
+                                    349,
+                                    70,
+                                    40
+                                ],
+                       "phaseMs":  630,
+                       "file":  "grass-slope.png"
+                   },
+                   {
+                       "id":  "grass-front-left",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    9,
+                                    546,
+                                    70,
+                                    52
+                                ],
+                       "phaseMs":  840,
+                       "file":  "grass-front-left.png"
+                   },
+                   {
+                       "id":  "grass-front-center",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    198,
+                                    583,
+                                    47,
+                                    40
+                                ],
+                       "phaseMs":  1050,
+                       "file":  "grass-front-center.png"
+                   },
+                   {
+                       "id":  "grass-front-right",
+                       "frameMs":  210,
+                       "frames":  8,
+                       "rect":  [
+                                    581,
+                                    588,
+                                    58,
+                                    48
+                                ],
+                       "phaseMs":  1260,
+                       "file":  "grass-front-right.png"
+                   }
+               ]
+}

@@ -1,0 +1,101 @@
+{
+  "backgroundSha256": "0E1C5A61EED34ADD02D281BA4A6E5288F31D92F0B5740E5B2150C7FF9568E5CC",
+  "sprites": [
+    {
+      "id": "moon",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 512,
+      "height": 64
+    },
+    {
+      "id": "ship",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 512,
+      "height": 64
+    },
+    {
+      "id": "sail",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 512,
+      "height": 64
+    },
+    {
+      "id": "lanternHalo",
+      "uniqueFrames": 12,
+      "transparency": true,
+      "frames": 12,
+      "width": 1536,
+      "height": 128
+    },
+    {
+      "id": "windowGlow",
+      "uniqueFrames": 12,
+      "transparency": true,
+      "frames": 12,
+      "width": 288,
+      "height": 24
+    },
+    {
+      "id": "title",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 1920,
+      "height": 80
+    },
+    {
+      "id": "play",
+      "uniqueFrames": 3,
+      "transparency": true,
+      "frames": 3,
+      "width": 720,
+      "height": 48
+    },
+    {
+      "id": "settings",
+      "uniqueFrames": 3,
+      "transparency": true,
+      "frames": 3,
+      "width": 720,
+      "height": 48
+    },
+    {
+      "id": "playPress",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 1920,
+      "height": 48
+    },
+    {
+      "id": "settingsPress",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 1920,
+      "height": 48
+    },
+    {
+      "id": "shipWake",
+      "uniqueFrames": 8,
+      "transparency": true,
+      "frames": 8,
+      "width": 640,
+      "height": 24
+    }
+  ],
+  "checks": [
+    "sheet dimensions",
+    "unique frames",
+    "actual alpha transparency",
+    "transparent corners",
+    "moon has no outside background",
+    "title glyph silhouette is stable across all frames"
+  ]
+}

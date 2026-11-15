@@ -1,0 +1,37 @@
+{
+  "title": {
+    "file": "title.png",
+    "frameWidth": 240,
+    "frameHeight": 80,
+    "frames": 8,
+    "durationMs": 220,
+    "sequence": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "loopMode": "ping-pong",
+    "sha256": "8820a4dddaf503b2378cf7d16c2ac426becee18ea73464a3bf77ca1f01002b7f",
+    "frameFiles": [
+      "frames/title/frame-01.png",
+      "frames/title/frame-02.png",
+      "frames/title/frame-03.png",
+      "frames/title/frame-04.png",
+      "frames/title/frame-05.png",
+      "frames/title/frame-06.png",
+      "frames/title/frame-07.png",
+      "frames/title/frame-08.png"
+    ]
+  }
+}

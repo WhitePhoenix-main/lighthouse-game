@@ -1,0 +1,477 @@
+{
+  "version": 1,
+  "background": {
+    "file": "background.png",
+    "width": 640,
+    "height": 640
+  },
+  "layouts": {
+    "landscape": {
+      "width": 640,
+      "height": 360,
+      "crop": [
+        0,
+        100,
+        640,
+        360
+      ],
+      "title": [
+        18,
+        30
+      ],
+      "play": [
+        18,
+        202
+      ],
+      "settings": [
+        18,
+        258
+      ]
+    },
+    "portrait": {
+      "width": 360,
+      "height": 640,
+      "crop": [
+        220,
+        0,
+        360,
+        640
+      ],
+      "title": [
+        60,
+        415
+      ],
+      "play": [
+        60,
+        507
+      ],
+      "settings": [
+        60,
+        569
+      ]
+    }
+  },
+  "world": {
+    "moon": [
+      514,
+      128
+    ],
+    "ship": [
+      500,
+      318
+    ],
+    "sail": [
+      500,
+      318
+    ],
+    "lanternHalo": [
+      327,
+      122
+    ],
+    "windows": [
+      [
+        406,
+        238
+      ],
+      [
+        386,
+        252
+      ],
+      [
+        371,
+        276
+      ],
+      [
+        412,
+        286
+      ],
+      [
+        394,
+        300
+      ],
+      [
+        391,
+        325
+      ]
+    ],
+    "shipWake": [
+      501,
+      362
+    ]
+  },
+  "sprites": {
+    "moon": {
+      "file": "moon.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "durationMs": 400,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "loopMode": "ping-pong",
+      "sha256": "b7649c56b3f6720a2f1bfa85154f07ea3f4248f91bf27d0faea5b8dabed063ce",
+      "frameFiles": [
+        "frames/moon/frame-01.png",
+        "frames/moon/frame-02.png",
+        "frames/moon/frame-03.png",
+        "frames/moon/frame-04.png",
+        "frames/moon/frame-05.png",
+        "frames/moon/frame-06.png",
+        "frames/moon/frame-07.png",
+        "frames/moon/frame-08.png"
+      ]
+    },
+    "ship": {
+      "file": "ship.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "durationMs": 180,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "loopMode": "ping-pong",
+      "sha256": "b3a21065c8c17993dbe33276ad1a54b449e14aee3d3051c0483dd84616ab36f9",
+      "frameFiles": [
+        "frames/ship/frame-01.png",
+        "frames/ship/frame-02.png",
+        "frames/ship/frame-03.png",
+        "frames/ship/frame-04.png",
+        "frames/ship/frame-05.png",
+        "frames/ship/frame-06.png",
+        "frames/ship/frame-07.png",
+        "frames/ship/frame-08.png"
+      ]
+    },
+    "sail": {
+      "file": "sail.png",
+      "frameWidth": 64,
+      "frameHeight": 64,
+      "frames": 8,
+      "durationMs": 180,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "loopMode": "ping-pong",
+      "sha256": "9b9e1e818822b11f37af866a2fadeaaccf0d41da4a12febc654cf79457637298",
+      "frameFiles": [
+        "frames/sail/frame-01.png",
+        "frames/sail/frame-02.png",
+        "frames/sail/frame-03.png",
+        "frames/sail/frame-04.png",
+        "frames/sail/frame-05.png",
+        "frames/sail/frame-06.png",
+        "frames/sail/frame-07.png",
+        "frames/sail/frame-08.png"
+      ]
+    },
+    "lanternHalo": {
+      "file": "lantern-halo.png",
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "frames": 12,
+      "durationMs": 140,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "sha256": "52f125ace19d843d13ee2f32639dd8f93d78aef4531196336ae60842e194082a",
+      "frameFiles": [
+        "frames/lanternHalo/frame-01.png",
+        "frames/lanternHalo/frame-02.png",
+        "frames/lanternHalo/frame-03.png",
+        "frames/lanternHalo/frame-04.png",
+        "frames/lanternHalo/frame-05.png",
+        "frames/lanternHalo/frame-06.png",
+        "frames/lanternHalo/frame-07.png",
+        "frames/lanternHalo/frame-08.png",
+        "frames/lanternHalo/frame-09.png",
+        "frames/lanternHalo/frame-10.png",
+        "frames/lanternHalo/frame-11.png",
+        "frames/lanternHalo/frame-12.png"
+      ]
+    },
+    "windowGlow": {
+      "file": "window-glow.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "frames": 12,
+      "durationMs": 140,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "sha256": "afb4a872ce10709aaf77331dfdaa252461509f4d0ef7d4ee3abd7ee7be9898be",
+      "frameFiles": [
+        "frames/windowGlow/frame-01.png",
+        "frames/windowGlow/frame-02.png",
+        "frames/windowGlow/frame-03.png",
+        "frames/windowGlow/frame-04.png",
+        "frames/windowGlow/frame-05.png",
+        "frames/windowGlow/frame-06.png",
+        "frames/windowGlow/frame-07.png",
+        "frames/windowGlow/frame-08.png",
+        "frames/windowGlow/frame-09.png",
+        "frames/windowGlow/frame-10.png",
+        "frames/windowGlow/frame-11.png",
+        "frames/windowGlow/frame-12.png"
+      ]
+    },
+    "title": {
+      "file": "title.png",
+      "frameWidth": 240,
+      "frameHeight": 80,
+      "frames": 8,
+      "durationMs": 220,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "loopMode": "ping-pong",
+      "sha256": "8820a4dddaf503b2378cf7d16c2ac426becee18ea73464a3bf77ca1f01002b7f",
+      "frameFiles": [
+        "frames/title/frame-01.png",
+        "frames/title/frame-02.png",
+        "frames/title/frame-03.png",
+        "frames/title/frame-04.png",
+        "frames/title/frame-05.png",
+        "frames/title/frame-06.png",
+        "frames/title/frame-07.png",
+        "frames/title/frame-08.png"
+      ]
+    },
+    "play": {
+      "file": "button-play.png",
+      "frameWidth": 240,
+      "frameHeight": 48,
+      "frames": 3,
+      "durationMs": 0,
+      "states": [
+        "idle",
+        "hover",
+        "pressed"
+      ],
+      "sha256": "918b77e839d592bbbab5f009d3c0e9d3d307b6c499c1494899459b0384515b6d",
+      "frameFiles": [
+        "frames/play/frame-01.png",
+        "frames/play/frame-02.png",
+        "frames/play/frame-03.png"
+      ],
+      "stateFiles": {
+        "idle": "frames/play/frame-01.png",
+        "hover": "frames/play/frame-02.png",
+        "pressed": "frames/play/frame-03.png"
+      },
+      "pressAnimation": {
+        "sprite": "playPress",
+        "durationMs": 60,
+        "frames": 8,
+        "loop": false
+      }
+    },
+    "settings": {
+      "file": "button-settings.png",
+      "frameWidth": 240,
+      "frameHeight": 48,
+      "frames": 3,
+      "durationMs": 0,
+      "states": [
+        "idle",
+        "hover",
+        "pressed"
+      ],
+      "sha256": "2eccf2ffd40e2ed92bc7cbe99cedbe95ea2b35b7d15f2e43a2eff60cb81348c4",
+      "frameFiles": [
+        "frames/settings/frame-01.png",
+        "frames/settings/frame-02.png",
+        "frames/settings/frame-03.png"
+      ],
+      "stateFiles": {
+        "idle": "frames/settings/frame-01.png",
+        "hover": "frames/settings/frame-02.png",
+        "pressed": "frames/settings/frame-03.png"
+      },
+      "pressAnimation": {
+        "sprite": "settingsPress",
+        "durationMs": 60,
+        "frames": 8,
+        "loop": false
+      }
+    },
+    "playPress": {
+      "file": "button-play-press.png",
+      "frameWidth": 240,
+      "frameHeight": 48,
+      "frames": 8,
+      "durationMs": 60,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "sha256": "0676e6173c04b967bc25e0735ffe45e7a20438e717ff095dd65063870751399f",
+      "frameFiles": [
+        "frames/playPress/frame-01.png",
+        "frames/playPress/frame-02.png",
+        "frames/playPress/frame-03.png",
+        "frames/playPress/frame-04.png",
+        "frames/playPress/frame-05.png",
+        "frames/playPress/frame-06.png",
+        "frames/playPress/frame-07.png",
+        "frames/playPress/frame-08.png"
+      ]
+    },
+    "settingsPress": {
+      "file": "button-settings-press.png",
+      "frameWidth": 240,
+      "frameHeight": 48,
+      "frames": 8,
+      "durationMs": 60,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "loop": false,
+      "sha256": "3db080ef198023f79e81bd8c3dd424cfa451337871d1ed97794462dac9fab0f7",
+      "frameFiles": [
+        "frames/settingsPress/frame-01.png",
+        "frames/settingsPress/frame-02.png",
+        "frames/settingsPress/frame-03.png",
+        "frames/settingsPress/frame-04.png",
+        "frames/settingsPress/frame-05.png",
+        "frames/settingsPress/frame-06.png",
+        "frames/settingsPress/frame-07.png",
+        "frames/settingsPress/frame-08.png"
+      ]
+    },
+    "shipWake": {
+      "file": "ship-wake.png",
+      "frameWidth": 80,
+      "frameHeight": 24,
+      "frames": 8,
+      "durationMs": 200,
+      "sequence": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "loopMode": "ping-pong",
+      "sha256": "4e5aa4955e6d944e686e7c21a0a1bf612b7397ef69f0187ffef5f6fcf504dd92",
+      "frameFiles": [
+        "frames/shipWake/frame-01.png",
+        "frames/shipWake/frame-02.png",
+        "frames/shipWake/frame-03.png",
+        "frames/shipWake/frame-04.png",
+        "frames/shipWake/frame-05.png",
+        "frames/shipWake/frame-06.png",
+        "frames/shipWake/frame-07.png",
+        "frames/shipWake/frame-08.png"
+      ],
+      "displayWidth": 56,
+      "displayHeight": 17,
+      "opacity": 0.25
+    }
+  },
+  "playback": {
+    "loop": true,
+    "sampling": "nearest",
+    "blend": "source-over",
+    "pauseWhenHidden": true,
+    "respectReducedMotion": true
+  }
+}
