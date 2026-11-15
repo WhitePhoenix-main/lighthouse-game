@@ -1,0 +1,62 @@
+.menu-fog {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Stationary world-space banks keep the moving haze away from the lighthouse. */
+.menu-fog-bank {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+}
+
+.menu-fog-bank--left {
+  left: 0;
+  top: 32.8125%;
+  width: 56.25%;
+  height: 31.25%;
+}
+
+.menu-fog-bank--right {
+  left: 65.625%;
+  top: 35.9375%;
+  width: 34.375%;
+  height: 26.5625%;
+}
+
+.menu-fog-veil {
+  position: absolute;
+  inset: 0 -50%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 31% 28% at 18% 58%, rgba(155, 184, 205, .46), rgba(112, 154, 180, .22) 55%, transparent 100%),
+    radial-gradient(ellipse 34% 26% at 52% 45%, rgba(134, 171, 194, .38), rgba(104, 148, 176, .18) 55%, transparent 100%),
+    radial-gradient(ellipse 27% 23% at 84% 62%, rgba(150, 183, 204, .34), transparent 100%);
+}
+
+.menu-fog-veil--left {
+  animation: menu-fog-drift-left 10s ease-in-out infinite alternate;
+  animation-delay: -4s;
+}
+
+.menu-fog-veil--right {
+  animation: menu-fog-drift-right 13s ease-in-out infinite alternate;
+  animation-delay: -8s;
+}
+
+@keyframes menu-fog-drift-left {
+  from { transform: translate(-20%, 4%); }
+  to { transform: translate(20%, -4%); }
+}
+
+@keyframes menu-fog-drift-right {
+  from { transform: translate(24%, -4%); }
+  to { transform: translate(-24%, 4%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-fog-veil { animation: none; }
+}

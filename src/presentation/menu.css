@@ -1,0 +1,85 @@
+@font-face { font-family: 'Avalon Menu'; src: url('/fonts/menu/VollkornSC-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+/* Pixel scenery and native controls use independent responsive viewports. */
+.lighthouse-app.is-main-menu { width: 100%; max-width: none; height: 100dvh; min-height: 280px; padding: 0; }
+.is-main-menu .masthead, .is-main-menu .battle-rail, .is-main-menu .ocean { display: none; }
+.is-main-menu .play-area { margin: 0; border: 0; border-radius: 0; background: #172d47; }
+.is-main-menu .overlay.screen-menu { padding: 0; overflow: hidden; background: transparent; }
+.is-main-menu .save-error { position: fixed; z-index: 10; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); margin: 0; }
+.avalon-menu { width: 100%; height: 100%; position: relative; overflow: hidden; background: #182d45; }
+.menu-artboard { position: absolute; isolation: isolate; --menu-scale: 1; --menu-text-scale: 1; }
+.menu-scenery { position: absolute; pointer-events: none; user-select: none; }
+.menu-background, .menu-button-art { display: block; width: 100%; height: 100%; }
+.menu-background { position: absolute; inset: 0; image-rendering: pixelated; }
+.menu-decoration { position: absolute; pointer-events: none; user-select: none; }
+.menu-sprite { display: block; background-repeat: no-repeat; background-size: 800% 100%; image-rendering: pixelated; animation: menu-sprite-ping-pong 2.8s steps(7, end) infinite alternate; }
+.menu-moon { animation-duration: 14s; }
+.menu-moon-halo { background: radial-gradient(circle closest-side, rgba(191, 215, 240, .38), rgba(165, 198, 230, .24) 38%, rgba(128, 173, 218, .11) 60%, transparent 100%); mix-blend-mode: screen; }
+.menu-ship, .menu-sail { animation: none; background-position-x: 0%; }
+/* Small ripples sit behind the hull; pause and reduced motion are shared. */
+.menu-ship-wake { animation-duration: 1.4s; opacity: .25; }
+.menu-lantern-halo, .menu-window-glow, .menu-ship-glow { background-size: 1200% 100%; }
+.menu-lantern-halo { animation: menu-lantern-pulse 7.8s steps(1, end) infinite, menu-lantern-brightness 7.8s linear infinite; filter: blur(calc(1.2px * var(--menu-world-scale, 1))) brightness(1.15); mix-blend-mode: screen; mask-image: radial-gradient(circle, #000 20%, #000a 45%, transparent 70%); }
+.menu-window-glow { filter: brightness(1.7); mix-blend-mode: screen; animation: none; background-position-x: 0%; opacity: 0; }
+.menu-ship-glow { animation: menu-sprite-loop 1.68s steps(12, end) infinite; opacity: .8; mix-blend-mode: screen; }
+.menu-title { position: absolute; margin: 0; }
+.menu-title-sprite { position: absolute; inset: 0; width: 100%; height: 100%; animation: none; }
+.menu-title:focus { outline: none; }
+.menu-hotspot { position: absolute; display: grid; place-items: center; min-height: 44px; border: 0; border-radius: 0; padding: 0; margin: 0; background: transparent; box-shadow: none; touch-action: manipulation; color: #f3cfa4; font: 400 calc(24px * var(--menu-scale) * var(--menu-text-scale))/1 'Avalon Menu', Georgia, serif; letter-spacing: calc(1px * var(--menu-scale)); }
+.menu-button-art { position: absolute; inset: 0; pointer-events: none; }
+.menu-button-frame, .menu-button-label-art { position: absolute; inset: 0; display: block; background-repeat: no-repeat; image-rendering: pixelated; pointer-events: none; }
+.menu-button-frame { background-image: var(--menu-button-states); background-size: 300% 100%; background-position: 0% 0; }
+.menu-button-label-art { background-image: var(--menu-button-labels-ru); background-size: 200% 100%; background-position: 0% 0; scale: var(--menu-text-scale); }
+.menu-button-label-art[data-menu-button-label='settings'] { background-position-x: 100%; }
+html[lang='en'] .menu-button-label-art { background-image: var(--menu-button-labels-en); }
+.menu-button-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (hover: hover) {
+  .menu-hotspot:hover:not(:disabled) .menu-button-frame { background-position-x: 50%; }
+}
+.menu-hotspot:focus-visible:not(:disabled) .menu-button-frame { background-position-x: 50%; }
+.menu-hotspot:active:not(:disabled):not(.is-menu-pressing) .menu-button-frame { background-position-x: 100%; }
+.menu-hotspot:active:not(:disabled):not(.is-menu-pressing) .menu-button-label-art { transform: translateY(calc(2px * var(--menu-scale))); }
+.menu-hotspot.is-menu-pressing .menu-button-frame { background-image: var(--menu-button-press); background-size: 800% 100%; }
+.menu-hotspot:hover:not(:disabled) { background: transparent; filter: none; }
+.menu-hotspot:focus-visible { outline: 2px solid #ffe1b2; outline-offset: 3px; }
+.menu-hotspot:disabled { background: transparent; opacity: .55; }
+html[data-text-size='large'] .menu-artboard { --menu-text-scale: 1.12; }
+.menu-motion-paused .menu-decoration { animation-play-state: paused; }
+.menu-notice { position: absolute; bottom: max(12px, env(safe-area-inset-bottom)); left: 5%; right: 5%; max-width: 700px; margin: 0 auto; padding: 10px 16px; color: #ffe1b6; background: #16283bf2; border: 1px solid #a27c58; font-size: .8rem; line-height: 1.5; text-align: center; }
+.volume-setting { display: grid; gap: 10px; margin-top: 24px; }
+.volume-setting > span { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.volume-setting output { color: #e6cc97; font-variant-numeric: tabular-nums; }
+.volume-setting input { width: 100%; height: 44px; margin: 0; cursor: pointer; accent-color: #d39b69; touch-action: pan-y; }
+.volume-setting input:focus-visible { outline: 2px solid #f4cd85; outline-offset: 2px; }
+.volume-setting input:disabled { opacity: .45; }
+@media (orientation: portrait) {
+  .menu-notice { font-size: .65rem; padding: 6px 10px; bottom: max(6px, env(safe-area-inset-bottom)); }
+}
+@keyframes menu-sprite-ping-pong { from { background-position-x: 0%; } to { background-position-x: 100%; } }
+/* 12 steps advance by one frame each; the final off-sheet position resets at the loop boundary. */
+@keyframes menu-sprite-loop { from { background-position-x: 0%; } to { background-position-x: 109.090909%; } }
+/* The 2.8-second light cue is followed by 5 seconds fully dark (7.8 seconds total). */
+@keyframes menu-lantern-pulse {
+  0% { background-position-x: 0%; }
+  1.794872% { background-position-x: 9.090909%; }
+  3.589744% { background-position-x: 18.181818%; }
+  5.384615% { background-position-x: 27.272727%; }
+  7.179487% { background-position-x: 36.363636%; }
+  8.974359% { background-position-x: 45.454545%; }
+  10.769231% { background-position-x: 54.545455%; }
+  33.333333% { background-position-x: 63.636364%; }
+  33.846154% { background-position-x: 72.727273%; }
+  34.358974% { background-position-x: 81.818182%; }
+  34.871795% { background-position-x: 90.909091%; }
+  35.384615%, 100% { background-position-x: 100%; }
+}
+@keyframes menu-lantern-brightness {
+  0% { opacity: 0; animation-timing-function: ease-in-out; }
+  10.769231% { opacity: 1; animation-timing-function: linear; }
+  33.333333% { opacity: 1; animation-timing-function: ease-in-out; }
+  35.897436%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-decoration { animation: none; }
+  .menu-window-glow { opacity: .32; background-position-x: 54.545455%; }
+  .menu-lantern-halo { opacity: .48; background-position-x: 54.545455%; }
+}

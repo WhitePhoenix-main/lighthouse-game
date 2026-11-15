@@ -1,0 +1,53 @@
+.menu-title-sprite.menu-title-ready {
+  /* First pass after 3 seconds; each 720ms pass is followed by 20 seconds at rest. */
+  animation: menu-title-frames 20.72s steps(7, end) 3s infinite,
+    menu-title-light 20.72s ease-in-out 3s infinite;
+}
+
+.menu-title-sprite.menu-title-ready::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: inherit;
+  background-size: 800% 100%;
+  image-rendering: pixelated;
+  filter: brightness(1.7);
+  mix-blend-mode: screen;
+  opacity: 0;
+  mask-image: linear-gradient(105deg, transparent 38%, #000 49%, #000 51%, transparent 62%);
+  mask-size: 250% 100%;
+  animation: menu-title-frames 20.72s steps(7, end) 3s infinite,
+    menu-title-shine 20.72s linear 3s infinite;
+}
+
+@keyframes menu-title-frames {
+  0% { background-position: 0 0; }
+  3.474903%, 100% { background-position: 100% 0; }
+}
+
+@keyframes menu-title-light {
+  0%, 3.474903%, 100% { filter: brightness(1); }
+  1.563707% { filter: brightness(1.4); }
+}
+
+@keyframes menu-title-shine {
+  0% { opacity: 0; mask-position: 100% 0; }
+  .416988% { opacity: .65; }
+  2.953668% { opacity: .65; }
+  3.474903%, 100% { opacity: 0; mask-position: 0 0; }
+}
+
+.menu-motion-paused .menu-title-sprite.menu-title-ready,
+.menu-motion-paused .menu-title-sprite.menu-title-ready::after {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-title-sprite.menu-title-ready {
+    animation: none;
+    background-position: 100% 0;
+    filter: none;
+  }
+  .menu-title-sprite.menu-title-ready::after { animation: none; opacity: 0; }
+}
