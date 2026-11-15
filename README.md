@@ -94,13 +94,23 @@ pnpm dev
 Для приватного проекта можно отдельно опубликовать собранную игру в публичном
 репозитории. Подробнее — в [документации GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
+В коммит обязательно должен входить скрытый каталог `.github/`, в частности
+`.github/workflows/deploy-pages.yml`. Одного наличия файла на компьютере недостаточно:
+проверьте его на вкладке **Code** репозитория.
+
 После загрузки проекта в репозиторий откройте **Settings → Pages** и выберите
 **Build and deployment → Source → GitHub Actions**. Процесс
-`.github/workflows/deploy-pages.yml` устанавливает зависимости по lock-файлу,
-собирает игру и публикует `dist/` при отправке изменений в `main`. Он также
+`.github/workflows/deploy-pages.yml` устанавливает зависимости по lock-файлу
+и собирает игру в pull request. После отправки изменений в `main` отдельный этап
+публикует только `dist/`. Права публикации выдаются только этому этапу. Процесс также
 запускается вручную из **Actions → Deploy preview to GitHub Pages → Run workflow**
 для `main`. Если первая сборка была запущена до настройки Pages, после выбора
 GitHub Actions запустите процесс вручную.
+
+Если в Actions запущен **pages build and deployment** с этапом **Build with Jekyll**,
+публикуются исходники без компиляции Vite. Для этой игры выберите источник
+**GitHub Actions** и дождитесь **Deploy preview to GitHub Pages**: сначала
+`build` (установка зависимостей и `pnpm build`), затем `deploy`.
 
 Рабочие ветки сами по себе сайт не обновляют: после проверки создайте pull request
 и объедините его с `main`. Адрес обычно имеет вид
