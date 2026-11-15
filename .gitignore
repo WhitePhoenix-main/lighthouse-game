@@ -4,3 +4,7 @@ dist/
 test-results/
 .idea/
 *.local
+
+# Generated sprite archives; source sheets and frames live beside them.
+/art/menu-sprites-v1.zip
+/sprites/title-8-frames.zip
