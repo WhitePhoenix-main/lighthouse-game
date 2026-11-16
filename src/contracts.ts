@@ -1,6 +1,15 @@
 /** Shared contracts. Only the lead edits this file. All balance is provisional. */
+import type { CampaignAbilityRules } from './abilityRules';
+export interface SealMark { castId: number; untilTick: number; entryUntilTick: number }
+export interface SelectedAbilityState {
+    id: CampaignAbilityRules['abilityId']; readyTick: number; activeUntilTick: number;
+    fadeUntilTick: number; nextCastId: number;
+    seal?: { castId: number; x: number; y: number; untilTick: number; enteredIds: number[] };
+}
 export type EnemyKind = 'ghost' | 'turtle' | 'minotaur' | 'bat';
-export type NightId = 'first-light' | 'broken-shore' | 'winged-tide' | 'rescue-trial' | 'abyss-warden' | 'far-shore';
+export type NightId = 'first-light' | 'broken-shore' | 'winged-tide' | 'rescue-trial' | 'abyss-warden' | 'far-shore' | 'armored-front' | 'sky-siege' | 'cross-current';
+export type LateNightMode = 'transition' | 'assault';
+export interface LateNightModeOption { id: LateNightMode; name: string; description: string; totalReward: number }
 export type BossId = 'abyss-warden';
 export type LensId = 'basic' | 'expanded' | 'slowing' | 'armor-breaker' | 'focused' | 'smoldering' | 'resonant' | 'long-range';
 export type LensUpgradeId = 'expanded-width' | 'expanded-targets' | 'slowing-control' | 'slowing-power' | 'armor-breaker-armor' | 'armor-breaker-power'
@@ -21,6 +30,7 @@ export interface BossRules {
 export interface TentacleState {
     id: number; x: number; y: number; attackCooldown: number;
     bellSlows?: BellSlow[];
+    sealMark?: SealMark;
 }
 export interface BossState {
     id: BossId; health: number; stunnedUntilTick: number; tentacles: TentacleState[];
@@ -79,6 +89,7 @@ export interface DeviceRules {
 export interface MortarProjectile {
     id: number; deviceId: number; fromX: number; fromY: number; x: number; y: number;
     launchTick: number; impactTick: number; damage: number; blastRadius: number; armorMultiplier: number;
+    barrage?: { damageBonus: number; armorDamageBonus: number; litDamageBonus: number; damageBonusCap: number };
 }
 export interface DevicePlacement { id: number; kind: DeviceKind; x: number; y: number }
 /** Persistent v6 ownership: health uses base-max HP units; a null position means reserve. */
@@ -93,6 +104,8 @@ export interface OwnedDeviceView extends OwnedDevice {
     maxHealth: number; repairCost: number; rechargeCost: number;
 }
 export interface DeviceState extends DevicePlacement {
+    /** Control-scenario suppression; timers continue while firing is unavailable. */
+    suppressedUntilTick?: number;
     /** Actual HP after hull upgrades; never persist directly as OwnedDevice.health. */
     health: number;
     attackCooldown: number;
@@ -147,7 +160,27 @@ export interface WaveDefinition {
     spawnInterval: number;
 }
 
+export type CombatUpgradeStat = 'beamArmorBonus' | 'beamExecuteBonus' | 'litDeviceDamageBonus' | 'lighthouseDamageReduction' | 'lighthouseHeavyReduction' | 'lighthouseEmergencyReduction' | 'lighthouseWaveRepair' | 'shieldRestoreReduction';
+/** Stage A control-scenario rules; not enabled by the live purchase catalog. Angles are radians. */
+export interface QuickTurnRules {
+    speedBonus: number;
+    normalSpeedAngle: number;
+    fullBonusAngle: number;
+    durationSeconds: number;
+    fadeInSeconds: number;
+    fadeOutSeconds: number;
+    cooldownSeconds: number;
+}
+export interface ShieldStabilizationRules {
+    /** Also caps extra charge to this fraction of the charge absorbed by the depleting hit. */
+    regenerationBonus: number;
+    durationSeconds: number;
+}
 export interface NightConfig {
+    /** Explicit Stage A control selection; absent preserves legacy flash-only rules. */
+    ability?: CampaignAbilityRules;
+    lateMode?: LateNightMode;
+    progression?: Partial<Record<CombatUpgradeStat, number>>;
     id: string;
     rulesVersion: string;
     stepSeconds: number;
@@ -155,7 +188,7 @@ export interface NightConfig {
     spawnRadius: number;
     lighthouseRadius: number;
     lighthouseHealth: number;
-    beam: { range: number; halfAngle: number; damagePerSecond: number; maxTargets: number; turnSpeed: number };
+    beam: { range: number; halfAngle: number; damagePerSecond: number; maxTargets: number; turnSpeed: number; quickTurn?: QuickTurnRules };
     /** Bonus fraction only while at least two hostile zones are actually lit. */
     pairedDamageBonus?: number;
     waveInterval: number;
@@ -165,8 +198,8 @@ export interface NightConfig {
     enemies: Readonly<Record<EnemyKind, EnemyDefinition>>;
     waves: readonly WaveDefinition[];
     devices: DeviceRules;
-    shield: { radius: number; capacityPerGenerator: number; regenerationDelay: number; regenerationPerSecond: number };
-    flash: { radius: number; damage: number; stunDuration: number; cooldown: number; enabled?: boolean };
+    shield: { radius: number; capacityPerGenerator: number; regenerationDelay: number; regenerationPerSecond: number; stabilization?: ShieldStabilizationRules };
+    flash: { radius: number; damage: number; stunDuration: number; cooldown: number; enabled?: boolean; reloadAssist?: number; damagedArmorBonus?: number };
     /** Absent only in legacy/synthetic combat configurations. Land is x <= shoreX. */
     terrain?: { shoreX: number; landOnlyPlacement: boolean };
     /** Absent means unrestricted equipment for legacy combat fixtures. */
@@ -210,6 +243,7 @@ export interface EnemyState {
     targetDeviceId?: number | null;
     burn?: BurnState;
     bellSlows?: BellSlow[];
+    sealMark?: SealMark;
 }
 
 export interface WaveState {
@@ -231,6 +265,7 @@ export type CombatEventData = { x: number; y: number } & (
     | { type: 'wave-started' | 'wave-completed'; waveIndex: number; bonus: number; early: boolean }
     | { type: 'shield-hit'; damage: number }
     | { type: 'shield-broken' | 'shield-restored' | 'flash-used' }
+    | { type: 'ability-used'; abilityId: CampaignAbilityRules['abilityId'] }
     | { type: 'trap-triggered'; deviceId: number }
     | { type: 'mortar-impact'; deviceId: number; radius: number }
     | { type: 'bell-pulse'; deviceId: number; radius: number; multiplier: number }
@@ -246,6 +281,7 @@ export type CombatEventData = { x: number; y: number } & (
 export type CombatEvent = CombatEventData & { id: number; tick: number };
 
 export interface BattleState {
+    ability?: SelectedAbilityState;
     /** Bounded chronological history (256 facts); presentation ages it by simulation ticks. */
     events: CombatEvent[];
     nextEventId: number;
@@ -255,9 +291,13 @@ export interface BattleState {
     seed: number;
     rngState: number;
     lighthouseHealth: number;
+    emergencyUsed?: boolean;
+    emergencyUntilTick?: number;
     beamAngle: number;
     /** Desired direction; actual beamAngle moves toward it at beam.turnSpeed radians/s. */
     desiredBeamAngle: number;
+    /** Attempt-local burst/cooldown, measured only in simulation ticks. */
+    quickTurn?: { startedTick: number; untilTick: number; readyTick: number };
     /** Continuous illumination of one hostile zone, measured in simulation steps. */
     focus: { targetId: number | null; ticks: number };
     /** Continuous steps with at least two actually selected hostile hit zones. */
@@ -266,7 +306,8 @@ export interface BattleState {
     devices: DeviceState[];
     mortarProjectiles: MortarProjectile[];
     nextProjectileId: number;
-    shield: { current: number; maximum: number; recoveryRemaining: number };
+    shield: { current: number; maximum: number; recoveryRemaining: number; guardUntilTick?: number;
+        stabilizationPending?: boolean; stabilizationUntilTick?: number; stabilizationBudget?: number };
     flash: { cooldownRemaining: number; lastUsedTick: number | null };
     ship: ShipState | null;
     earnedRescue: number;
@@ -285,6 +326,7 @@ export interface BattleState {
 }
 
 export type BattleCommand = { type: 'aim'; angle: number } | { type: 'callWave' } | { type: 'flash' }
+    | { type: 'use-ability'; target?: { x: number; y: number; enemyId?: number } }
     | { type: 'cannon-priority'; deviceId: number; priority: CannonPriority }
     | { type: 'cannon-target'; deviceId: number; enemyId: number | null };
 
@@ -305,9 +347,14 @@ export type UpgradeId = 'beam-power-1' | 'beam-power-2' | 'beam-width-1' | 'beam
     | 'barrier-health-1' | 'barrier-health-2' | 'barrier-health-3' | 'barrier-guard' | 'barrier-charge-guard' | 'barrier-break-slow' | 'barrier-repair'
     | 'generator-health-1' | 'generator-health-2' | 'generator-health-3' | 'generator-guard-1' | 'generator-guard-2' | 'generator-residual' | 'generator-last-stand'
     | 'harpoon-damage-2' | 'harpoon-speed-2' | 'harpoon-slow' | 'harpoon-flying'
-    | 'trap-damage-1' | 'trap-damage-2' | 'trap-radius-1' | 'trap-radius-2' | 'trap-health' | 'trap-armor' | 'trap-second-charge';
+    | 'trap-damage-1' | 'trap-damage-2' | 'trap-radius-1' | 'trap-radius-2' | 'trap-health' | 'trap-armor' | 'trap-second-charge'
+    | 'beam-power-3' | 'beam-power-4' | 'beam-width-3' | 'beam-range-3' | 'beam-turn-3' | 'lighthouse-health-3' | 'lighthouse-health-4' | 'shield-capacity-2' | 'shield-regeneration-2' | 'flash-damage-2' | 'flash-cooldown-2' | 'paired-light-2'
+    | 'beam-power-5' | 'beam-power-6' | 'beam-width-4' | 'beam-width-5' | 'beam-range-4' | 'beam-range-5' | 'beam-turn-4' | 'beam-turn-5' | 'beam-turn-6' | 'lighthouse-health-5' | 'lighthouse-health-6' | 'shield-capacity-3' | 'shield-capacity-4' | 'shield-regeneration-3' | 'shield-regeneration-4' | 'paired-light-3'
+    | 'flash-damage-3' | 'flash-damage-4' | 'flash-radius-1' | 'flash-radius-2' | 'flash-stun-1' | 'flash-stun-2' | 'flash-cooldown-3' | 'device-objects-1' | 'device-objects-2' | 'engineering-repair-1' | 'engineering-repair-2' | 'engineering-repair-3'
+    | 'flash-radius-3' | 'flash-stun-3' | 'flash-ready' | 'flash-damaged-armor' | 'device-objects-3' | 'device-objects-4' | 'engineering-health-1' | 'engineering-health-2' | 'engineering-health-3' | 'engineering-aim-1' | 'engineering-aim-2' | 'engineering-recharge-1' | 'engineering-recharge-2'
+    | 'beam-armor-1' | 'beam-armor-2' | 'beam-armor-3' | 'beam-execute-1' | 'beam-execute-2' | 'beam-support-1' | 'beam-support-2' | 'hull-guard-1' | 'hull-guard-2' | 'hull-guard-3' | 'hull-emergency-1' | 'hull-emergency-2' | 'hull-emergency-3' | 'hull-wave-repair-1' | 'hull-wave-repair-2' | 'hull-heavy-1' | 'hull-heavy-2' | 'shield-delay-1' | 'shield-delay-2' | 'shield-delay-3' | 'shield-radius-1' | 'shield-radius-2' | 'shield-radius-3' | 'shield-restore-1' | 'shield-restore-2';
 export type BeamStat = 'damagePerSecond' | 'halfAngle' | 'range';
-export type UpgradeStat = BeamStat | DeviceKind | 'flash' | 'typeSlots' | 'pairedDamageBonus'
+export type UpgradeStat = CombatUpgradeStat | 'shieldDelayReduction' | 'shieldRadius' | 'flashReloadAssist' | 'flashDamagedArmorBonus' | 'deviceHealthBonus' | 'rechargeCostReduction' | 'flashRadius' | 'flashStunDuration' | 'maxObjects' | 'repairCostReduction' | BeamStat | DeviceKind | 'flash' | 'typeSlots' | 'pairedDamageBonus'
     | 'turnSpeed' | 'lighthouseHealth' | 'shieldCapacity' | 'shieldRegeneration' | 'flashDamage' | 'flashCooldownReduction'
     | 'cannonDamage' | 'cannonIntervalReduction' | 'cannonRange' | 'harpoonDamage' | 'harpoonIntervalReduction' | 'harpoonRange'
     | 'mortarDamage' | 'mortarBlastRadius' | 'mortarProjectileSpeed' | 'mortarIntervalReduction' | 'mortarArmorMultiplier'
@@ -351,6 +398,7 @@ export interface Profile {
 }
 
 export interface AttemptRecord {
+    lateMode?: LateNightMode;
     /** Base-normalized HP (unchanged since v5), matching OwnedDevice exactly; not combat HP. */
     deviceSnapshot?: DeviceDeployment[];
     /** Only migrated, already paid attempts may retain a rental refund. */
@@ -384,6 +432,7 @@ export interface SaveStore {
 }
 
 export interface NightResult {
+    lateMode?: LateNightMode;
     attemptId: string;
     outcome: 'victory' | 'defeat';
     resources: number;
@@ -399,13 +448,14 @@ export interface NightResult {
     bossDefeated: boolean;
 }
 
-export type ApplicationScreen = 'menu' | 'development' | 'settings' | 'preparation' | 'battle' | 'result';
+export type ApplicationScreen = 'menu' | 'game-menu' | 'trials' | 'development' | 'settings' | 'preparation' | 'battle' | 'result';
 export type TextSize = 'normal' | 'large';
 export type LanguagePreference = 'auto' | 'ru' | 'en';
 export interface AudioSettings { soundEnabled: boolean; musicVolume: number; effectsVolume: number }
 export interface UserSettings extends AudioSettings { textSize: TextSize; language: LanguagePreference }
 
 export interface ApplicationView {
+    lateNightModes?: readonly LateNightModeOption[];
     screen: ApplicationScreen;
     hasProgress: boolean;
     settings: Readonly<UserSettings>;
@@ -431,6 +481,12 @@ export interface GameApplication {
     start(): void;
 
     openPreparation(): void;
+    openGameMenu(): void;
+    continueGame(): void;
+    openTrials(): void;
+    /** Reset an existing campaign only after an explicit UI confirmation. */
+    startNewGame(confirmedReset?: boolean): void;
+    cancelNewGame(): void;
     openMainMenu(): void;
     openDevelopment(): void;
     openSettings(): void;
@@ -450,6 +506,7 @@ export interface GameApplication {
     repairDevice(id: number): void;
     rechargeDevice(id: number): void;
     selectNight(id: NightId): void;
+    selectLateMode(mode: LateNightMode): void;
     selectLens(id: LensId): void;
     purchaseLens(id: LensId): void;
     purchaseLensUpgrade(id: LensUpgradeId): void;

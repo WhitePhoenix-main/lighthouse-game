@@ -1,3 +1,4 @@
+import { createLateNights } from './lateNights';
 import type { NightDefinition } from '../contracts';
 import { getBossRules } from './boss';
 import { NIGHT_CONFIG } from './night';
@@ -48,8 +49,9 @@ export const NIGHT_CATALOG: readonly NightDefinition[] = [
       {id:'new-current',enemies:['ghost','bat','ghost','turtle','ghost','ghost','ghost','minotaur','ghost','turtle','ghost','ghost'],spawnInterval:3.2},
       {id:'new-dawn',enemies:['ghost','bat','ghost','turtle','ghost','ghost','ghost','minotaur','ghost','turtle','ghost','ghost'],spawnInterval:3.2},
     ]} },
+  ...createLateNights(base),
 ];
-export const NIGHT_IDS = ['first-light', 'broken-shore', 'winged-tide', 'rescue-trial', 'abyss-warden', 'far-shore'] as const;
+export const NIGHT_IDS = ['first-light', 'broken-shore', 'winged-tide', 'rescue-trial', 'abyss-warden', 'far-shore', 'armored-front', 'sky-siege', 'cross-current'] as const;
 export function validateNightDefinitions(nights: readonly NightDefinition[]): void {
   if (nights.length === 0) throw new Error('Пустой каталог ночей.');
   const byId = new Map(nights.map(night => [night.id, night]));

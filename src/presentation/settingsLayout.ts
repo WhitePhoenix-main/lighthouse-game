@@ -119,7 +119,7 @@ export function settingsLayout(viewportWidth: number, viewportHeight: number, te
   const minimumHeight = desktopRows(0).back + backHeight + 40;
   const extraHeight = Math.max(0, viewportHeight / scale - minimumHeight);
   // Ignore subpixel aspect-ratio rounding at the reference ratio.
-  const gap = extraHeight >= 1 ? extraHeight / 6 : 0;
+  const gap = extraHeight >= 1 ? Math.min(extraHeight / 6, 8 / scale) : 0;
   const { sound, music, effects, firstDivider, languageHeading, language, text, lastDivider, footer, back } = desktopRows(gap);
   return {
     orientation, compact, mobile, width, scale, textScale,

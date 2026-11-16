@@ -33,7 +33,7 @@ function eventCue(event: CombatEvent): Cue {
         case 'shield-hit': return 'shield';
         case 'generator-residual': case 'barrier-slow': case 'bell-pulse': return 'shield';
         case 'generator-saved': case 'device-repaired': case 'shield-restored': return 'restore';
-        case 'mortar-impact': case 'flash-used': case 'trap-triggered': case 'boss-stunned': return 'flash';
+        case 'ability-used': case 'mortar-impact': case 'flash-used': case 'trap-triggered': case 'boss-stunned': return 'flash';
         case 'wave-started': case 'charge-started': return 'wave';
         case 'wave-completed': case 'ship-rescued': case 'boss-died': return 'success';
     }

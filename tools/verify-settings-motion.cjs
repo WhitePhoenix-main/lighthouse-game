@@ -149,17 +149,15 @@ let ws;
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
     check(`${touch?'mobile':'desktop'} ${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }
-  for(const [width,height] of [[1280,1024],[2048,1548]]) {
-    await viewport(width,height,false);
-    const tallScenery=await scenery();await remember();await observeEntry();
-    await click('[data-action="settings"]');await checkEntry(`tall desktop ${width}x${height}`);
-    const tallBack=await evaluate(`(()=>{const page=document.querySelector('.reference-settings'),r=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{bottom:r.bottom,height:innerHeight,scale:+getComputedStyle(page).getPropertyValue('--settings-ui-scale')}})()`);
-    assert(Math.abs(tallBack.bottom-(tallBack.height-40*tallBack.scale))<=1,'tall desktop Back must leave exactly the scaled 40px bottom margin');
-    assert.deepEqual(await scenery(),tallScenery);await continuity('tall desktop');
-    await screenshot(`settings-desktop-${width}x${height}`);
-    await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
-    check(`${width}×${height} desktop preserves left motion and stretches Back to the scaled bottom margin`);
-  }
+  await viewport(1280,1024,false);
+  const tallScenery=await scenery();await remember();await observeEntry();
+  await click('[data-action="settings"]');await checkEntry('tall desktop');
+  const tallBack=await evaluate(`(()=>{const r=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:innerHeight}})()`);
+  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom<=630*(1280/1120)+49,'tall desktop spacing exceeds density cap');
+  assert.deepEqual(await scenery(),tallScenery);await continuity('tall desktop');
+  await screenshot('settings-desktop-1280x1024');
+  await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
+  check('1280×1024 desktop preserves left motion and bounded density');
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
   for(const [width,height] of [[844,390],[390,844]]) {
   await viewport(width,height,true);

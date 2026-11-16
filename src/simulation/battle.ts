@@ -1,15 +1,21 @@
+import { damageLighthouse, healLighthouseAfterWave } from './lighthouse';
+import { finishingLightMultiplier } from './lightSupport';
 import type { BattleCommand, BattleState, DeviceDeployment, DevicePlacement, NightConfig, RandomSource } from '../contracts';
 import { angleDifference, selectBeamTargets } from './beam';
+import { advanceBeamTurn } from './beamTurning';
 import { damageEnemy, fireCannons, moveEnemies } from './devices';
 import { attackTentacles, createBoss, damageBoss, moveTentacles } from './boss';
 import { emitCombatEvent } from './events';
 import { triggerTraps, useFlash } from './abilities';
-import { delayShieldRecovery, hitShield, isProtected, updateShield } from './shield';
+import { hitShield, isProtected, updateShield } from './shield';
 import { updateBurning } from './burning';
 import { updateMortars } from './mortar';
 import { updateBells } from './bell';
 import { updateRepairLamps } from './repair';
 import { damageDevice } from './deviceDamage';
+import { createSelectedAbility, useSelectedAbility } from './selectedAbility';
+import { overloadBeamMultipliers } from './abilityEffects';
+import { updateSeal } from './seal';
 
 const injectedRandom = new WeakMap<BattleState, RandomSource>();
 const EPSILON = 1e-9;
@@ -72,6 +78,7 @@ export function createBattle(config: NightConfig, seed: number, random?: RandomS
     attackCooldown: 0, lastShot: null, priority: 'nearest' as const, targetId: null }));
   const shieldCapacity = devices.filter(device => device.kind === 'generator' && device.health > 0).length * config.shield.capacityPerGenerator;
   const state: BattleState = {
+    ...(config.ability ? { ability: createSelectedAbility(config)! } : {}),
     events: [], nextEventId: 1,
     tick: 0, elapsed: 0, outcome: 'playing', seed: seed >>> 0, rngState: seed >>> 0,
     lighthouseHealth: config.lighthouseHealth, beamAngle: -Math.PI / 2, desiredBeamAngle: -Math.PI / 2,
@@ -94,10 +101,15 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   if (state.outcome !== 'playing') return;
   state.flash.cooldownRemaining = Math.max(0, state.flash.cooldownRemaining - config.stepSeconds);
   updateShield(state, config);
+  const barrages: Extract<BattleCommand, { type: 'use-ability' }>[] = [];
   for (const command of commands) {
     if (command.type === 'aim' && Number.isFinite(command.angle)) state.desiredBeamAngle = angleDifference(command.angle, 0);
     if (command.type === 'callWave') startWave(state, config, true);
     if (command.type === 'flash') useFlash(state, config);
+    if (command.type === 'use-ability') {
+      if (config.ability?.abilityId === 'barrage') barrages.push(command);
+      else useSelectedAbility(state, config, command);
+    }
     if (command.type === 'cannon-priority' || command.type === 'cannon-target') {
       const cannon = state.devices.find(device => device.id === command.deviceId && (device.kind === 'cannon' || device.kind === 'harpoon' || device.kind === 'mortar') && device.health > 0 && !device.consumed);
       if (!cannon) continue;
@@ -108,10 +120,9 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   if (state.elapsed + EPSILON >= state.nextWaveAt) startWave(state, config, false);
   spawnDue(state, config);
   const dt = config.stepSeconds;
-  const turn = angleDifference(state.desiredBeamAngle, state.beamAngle);
-  const maxTurn = config.beam.turnSpeed * dt;
-  state.beamAngle = angleDifference(state.beamAngle + Math.max(-maxTurn, Math.min(maxTurn, turn)), 0);
+  advanceBeamTurn(state, config);
   updateBells(state, config);
+  updateSeal(state, config);
   const beforeMovement = selectBeamTargets(state.enemies, config, state.beamAngle, state.ship, state.boss);
   const contacts = moveEnemies(state, config, beforeMovement.lit);
   const tentacleContacts = moveTentacles(state, config, beforeMovement.litTentacles ?? []);
@@ -148,15 +159,20 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   // Keep holding the group even as its members change; ships and residual burn never count.
   state.resonance.ticks = resonance && paired ? state.resonance.ticks + 1 : 0;
   const resonanceBonus = resonance && state.resonance.ticks > Math.ceil(resonance.seconds / dt - EPSILON) ? resonance.damageBonus : 0;
-  const beamMultiplier = ((paired ? 1 + (config.pairedDamageBonus ?? 0) : 1) + resonanceBonus) * focusMultiplier;
+  const beamFactors = overloadBeamMultipliers(state, config, (paired ? 1 + (config.pairedDamageBonus ?? 0) : 1) + resonanceBonus);
+  const beamMultiplier = beamFactors.health * focusMultiplier;
+  const overloadArmorRatio = beamFactors.armor === beamFactors.health ? 1 : beamFactors.armor / beamFactors.health;
   for (const enemy of state.enemies) {
     if (selection.lit.includes(enemy.id)) {
-      damageEnemy(enemy, config.beam.damagePerSecond * dt * beamMultiplier, state, config.lens?.armorMultiplier ?? 1);
+      damageEnemy(enemy, config.beam.damagePerSecond * dt * beamMultiplier * finishingLightMultiplier(config, enemy.health, config.enemies[enemy.kind].health), state,
+        ((config.lens?.armorMultiplier ?? 1) + (config.progression?.beamArmorBonus ?? 0)) * overloadArmorRatio);
     }
   }
+  const bossFinisher = state.boss && config.boss ? finishingLightMultiplier(config, state.boss.health, config.boss.health) : 1;
   for (const zone of state.boss?.tentacles ?? []) {
-    if (selection.litTentacles?.includes(zone.id)) damageBoss(state, config.beam.damagePerSecond * dt * beamMultiplier, zone);
+    if (selection.litTentacles?.includes(zone.id)) damageBoss(state, config.beam.damagePerSecond * dt * beamMultiplier * bossFinisher, zone);
   }
+  for (const command of barrages) useSelectedAbility(state, config, command);
   fireCannons(state, config);
   updateMortars(state, config);
   updateBurning(state, config);
@@ -178,19 +194,13 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
     if (device === 'shield') {
       // Another attacker may have exhausted the field earlier in this step.
       if (state.shield.current <= 0) continue;
-      hitShield(state, config, attackDamage, enemy.x, enemy.y);
+      hitShield(state, config, attackDamage, enemy.x, enemy.y, charging);
     } else if (device) {
       if (device.health <= 0 || device.consumed) continue;
       if (state.shield.current > 0 && isProtected(device, config)) continue;
       damageDevice(state, config, device, attackDamage, charging);
     } else if (Math.hypot(enemy.x, enemy.y) <= config.lighthouseRadius + definition.radius + EPSILON) {
-      const healthBefore = state.lighthouseHealth;
-      state.lighthouseHealth = Math.max(0, state.lighthouseHealth - definition.attackDamage);
-      const damage = healthBefore - state.lighthouseHealth;
-      if (damage > 0) {
-        delayShieldRecovery(state, config);
-        emitCombatEvent(state, { type: 'lighthouse-hit', damage, x: 0, y: 0 });
-      }
+      damageLighthouse(state, config, definition.attackDamage, charging);
     } else continue;
     if (charging) {
       enemy.chargePhase = 'spent';
@@ -203,6 +213,7 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   state.waves.forEach((wave, index) => {
     if (wave.started && !wave.completed && wave.defeated === config.waves[index]!.enemies.length) {
       wave.completed = true;
+      healLighthouseAfterWave(state, config);
       state.earnedBonus += wave.earlyBonus;
       emitCombatEvent(state, { type: 'wave-completed', waveIndex: index, bonus: wave.earlyBonus, early: wave.startedEarly, x: 0, y: 0 });
     }

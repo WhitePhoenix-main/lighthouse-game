@@ -1,9 +1,12 @@
+import { lightGuidanceMultiplier, overloadGuidanceBonus } from './lightSupport';
+import type { BarrageAbilityRules } from '../abilityRules';
 import type { BattleState, DeviceState, EnemyState, NightConfig } from '../contracts';
 import { emitCombatEvent } from './events';
 import { contactFraction } from './geometry';
 import { damageBoss } from './boss';
 import { isProtected } from './shield';
 import { applyMovementSlow, movementSlowMultiplier } from './slows';
+import { sealSlowMultiplier } from './seal';
 
 const EPSILON = 1e-9;
 
@@ -56,7 +59,8 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
       }
     }
     const speed = enemy.chargePhase === 'charging' && definition.charge ? definition.charge.speed : definition.speed;
-    const multiplier = Math.min(movementSlowMultiplier(enemy, state.tick), litIds.includes(enemy.id) ? config.lens?.slowMultiplier ?? 1 : 1);
+    const multiplier = Math.min(movementSlowMultiplier(enemy, state.tick), litIds.includes(enemy.id) ? config.lens?.slowMultiplier ?? 1 : 1,
+      sealSlowMultiplier(enemy, state, config));
     const nextDistance = Math.max(targetRadius + definition.radius, distance - speed * dt * multiplier);
     const scale = distance > nextDistance ? nextDistance / distance - 1 : 0;
     const dx = (enemy.x - targetX) * scale, dy = (enemy.y - targetY) * scale;
@@ -91,7 +95,8 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
 
 export function fireCannons(state: BattleState, config: NightConfig): void {
   for (const cannon of [...state.devices].sort((a, b) => a.id - b.id)) {
-    if ((cannon.kind !== 'cannon' && cannon.kind !== 'harpoon') || cannon.health <= 0 || cannon.consumed) continue;
+    if ((cannon.kind !== 'cannon' && cannon.kind !== 'harpoon') || cannon.health <= 0 || cannon.consumed
+      || state.tick < (cannon.suppressedUntilTick ?? 0)) continue;
     const zones = state.boss && state.boss.health > 0 ? state.boss.tentacles.map(zone => ({ ...zone, health: state.boss!.health, armor: 0 })) : [];
     const candidates = [...state.enemies.filter(enemy => enemy.health > 0 && (cannon.kind === 'harpoon' || enemy.kind !== 'bat')), ...zones];
     const manual = candidates.find(target => target.id === cannon.targetId);
@@ -105,25 +110,59 @@ export function fireCannons(state: BattleState, config: NightConfig): void {
     available.sort((a, b) => score(a) - score(b) || a.id - b.id);
     const target = available[0];
     if (!target) continue;
-    const enemy = state.enemies.find(enemy => enemy.id === target.id);
-    // All boss hit zones share key 0: switching tentacles cannot repeat the bonus.
-    const ownerKey = enemy ? enemy.id : 0;
-    const bonus = cannon.kind === 'cannon' && manual && !(cannon.manualBonusTargets ?? []).includes(ownerKey)
-      ? config.devices.cannon.manualDamageBonus : 0;
-    const flyingBonus = cannon.kind === 'harpoon' && enemy && config.enemies[enemy.kind].movement === 'flying'
-      ? config.devices.harpoon.flyingDamageMultiplier : 1;
-    const damage = definition.damage * (1 + bonus) * flyingBonus;
-    if (enemy) damageEnemy(enemy, damage, state, cannon.kind === 'cannon' ? config.devices.cannon.armorMultiplier : 1);
-    else damageBoss(state, damage, target);
-    if (cannon.kind === 'harpoon' && config.devices.harpoon.slowMultiplier < 1 && config.devices.harpoon.slowSeconds > 0) {
-      const slowTarget = enemy ?? state.boss?.tentacles.find(zone => zone.id === target.id);
-      // Shots follow movement, so preserve the full duration on following steps.
-      if (slowTarget) applyMovementSlow(slowTarget, cannon.id,
-        state.tick + 1 + Math.ceil(config.devices.harpoon.slowSeconds / config.stepSeconds - EPSILON),
-        config.devices.harpoon.slowMultiplier, state.tick);
-    }
-    if (bonus > 0) cannon.manualBonusTargets = [...(cannon.manualBonusTargets ?? []), ownerKey];
-    cannon.attackCooldown = definition.attackInterval;
-    cannon.lastShot = { tick: state.tick, x: target.x, y: target.y };
+    fireDirectWeapon(state, config, cannon, target.id, Boolean(manual));
   }
+}
+
+/** Shares ordinary/manual weapon semantics with the extra aimed attack. */
+export function fireDirectWeapon(state: BattleState, config: NightConfig, cannon: DeviceState,
+  targetId: number, manual: boolean, barrage?: BarrageAbilityRules): boolean {
+  if ((cannon.kind !== 'cannon' && cannon.kind !== 'harpoon') || cannon.health <= 0 || cannon.consumed
+    || state.tick < (cannon.suppressedUntilTick ?? 0)) return false;
+  const enemy = state.enemies.find(enemy => enemy.id === targetId && enemy.health > 0);
+  const zone = state.boss && state.boss.health > 0 ? state.boss.tentacles.find(zone => zone.id === targetId) : undefined;
+  const target = enemy ?? zone;
+  if (!target || (enemy?.kind === 'bat' && cannon.kind === 'cannon')) return false;
+  const definition = config.devices.definitions[cannon.kind];
+  if (Math.hypot(target.x - cannon.x, target.y - cannon.y) > definition.range + EPSILON) return false;
+  const ownerKey = enemy ? enemy.id : 0;
+  const bonus = cannon.kind === 'cannon' && manual && !(cannon.manualBonusTargets ?? []).includes(ownerKey)
+    ? config.devices.cannon.manualDamageBonus : 0;
+  const airborne = Boolean(enemy && config.enemies[enemy.kind].movement === 'flying');
+  const flyingBonus = cannon.kind === 'harpoon' && airborne ? config.devices.harpoon.flyingDamageMultiplier : 1;
+  const modifiers = barrageDamageMultipliers(state, config, target.id, barrage, bonus,
+    cannon.kind === 'harpoon' && airborne ? barrage?.airDamageBonus ?? 0 : 0);
+  const damage = barrage || overloadGuidanceBonus(state, config, target.id) > 0 ? definition.damage * flyingBonus * modifiers.health
+    : definition.damage * (1 + bonus) * flyingBonus * lightGuidanceMultiplier(state, config, target.id);
+  const armorRatio = modifiers.armor === modifiers.health ? 1 : modifiers.armor / modifiers.health;
+  if (enemy) damageEnemy(enemy, damage, state,
+    (cannon.kind === 'cannon' ? config.devices.cannon.armorMultiplier : 1) * armorRatio);
+  else damageBoss(state, damage, target);
+  if (cannon.kind === 'harpoon' && config.devices.harpoon.slowMultiplier < 1 && config.devices.harpoon.slowSeconds > 0) {
+    applyMovementSlow(target, cannon.id,
+      state.tick + 1 + Math.ceil(config.devices.harpoon.slowSeconds / config.stepSeconds - EPSILON),
+      config.devices.harpoon.slowMultiplier, state.tick);
+  }
+  if (bonus > 0) cannon.manualBonusTargets = [...(cannon.manualBonusTargets ?? []), ownerKey];
+  cannon.attackCooldown = definition.attackInterval;
+  cannon.lastShot = { tick: state.tick, x: target.x, y: target.y };
+  return true;
+}
+
+/** Ability bonuses add within their cap; existing conditional bonuses share one group. */
+export function barrageDamageMultipliers(state: BattleState, config: NightConfig, targetId: number,
+  barrage?: Pick<BarrageAbilityRules, 'damageBonus' | 'litDamageBonus' | 'armorDamageBonus' | 'damageBonusCap'>,
+  manualBonus = 0, airBonus = 0): { health: number; armor: number } {
+  const common = lightGuidanceMultiplier(state, config, targetId) - 1;
+  if (!barrage) {
+    // Preserve all old gains, then add the new guidance once, without multiplying it by manual bonuses.
+    const lit = state.litEnemyIds.includes(targetId) || state.litTentacleIds.includes(targetId);
+    const legacy = (1 + manualBonus) * (lit ? 1 + (config.progression?.litDeviceDamageBonus ?? 0) : 1)
+      + overloadGuidanceBonus(state, config, targetId);
+    return { health: legacy, armor: legacy };
+  }
+  const lit = state.litEnemyIds.includes(targetId) || state.litTentacleIds.includes(targetId);
+  const bonus = barrage.damageBonus + airBonus + (lit ? barrage.litDamageBonus : 0);
+  return { health: 1 + common + manualBonus + Math.min(barrage.damageBonusCap, bonus),
+    armor: 1 + common + manualBonus + Math.min(barrage.damageBonusCap, bonus + barrage.armorDamageBonus) };
 }

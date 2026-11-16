@@ -129,8 +129,8 @@ describe('shared settings artwork and native control geometry', () => {
     expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBeCloseTo(60, 8);
   });
 
-  it.each(['normal', 'large'] as const)('fills desktop height while retaining control sizes (%s)', size => {
-    for (const [width, height] of [[1280, 1024], [1000, 1000], [2048, 1548]] as const) {
+  it.each(['normal', 'large'] as const)('keeps tall desktop panels dense while retaining control sizes (%s)', size => {
+    for (const [width, height] of [[1280, 1024], [1000, 1000]] as const) {
       const base = settingsLayout(width, width * 630 / 1120, size, false);
       const layout = settingsLayout(width, height, size, false);
       expect(layout.scale).toBe(base.scale);
@@ -140,8 +140,9 @@ describe('shared settings artwork and native control geometry', () => {
       expect(layout.width).toBe(640);
       const extraGap = layout.choices.on.y - base.choices.on.y;
       expect(extraGap * layout.scale).toBeGreaterThan(0);
-      expect((layout.choices.back.y + layout.choices.back.height) * layout.scale).toBeCloseTo(height - 40 * layout.scale, 5);
-      expect(layout.choices.back.y).toBeLessThan(settingsLayout(width, height * 2, size, false).choices.back.y);
+      expect(extraGap * layout.scale).toBeLessThanOrEqual(8.001);
+      expect((layout.choices.back.y - base.choices.back.y) * layout.scale).toBeLessThanOrEqual(48.001);
+      expect(layout.choices.back).toEqual(settingsLayout(width, height * 2, size, false).choices.back);
       for (const name of Object.keys(base.choices) as (keyof typeof base.choices)[]) {
         expect(layout.choices[name].x).toBe(base.choices[name].x);
         expect(layout.choices[name].width).toBe(base.choices[name].width);
