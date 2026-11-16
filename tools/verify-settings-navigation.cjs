@@ -10,6 +10,10 @@ const testBrowser = createTestBrowser(out);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const checks = [], runtimeErrors = [];
 const timelines = [];
+const timeline = value => {
+  timelines.push(value);
+  fs.writeFileSync(path.join(out,'timelines.json'),JSON.stringify(timelines,null,2));
+};
 const check = name => { checks.push(name); console.log(name); };
 let ws;
 (async () => {
@@ -87,9 +91,11 @@ let ws;
   const record = () => evaluate(`(()=>{
     window.navFrames=[]; const token=window.navToken=(window.navToken||0)+1;
     function sample(){
-      const p=document.querySelector('.reference-settings'),m=document.querySelector('.menu-artboard'),b=p?.querySelector('.settings-board'),s=p?.querySelector('.settings-scrim');
+      const p=document.querySelector('.reference-settings'),g=document.querySelector('[data-settings-menu-ghost]'),ghost=g?.querySelector('.settings-menu-outgoing'),m=ghost||document.querySelector('.menu-artboard'),b=p?.querySelector('.settings-board'),s=p?.querySelector('.settings-scrim');
       const style=b&&getComputedStyle(b), menu=m&&getComputedStyle(m);
-      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:m?.dataset.menuTransition,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,exitDuration:b?.getAnimations()[0]?.effect.getTiming().duration,menuDuration:m?.getAnimations()[0]?.effect.getTiming().duration});
+      const timing=e=>{const a=e?.getAnimations()[0];return a?{start:a.startTime,time:a.currentTime,duration:a.effect.getTiming().duration,state:a.playState}:null};
+      const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);
+      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?'out':m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
       if(token===navToken)requestAnimationFrame(sample);
     } sample();requestAnimationFrame(sample);
   })()`);
@@ -99,18 +105,38 @@ let ws;
     assert(result.same&&result.animations&&result.phases,`${label}: backdrop DOM, CSSAnimation identity or playheads reset: ${JSON.stringify(result)}`);
     await evaluate('navTimes=navAnimations.map(a=>a.currentTime)');
   };
-  const open = async (touch=false,keyboard=false) => {
+  const open = async (touch=false,keyboard=false,holdArtwork=false) => {
     await menuReady(); await record();
+    if(holdArtwork)await evaluate(`(()=>{window.navImageSource=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');window.navHeldImages=[];Object.defineProperty(HTMLImageElement.prototype,'src',{...navImageSource,set(value){if(String(value).includes('menu-buttons-v2/'))navHeldImages.push([this,value]);else navImageSource.set.call(this,value)}})})()`);
     if(keyboard){if(keyboard!=='restored')await evaluate(`document.querySelector('[data-action="settings"]').focus()`);await key('Enter');}
     else await click('[data-action="settings"]',touch);
+    if(holdArtwork){
+      await wait(`document.querySelector('.reference-settings')?.dataset.entering==='pending'`);
+      await sleep(180);
+      assert.equal(await evaluate('settingsTest.application.view.screen'),'settings','route did not commit immediately while artwork was pending');
+      assert((await evaluate('navHeldImages.length'))>0,'artwork readiness gate was not exercised');
+      await evaluate(`Object.defineProperty(HTMLImageElement.prototype,'src',navImageSource);for(const [image,value] of navHeldImages)navImageSource.set.call(image,value)`);
+    }
     await ready(); await sleep(40);
     const frames=await evaluate('navFrames'),out=frames.filter(f=>f.menu==='out');
-    timelines.push({phase:'open',frames});
-    assert(out.length>=3,'menu outro has no rendered frames');
-    assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05),'menu title/buttons did not fade');
-    assert(out.every(f=>f.menuDuration===220),'menu outro duration must be 220ms');
-    assert(out.every(f=>!f.enter&&(!f.screen||f.screen==='menu')),'settings route committed during menu outro');
-    assert(frames.some(f=>f.enter==='true'&&f.x<0&&f.opacity<1),'settings entry absent');
+    timeline({phase:'open',frames});
+    assert(out.length>=3,'menu ghost has no rendered frames');
+    assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05&&f.enter==='true'&&f.x<0&&f.opacity>0&&f.opacity<1),'menu ghost fade and settings slide/fade did not share a frame');
+    assert(out.every(f=>!f.screen||f.screen==='settings'),'settings route was delayed until after menu outro');
+    const moving=frames.filter(f=>f.enter==='true');
+    assert(moving.length>=3,'settings entry absent');
+    assert(moving.every(f=>f.ghost&&f.menuDuration===420&&f.boardTiming?.duration===420&&f.scrimTiming?.duration===420),'all three entrance animations must run together for 420ms');
+    for(const f of moving){
+      const timings=[f.boardTiming,f.scrimTiming,f.menuTiming];
+      const starts=timings.map(a=>a.start),times=timings.map(a=>a.time);
+      if(starts.every(t=>typeof t==='number'))assert(Math.max(...starts)-Math.min(...starts)<1,'entrance animation start times differ');
+      if(times.every(t=>typeof t==='number'))assert(Math.max(...times)-Math.min(...times)<1,'entrance animation playheads differ');
+      assert(Math.abs(f.menuOpacity+f.opacity-1)<.015&&Math.abs(f.scrim-f.opacity)<.015,'menu/board/scrim opacity diverged or left an empty gap');
+    }
+    const pending=frames.filter(f=>f.enter==='pending');
+    assert(pending.every(f=>f.ghost&&f.menuOpacity===1&&f.opacity===0),'ghost did not cover settings asset readiness');
+    assert(frames.filter(f=>f.settingsPages).every(f=>f.settingsPages===1&&f.settingsControls===10&&f.menuActions===0&&!f.duplicateIds&&f.ghostSafe&&f.ghostSibling),'duplicate settings controls/IDs/actions or unsafe ghost');
+    assert.equal(frames.at(-1).ghost,false,'settled settings retained outgoing ghost');
     await continuity('open');
     return frames;
   };
@@ -124,7 +150,7 @@ let ws;
     assert.equal(await evaluate('window.settingsTest?.application.view.screen||"settings"'),'settings','route changed before exit finished');
     await menuReady(); await sleep(40);
     const frames=await evaluate('navFrames'),exit=frames.filter(f=>f.exit==='true'),intro=frames.filter(f=>f.menu==='in');
-    timelines.push({phase:'close',frames});
+    timeline({phase:'close',frames});
     assert(exit.length>=3,'settings exit has no rendered frames');
     assert(exit.every(f=>f.exitDuration===420),'settings exit duration must be 420ms');
     assert(exit.every(f=>!f.screen||f.screen==='settings'),'route changed while exiting');
@@ -144,7 +170,7 @@ let ws;
     await trigger();
     await wait(`document.querySelector(${JSON.stringify(selector)})?.dataset[${JSON.stringify(attribute)}]===${JSON.stringify(value)} && !!document.querySelector('.menu-motion-paused')`);
     await sleep(50);
-    const state=()=>evaluate(`({screen:settingsTest.application.view.screen,back:settingsTest.backCalls,board:document.querySelector(${JSON.stringify(selector)})?.outerHTML,styles:[...document.querySelectorAll('.menu-artboard,.settings-board,.settings-scrim')].map(e=>{const s=getComputedStyle(e);return[s.transform,s.opacity]}),times:navAnimations.map(a=>a.currentTime)})`);
+    const state=()=>evaluate(`({screen:settingsTest.application.view.screen,back:settingsTest.backCalls,board:document.querySelector(${JSON.stringify(selector)})?.outerHTML,styles:[...document.querySelectorAll('.menu-artboard,.settings-menu-outgoing,.settings-board,.settings-scrim')].map(e=>{const s=getComputedStyle(e);return[s.transform,s.opacity]}),times:navAnimations.map(a=>a.currentTime)})`);
     const paused=await state();await sleep(250);assert.deepEqual(await state(),paused,`${value}: blur did not freeze navigation and backdrop`);
     await evaluate(`window.dispatchEvent(new Event('focus'))`);
   };
@@ -156,7 +182,7 @@ let ws;
   await evaluate(`settingsTest.backCalls=0;settingsTest.originalBack=settingsTest.application.back.bind(settingsTest.application);settingsTest.application.back=()=>{settingsTest.backCalls++;return settingsTest.originalBack()}`);
   assert((await remember())>10,'ambient CSS animations absent');
   for(const [w,h] of [[1280,720],[390,844],[844,390]]) {
-    await viewport(w,h);await open(w<900,w===1280);await screenshot(`settings-${w}x${h}`);
+    await viewport(w,h);await open(w<900,w===1280,w===1280);await screenshot(`settings-${w}x${h}`);
     await evaluate(`document.querySelector('[data-action="music-volume"]').focus({preventScroll:true})`);
     await key('Home');await key('ArrowRight');
     assert.equal(await evaluate(`+document.querySelector('[data-action="music-volume"]').value`),1,'native range keys');
@@ -166,33 +192,50 @@ let ws;
     // No explicit .focus(): Enter must activate the button restored by navigation.
     await open(false,'restored');await close(true);
     await screenshot(`roundtrip-${w}x${h}`);
-    check(`${w}×${h}: menu outro → settings entry → Back/Escape exit → menu intro; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
+    check(`${w}×${h}: synchronous menu fade/settings entry → Back/Escape exit → menu intro; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
   }
+  // Force a real locale rerender while all three entrance animations are live.
+  await evaluate(`(()=>{window.navRerendered=false;window.navRerenderObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p?.dataset.entering==='true'){navRerenderObserver.disconnect();window.navOldBoard=p.querySelector('.settings-board');window.navOldGhost=document.querySelector('[data-settings-menu-ghost]');requestAnimationFrame(()=>requestAnimationFrame(()=>{settingsTest.application.setLanguage('en');window.navRerendered=true}))}});navRerenderObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,childList:true})})()`);
+  const rerenderFrames=await open(true);
+  assert.equal(await evaluate('navRerendered&&navOldBoard!==document.querySelector(".settings-board")'),true,'locale rerender during entry was not exercised');
+  const rerenderMoving=rerenderFrames.filter(f=>f.enter==='true');
+  assert(rerenderMoving.every((f,i)=>!i||f.boardTiming.time>=rerenderMoving[i-1].boardTiming.time),'rerender reset the shared entrance playhead');
+  await close(true);check('locale rerender retains synchronous entrance playheads and cleans up ghost');
   await open(true);await viewport(390,844);await ready();await viewport(844,390);await ready();await close(false,true);
-  await pausePhase('.menu-artboard','menuTransition','out',()=>click('[data-action="settings"]'));
+  await pausePhase('.reference-settings','entering','true',()=>click('[data-action="settings"]'));
+  assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),true,'paused entry lost ghost');
   await ready();await continuity('paused menu outro resumed');
   await pausePhase('.reference-settings','exiting','true',()=>key('Escape'));
   await menuReady();await continuity('paused exit resumed');
   await open(true);
   await pausePhase('.menu-artboard','menuTransition','in',()=>key('Escape'));
   await menuReady();await continuity('paused menu intro resumed');
-  check('rotation and blur/focus preserve outgoing, exit and incoming fades without route catch-up');
+  check('rotation and blur/focus preserve synchronous entry, exit and incoming fades without route catch-up');
   // Close while the entrance is still in flight: the first exit frame must continue its current pose.
   await record();await click('[data-action="settings"]',true);
   await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true'`);
   await key('Escape');await menuReady();
   const mid=await evaluate('navFrames'),firstExit=mid.findIndex(f=>f.exit==='true'),prior=mid.slice(0,firstExit).findLast(f=>f.enter==='true');
-  timelines.push({phase:'close-mid-entry',frames:mid});
+  timeline({phase:'close-mid-entry',frames:mid});
   assert(prior&&firstExit>0,'close during entry was not exercised');
   assert(Math.abs(mid[firstExit].x-prior.x)<90&&Math.abs(mid[firstExit].opacity-prior.opacity)<.2,'entry-to-exit pose jumped');
-  await continuity('mid-entry close');check('closing during entry preserves the current board pose');
+  assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),false,'mid-entry close retained ghost');
+  await continuity('mid-entry close');check('closing during entry preserves the current board pose and removes ghost');
+  await click('[data-action="settings"]',true);
+  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true'`);
+  await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+  await ready();
+  assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),false,'reduced motion change during entry retained ghost');
+  await evaluate(`document.querySelector('[data-setting="back"]').click()`);await menuReady();
+  check('switching to reduced motion during entry settles and removes ghost');
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
   await record();
   await evaluate(`document.querySelector('[data-action="settings"]').click()`);await ready();
   assert.equal(await evaluate('settingsTest.application.view.screen'),'settings');
   await evaluate(`document.querySelector('[data-setting="back"]').click()`);await menuReady();await sleep(50);
   assert(!(await evaluate('navFrames')).some(f=>f.menu==='in'||f.menu==='out'||f.enter==='true'||f.exit==='true'),'reduced motion rendered a navigation animation');
-  check('reduced motion settles all four navigation phases immediately');
+  assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),false,'reduced motion retained ghost');
+  check('reduced motion settles navigation immediately and removes ghost');
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
   await evaluate(`(()=>{const app=settingsTest.application;app.openPreparation();app.start();app.advance(1000);app.pause();app.openSettings()})()`);
   await ready();
@@ -211,7 +254,7 @@ let ws;
   await evaluate('localStorage.clear()');
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
   await viewport(1280,720);await cdp('Page.navigate',{url:base});await menuReady();await remember();
-  await open();await close(true);check('production bootstrap roundtrip preserves backdrop and delayed routing');
+  await open();await close(true);check('production bootstrap roundtrip preserves backdrop and synchronous entry');
   assert.deepEqual(runtimeErrors,[],'browser runtime errors');
   fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,runtimeErrors},null,2));
   fs.writeFileSync(path.join(out,'timelines.json'),JSON.stringify(timelines,null,2));

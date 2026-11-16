@@ -7,43 +7,68 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
   const media = Object.assign(new EventTarget(), { matches: false });
   vi.stubGlobal('window', {
     matchMedia: () => media,
-    getComputedStyle: (element: unknown) => element === board
-      ? { transform: 'matrix(1, 0, 0, 1, -123, 0)', opacity: '0.45' }
-      : { opacity: '0.4' },
+    getComputedStyle: (element: unknown) => Object.assign(
+      ['--menu-scale', '--menu-text-scale', 'font', 'background-position'], {
+        getPropertyValue: (key: string) => ({ '--menu-scale': '1.5', '--menu-text-scale': '1.12', font: '24px Avalon Menu', 'background-position': '50% 0%' })[key] ?? '',
+        transform: element === board ? 'matrix(1, 0, 0, 1, -123, 0)' : 'none',
+        opacity: element === board ? '0.45' : '0.4',
+      }),
   });
-  vi.stubGlobal('MutationObserver', class { observe() {} disconnect() {} });
+  let readinessChanged = () => {};
+  vi.stubGlobal('MutationObserver', class {
+    constructor(callback: () => void) { readinessChanged = callback; }
+    observe() {} disconnect() {}
+  });
   interface FakeAnimation {
     frames: Keyframe[]; options: KeyframeAnimationOptions; currentTime: number;
-    playState: string; onfinish: (() => void) | null;
+    playState: string; onfinish: (() => void) | null; startTime: number | null; timeline: { currentTime: number };
     cancel: ReturnType<typeof vi.fn>; pause: ReturnType<typeof vi.fn>; play: ReturnType<typeof vi.fn>;
   }
   const animations: FakeAnimation[] = [];
   function makeAnimation(frames: Keyframe[], options: KeyframeAnimationOptions): FakeAnimation {
     const result = {
-      frames, options, currentTime: 0, playState: 'running', onfinish: null as (() => void) | null,
+      frames, options, currentTime: 0, startTime: null as number | null, timeline: { currentTime: 1000 }, playState: 'running', onfinish: null as (() => void) | null,
       cancel: vi.fn(), pause: vi.fn(() => { result.playState = 'paused'; }),
       play: vi.fn(() => { result.playState = 'running'; }),
     };
     animations.push(result); return result;
   }
   function element() {
-    return { dataset: {} as Record<string, string>, inert: false, setAttribute: vi.fn(),
-      removeAttribute: vi.fn(), animate: vi.fn(makeAnimation) };
+    const attributes = new Map<string, string>([['id', 'menu-title'], ['data-action', 'settings'], ['data-focus-key', 'settings']]);
+    const properties: Record<string, string> = {};
+    const classes = new Set(['menu-artboard', 'menu-title-ready']);
+    return { dataset: {} as Record<string, string>, inert: false, attributes, properties, classes,
+      style: { setProperty: (key: string, value: string) => { properties[key] = value; } } as unknown as CSSStyleDeclaration,
+      classList: { remove: (key: string) => classes.delete(key), add: (key: string) => classes.add(key) },
+      setAttribute: vi.fn((key: string, value: string) => attributes.set(key, value)),
+      removeAttribute: vi.fn((key: string) => attributes.delete(key)), animate: vi.fn(makeAnimation),
+      getBoundingClientRect: () => ({ left: 30, top: 40, width: 540, height: 960 }),
+      append: vi.fn<(node: unknown) => void>(), remove: vi.fn(), querySelectorAll: () => [] as ReturnType<typeof element>[],
+    };
   }
   function makeMenu() {
-    const button = { isConnected: true, focus: vi.fn() };
-    return { ...element(), button, querySelector: (selector: string) => selector === '[data-action="settings"]' ? button : null };
+    const button = { ...element(), isConnected: true, focus: vi.fn() };
+    const copy = { ...element(), children: [element()] };
+    copy.querySelectorAll = () => copy.children;
+    return { ...element(), button, cloneNode: () => copy, querySelectorAll: () => [button],
+      querySelector: (selector: string) => selector === '[data-action="settings"]' ? button : null };
   }
+  const ghosts: ReturnType<typeof element>[] = [];
   let screen = initial;
   let menu = makeMenu();
   let board = element();
   let scrim = element();
   let page = { ...element(), dataset: { ready, entering: '', exiting: '' }, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
-  const overlay = { clientWidth: 390, querySelector: (selector: string) => selector === '.reference-settings'
+  const overlay = { clientWidth: 390,
+    ownerDocument: { createElement: () => { const node = element(); ghosts.push(node); return node; } },
+    parentElement: { clientLeft: 0, clientTop: 0, getBoundingClientRect: () => ({ left: 10, top: 15 }) },
+    before: vi.fn(), querySelector: (selector: string) => selector === '.reference-settings'
     ? (screen === 'settings' ? page : null) : screen === 'menu' ? menu : null } as unknown as HTMLElement;
   const controller = mountSettingsTransition(overlay);
   return {
-    controller, animations, media, get page() { return page; }, get menu() { return menu; },
+    controller, animations, media, ghosts, get page() { return page; }, get menu() { return menu; },
+    ready() { page.dataset.ready = 'true'; readinessChanged(); },
+    get ghostBoard() { return ghosts.at(-1)?.append.mock.calls[0]?.[0] as ReturnType<ReturnType<typeof makeMenu>['cloneNode']>; },
     show(next: typeof initial) { screen = next; controller.sync(); },
     replace() {
       if (screen === 'menu') { menu.button.isConnected = false; menu = makeMenu(); }
@@ -55,20 +80,79 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
 }
 
 describe('settings navigation motion', () => {
-  it('keeps menu inert through its outro, navigates once, then enters settings', () => {
+  it('navigates immediately and crossfades menu and settings on the same 420ms timeline', () => {
     const s = fixture();
     const navigate = vi.fn(() => s.show('settings'));
     s.controller.openSettings(navigate); s.controller.openSettings(navigate);
-    expect(navigate).not.toHaveBeenCalled();
-    expect(s.controller.isNavigating()).toBe(true);
-    expect(s.menu.inert).toBe(true);
-    expect(s.menu.dataset.menuTransition).toBe('out');
+    expect(navigate).toHaveBeenCalledOnce();
+    expect(s.controller.isNavigating()).toBe(false);
+    expect(s.page.dataset.entering).toBe('true');
+    expect(s.animations).toHaveLength(3);
+    expect(s.animations.map(a => a.options.duration)).toEqual([420, 420, 420]);
+    expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    expect(s.animations[2]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
+    const ghost = s.ghosts[0]!;
+    const copy = s.ghostBoard;
+    expect(ghost.inert).toBe(true);
+    expect(ghost.attributes.get('aria-hidden')).toBe('true');
+    expect(ghost.dataset.settingsMenuGhost).toBe('');
+    expect(copy.classes.has('menu-artboard')).toBe(false);
+    expect(copy.classes.has('settings-menu-outgoing')).toBe(true);
+    for (const node of [copy, ...copy.children]) {
+      expect(node.inert).toBe(true);
+      expect(node.attributes.has('id')).toBe(false);
+      expect(node.attributes.has('data-action')).toBe(false);
+      expect(node.attributes.has('data-focus-key')).toBe(false);
+      expect(node.classes.has('menu-title-ready')).toBe(false);
+      expect(node.style.animation).toBe('none');
+      expect(node.properties['background-position']).toBe('50% 0%');
+    }
+    expect(copy.style.left).toBe('20px'); expect(copy.style.top).toBe('25px');
+    expect(copy.style.width).toBe('540px'); expect(copy.style.height).toBe('960px');
+    expect(copy.style.background).toBe('transparent');
+    expect(copy.properties['--menu-scale']).toBe('1.5');
+    expect(copy.properties['--menu-text-scale']).toBe('1.12');
+    expect(copy.properties.font).toBe('24px Avalon Menu');
     const stale = s.animations[0]!.onfinish!;
     s.finish(0); stale();
     expect(navigate).toHaveBeenCalledOnce();
     expect(s.menu.inert).toBe(false);
     expect(s.controller.isNavigating()).toBe(false);
-    expect(s.page.dataset.entering).toBe('true');
+    expect(s.page.dataset.entering).toBe('false');
+    expect(ghost.remove).toHaveBeenCalledOnce();
+    s.controller.destroy();
+  });
+
+  it('keeps the ghost fully visible until cold artwork is ready, including pending repaint and pause', () => {
+    const s = fixture('menu', 'loading');
+    s.controller.openSettings(() => s.show('settings'));
+    const copy = s.ghostBoard;
+    expect(s.page.dataset.entering).toBe('pending');
+    expect(copy.style.opacity).toBe('1');
+    expect(s.animations).toHaveLength(0);
+    s.controller.setPaused(true); s.replace();
+    expect(s.ghosts).toHaveLength(1);
+    expect(s.ghostBoard).toBe(copy);
+    s.ready();
+    expect(s.animations.map(a => a.currentTime)).toEqual([0, 0, 0]);
+    expect(s.animations.every(a => a.playState === 'paused')).toBe(true);
+    s.controller.setPaused(false);
+    expect(s.animations.every(a => a.play.mock.calls.length === 1)).toBe(true);
+    s.controller.destroy();
+  });
+
+  it('freezes the ghost opacity when a replacement board waits for artwork mid-entry', () => {
+    const s = fixture();
+    s.controller.openSettings(() => s.show('settings'));
+    const copy = s.ghostBoard;
+    s.animations[0]!.currentTime = 180;
+    s.page.dataset.ready = 'loading'; s.replace();
+    expect(s.animations).toHaveLength(3);
+    expect(copy.style.opacity).toBe('0.4');
+    expect(s.ghostBoard).toBe(copy);
+    s.ready();
+    expect(s.animations.slice(3).map(a => a.currentTime)).toEqual([180, 180, 180]);
+    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([820, 820, 820]);
     s.controller.destroy();
   });
 
@@ -93,27 +177,29 @@ describe('settings navigation motion', () => {
     s.controller.destroy();
   });
 
-  it('preserves callback and frozen playheads across rerenders in every navigation phase', () => {
+  it('preserves the single ghost and frozen playheads across entry, exit and menu rerenders', () => {
     const s = fixture();
     const open = vi.fn(() => s.show('settings'));
     s.controller.openSettings(open);
+    const ghost = s.ghostBoard;
     s.animations[0]!.currentTime = 83;
     s.controller.setPaused(true); s.replace();
-    expect(s.animations[1]!.currentTime).toBe(83);
-    expect(s.animations[1]!.playState).toBe('paused');
-    s.controller.setPaused(false); s.finish(1);
+    expect(s.ghosts).toHaveLength(1); expect(s.ghostBoard).toBe(ghost);
+    expect(s.animations.slice(3).map(a => a.currentTime)).toEqual([83, 83, 83]);
+    expect(s.animations.slice(3).every(a => a.playState === 'paused')).toBe(true);
+    s.controller.setPaused(false); s.finish(3);
     const close = vi.fn(() => s.show('menu'));
     s.controller.closeSettings(close);
-    s.animations[4]!.currentTime = 91;
+    s.animations[6]!.currentTime = 91;
     s.controller.setPaused(true); s.replace();
-    expect(s.animations[6]!.currentTime).toBe(91);
-    expect(s.animations[7]!.playState).toBe('paused');
-    s.controller.setPaused(false); s.finish(6);
-    s.animations[8]!.currentTime = 54;
-    s.controller.setPaused(true); s.replace();
-    expect(s.animations[9]!.currentTime).toBe(54);
+    expect(s.animations[8]!.currentTime).toBe(91);
     expect(s.animations[9]!.playState).toBe('paused');
-    s.controller.setPaused(false); s.finish(9);
+    s.controller.setPaused(false); s.finish(8);
+    s.animations[10]!.currentTime = 54;
+    s.controller.setPaused(true); s.replace();
+    expect(s.animations[11]!.currentTime).toBe(54);
+    expect(s.animations[11]!.playState).toBe('paused');
+    s.controller.setPaused(false); s.finish(11);
     expect(open).toHaveBeenCalledOnce(); expect(close).toHaveBeenCalledOnce();
     s.controller.destroy();
   });
@@ -124,6 +210,7 @@ describe('settings navigation motion', () => {
     s.controller.openSettings(open);
     s.media.matches = true; s.media.dispatchEvent(new Event('change'));
     expect(open).toHaveBeenCalledOnce();
+    expect(s.ghosts[0]!.remove).toHaveBeenCalledOnce();
     expect(s.page.dataset.entering).toBe('false');
     expect(s.controller.isNavigating()).toBe(false);
     s.media.matches = false; s.media.dispatchEvent(new Event('change'));
@@ -148,22 +235,47 @@ describe('settings navigation motion', () => {
     s.controller.destroy();
   });
 
-  it('cancels menu outro on an unrelated screen and settles an in-flight menu intro', () => {
+  it('opens immediately without a ghost or animation when reduced motion is already enabled', () => {
+    const s = fixture('menu', 'loading');
+    s.media.matches = true;
+    const open = vi.fn(() => s.show('settings'));
+    s.controller.openSettings(open);
+    expect(open).toHaveBeenCalledOnce();
+    expect(s.ghosts).toHaveLength(0);
+    expect(s.animations).toHaveLength(0);
+    expect(s.page.dataset.entering).toBe('false');
+    s.controller.destroy();
+  });
+
+  it.each(['destroy', 'external', 'close'] as const)('cleans pending artwork and its ghost on %s', (reason) => {
+    const s = fixture('menu', 'loading');
+    const open = vi.fn(() => s.show('settings'));
+    const close = vi.fn(() => s.show('menu'));
+    s.controller.openSettings(open);
+    if (reason === 'destroy') s.controller.destroy();
+    else if (reason === 'external') s.show('other');
+    else s.controller.closeSettings(close);
+    expect(open).toHaveBeenCalledOnce();
+    expect(s.ghosts[0]!.remove).toHaveBeenCalledOnce();
+    if (reason === 'close') {
+      expect(close).toHaveBeenCalledOnce();
+      expect(s.animations[0]!.options.duration).toBe(220);
+    } else expect(s.animations).toHaveLength(0);
+    s.controller.destroy();
+  });
+
+  it.each(['destroy', 'external', 'close'] as const)('removes the ghost on %s and ignores stale entrance completions', (reason) => {
     const s = fixture();
     const open = vi.fn(() => s.show('settings'));
     s.controller.openSettings(open);
     const stale = s.animations[0]!.onfinish!;
-    s.show('other'); stale();
-    expect(open).not.toHaveBeenCalled();
-    expect(s.menu.inert).toBe(false);
-    s.show('settings');
-    const close = vi.fn(() => s.show('menu'));
-    s.controller.closeSettings(close); s.finish(3);
-    expect(s.menu.dataset.menuTransition).toBe('in');
-    s.media.matches = true; s.media.dispatchEvent(new Event('change'));
-    expect(close).toHaveBeenCalledOnce();
-    expect(s.menu.dataset.menuTransition).toBe('false');
-    expect(s.controller.isNavigating()).toBe(false);
+    if (reason === 'destroy') s.controller.destroy();
+    else if (reason === 'external') s.show('other');
+    else s.controller.closeSettings(() => s.show('menu'));
+    stale();
+    expect(open).toHaveBeenCalledOnce();
+    expect(s.ghosts[0]!.remove).toHaveBeenCalledOnce();
+    if (reason === 'close') expect(s.page.dataset.exiting).toBe('true');
     s.controller.destroy();
   });
   it('restores focus only after the menu intro and to its current markup', () => {
