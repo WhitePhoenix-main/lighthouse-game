@@ -103,7 +103,7 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
 }
 
 describe('settings navigation motion', () => {
-  it('navigates immediately and crossfades menu and settings on the same 420ms timeline', () => {
+  it('navigates immediately and crossfades menu and settings on the same 560ms timeline', () => {
     const s = fixture();
     const navigate = vi.fn(() => s.show('settings'));
     s.controller.openSettings(navigate); s.controller.openSettings(navigate);
@@ -111,7 +111,7 @@ describe('settings navigation motion', () => {
     expect(s.controller.isNavigating()).toBe(false);
     expect(s.page.dataset.entering).toBe('true');
     expect(s.animations).toHaveLength(3);
-    expect(s.animations.map(a => a.options.duration)).toEqual([420, 420, 420]);
+    expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[2]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
     const ghost = s.ghosts[0]!;
@@ -187,7 +187,7 @@ describe('settings navigation motion', () => {
     const incoming = s.ghosts[1]!;
     expect(incoming.dataset.settingsMenuDirection).toBe('in');
     expect(s.ghosts[0]!.dataset.settingsMenuDirection).toBe('out');
-    expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([420, 420, 420]);
+    expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
     expect(s.page.inert).toBe(true); expect(close).not.toHaveBeenCalled();

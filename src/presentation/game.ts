@@ -109,20 +109,9 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     if (width > 0 && height > 0 && (scale.width !== width || scale.height !== height)) scale.resize(width, height);
   }
 
-  function layoutSharedScenery(view: ApplicationView): void {
+  function layoutSharedScenery(): void {
     const width = sceneryLayer.clientWidth, height = sceneryLayer.clientHeight;
     layoutMenuScenery(sceneryLayer, width, height);
-    // Preserve the approved mobile camera; desktop always uses the menu camera.
-    if (view.screen === 'settings' && height >= width) {
-      const page = overlay.querySelector<HTMLElement>('.reference-settings');
-      const scale = Number(page?.style.getPropertyValue('--settings-ui-scale')) || 1;
-      const scene = sceneryLayer.querySelector<HTMLElement>('.menu-scenery')!;
-      const worldScale = 984 / 640 * scale;
-      scene.style.left = `${(page?.clientWidth ?? width) / 2 - 444 * worldScale}px`;
-      scene.style.top = `${-140 * scale}px`;
-      scene.style.width = scene.style.height = `${640 * worldScale}px`;
-      scene.style.setProperty('--menu-world-scale', String(worldScale));
-    }
   }
 
   function openSettingsWithMotion(): void {
@@ -251,7 +240,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     overlay.querySelector('.avalon-menu > .menu-scenery')?.remove();
     layoutReferenceMenu(overlay);
     layoutReferenceSettings(overlay, view);
-    layoutSharedScenery(view);
+    layoutSharedScenery();
     settingsTransition.sync();
     for (const element of root.querySelectorAll<HTMLElement>('[data-action]')) {
       element.dataset.focusKey = [element.dataset.action, element.dataset.upgrade ?? element.dataset.lensUpgrade ?? element.dataset.lens ?? element.dataset.night ?? element.dataset.kind ?? element.dataset.deviceId ?? element.dataset.size ?? element.dataset.enabled ?? element.dataset.language ?? ''].join(':');
@@ -782,7 +771,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   // Explicit host sizing avoids RESIZE mode overwriting resize() with its
   // cached parent size when a screen transition changes layout within a frame.
   const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: false, antialias: true, scale: { mode: Phaser.Scale.NONE, width: canvasHost.clientWidth, height: canvasHost.clientHeight }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
-  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutSharedScenery(application.view); settingsTransition.sync(); });
+  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutSharedScenery(); settingsTransition.sync(); });
   resize.observe(canvasHost);
   resize.observe(shell);
   const placementPoint = (map: SVGSVGElement, x: number, y: number): DOMPoint | null => {

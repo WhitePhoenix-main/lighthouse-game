@@ -1,6 +1,6 @@
 import { layoutReferenceMenu } from './referenceMenu';
 
-const duration = 420;
+const duration = 560;
 const menuDuration = 220;
 type Phase = 'idle' | 'entry' | 'exit' | 'menu-in';
 

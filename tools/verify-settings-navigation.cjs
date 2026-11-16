@@ -131,7 +131,7 @@ let ws;
     assert(out.every(f=>!f.screen||f.screen==='settings'),'settings route was delayed until after menu outro');
     const moving=frames.filter(f=>f.enter==='true');
     assert(moving.length>=3,'settings entry absent');
-    assert(moving.every(f=>f.ghost&&f.menuDuration===420&&f.boardTiming?.duration===420&&f.scrimTiming?.duration===420),'all three entrance animations must run together for 420ms');
+    assert(moving.every(f=>f.ghost&&f.menuDuration===560&&f.boardTiming?.duration===560&&f.scrimTiming?.duration===560),'all three entrance animations must run together for 560ms');
     for(const f of moving){
       const timings=[f.boardTiming,f.scrimTiming,f.menuTiming];
       const starts=timings.map(a=>a.start),times=timings.map(a=>a.time);
@@ -158,14 +158,14 @@ let ws;
     const frames=await evaluate('navFrames'),exit=frames.filter(f=>f.exit==='true'),intro=frames.filter(f=>f.menu==='in');
     timeline({phase:'close',frames});
     assert(exit.length>=3,'settings exit has no rendered frames');
-    assert(exit.every(f=>f.exitDuration===420),'settings exit duration must be 420ms');
+    assert(exit.every(f=>f.exitDuration===560),'settings exit duration must be 560ms');
     assert(exit.every(f=>!f.screen||f.screen==='settings'),'route changed while exiting');
     assert(exit.some(f=>f.x<-40&&f.opacity<.8),'settings board did not exit left and fade');
     assert(exit.at(-1).x<exit[0].x&&exit.at(-1).opacity<exit[0].opacity,'settings exit did not progress');
     assert(exit.at(-1).scrim<exit[0].scrim,'scrim did not fade out');
     assert.equal(intro.length,0,'real menu must appear settled without a second intro');
     assert(exit.every(f=>f.ghost&&f.ghostSafe&&f.ghostSibling&&f.settingsPages===1&&f.settingsControls===10&&f.menuActions===0&&!f.duplicateIds),'exit ghost duplicated actions/IDs/pages or was unsafe');
-    assert(exit.every(f=>f.menuDuration===420&&f.boardTiming?.duration===420&&f.scrimTiming?.duration===420),'exit board/scrim/menu must share 420ms');
+    assert(exit.every(f=>f.menuDuration===560&&f.boardTiming?.duration===560&&f.scrimTiming?.duration===560),'exit board/scrim/menu must share 560ms');
     assert(exit.some(f=>f.menuOpacity>.05&&f.menuOpacity<.95&&f.opacity>0&&f.opacity<1),'incoming ghost and outgoing board did not share rendered frames');
     for(const f of exit){
       const timings=[f.boardTiming,f.scrimTiming,f.menuTiming];

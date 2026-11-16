@@ -69,25 +69,31 @@ let ws;
     await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
   const viewport = async (width, height) => {
-    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 900 });
     await sleep(120);
   };
   // Layout registration and timeline identity are checked separately; never seek animations.
-  const scenery = () => evaluate(`(()=>{const s=document.querySelector('.menu-scenery'),r=s.getBoundingClientRect();return{rect:[r.x,r.y,r.width,r.height],images:[...s.querySelectorAll('img')].map(e=>{const q=e.getBoundingClientRect();return{src:e.currentSrc,rect:[q.x,q.y,q.width,q.height]}}),decor:[...s.querySelectorAll('.menu-decoration')].map(e=>{const c=getComputedStyle(e);return{class:e.className,world:e.dataset.worldRect,box:[e.offsetLeft,e.offsetTop,e.offsetWidth,e.offsetHeight],background:c.backgroundImage,animation:[c.animationName,c.animationDuration,c.animationDelay,c.animationTimingFunction,c.animationIterationCount,c.animationDirection]}})}})()`);
-  const remember = () => evaluate(`(()=>{window.motionScene=document.querySelector('.menu-scenery');window.motionAnimations=motionScene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);window.motionMoon=motionScene.querySelector('.menu-moon').getAnimations()[0];window.motionMoonTime=motionMoon.currentTime;return motionAnimations.length})()`);
+  const scenery = () => evaluate(`(window.motionScenerySnapshot=()=>{const s=document.querySelector('.menu-scenery'),r=s.getBoundingClientRect();return{rect:[r.x,r.y,r.width,r.height],images:[...s.querySelectorAll('img')].map(e=>{const q=e.getBoundingClientRect();return{src:e.currentSrc,rect:[q.x,q.y,q.width,q.height]}}),decor:[...s.querySelectorAll('.menu-decoration')].map(e=>{const c=getComputedStyle(e);return{class:e.className,world:e.dataset.worldRect,box:[e.offsetLeft,e.offsetTop,e.offsetWidth,e.offsetHeight],background:c.backgroundImage,animation:[c.animationName,c.animationDuration,c.animationDelay,c.animationTimingFunction,c.animationIterationCount,c.animationDirection]}})}})()`);
+  const remember = () => evaluate(`(()=>{window.motionScene=document.querySelector('.menu-scenery');window.motionAnimations=motionScene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);window.motionMoon=motionScene.querySelector('.menu-moon').getAnimations()[0];window.motionMoonTime=motionMoon.currentTime;window.motionTimes=motionAnimations.map(a=>a.currentTime);return motionAnimations.length})()`);
   const continuity = async label => {
-    const result = await evaluate(`({same:motionScene===document.querySelector('.menu-scenery'),animations:motionAnimations.every(a=>motionScene.getAnimations({subtree:true}).includes(a)),moon:motionMoon===motionScene.querySelector('.menu-moon').getAnimations()[0],time:motionMoon.currentTime,previous:motionMoonTime})`);
+    const result = await evaluate(`({same:motionScene===document.querySelector('.menu-scenery'),animations:motionAnimations.every(a=>motionScene.getAnimations({subtree:true}).includes(a)),moon:motionMoon===motionScene.querySelector('.menu-moon').getAnimations()[0],time:motionMoon.currentTime,previous:motionMoonTime,phases:motionAnimations.every((a,i)=>a.currentTime>=motionTimes[i])})`);
     assert(result.same && result.animations && result.moon, `${label}: scenery or CSS animation objects replaced`);
-    assert(result.time >= result.previous, `${label}: moon timeline reset`);
-    await evaluate('motionMoonTime=motionMoon.currentTime');
+    assert(result.time >= result.previous && result.phases, `${label}: ambient timeline reset`);
+    await evaluate('motionMoonTime=motionMoon.currentTime;motionTimes=motionAnimations.map(a=>a.currentTime)');
   };
-  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,x:new DOMMatrix(c.transform).m41,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
+  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,x:new DOMMatrix(c.transform).m41,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
+  const checkSceneryFrames = async label => {
+    const frames=await evaluate('motionSceneryFrames');
+    assert(frames.length>=3, `${label}: missing backdrop frames`);
+    assert(frames.every(f=>f.layout&&f.same&&f.animations&&f.phases), `${label}: backdrop camera, DOM, CSSAnimation identity or phases changed: ${JSON.stringify(frames.filter(f=>!f.layout||!f.same||!f.animations||!f.phases))}`);
+  };
   const checkEntry = async label => {
     await ready(); await sleep(60);
+    await checkSceneryFrames(label);
     const frames = await evaluate('motionFrames');
     const moving = frames.filter(f=>f.state==='true');
     assert(moving.some(f=>f.x < -20 && f.opacity < .99), `${label}: missing left slide/fade: ${JSON.stringify(frames)}`);
-    assert(moving.every(f=>f.duration===420), `${label}: entrance duration differs from 420ms`);
+    assert(moving.every(f=>f.duration===560), `${label}: entrance duration differs from 560ms`);
     assert(frames.filter(f=>f.state==='pending').every(f=>f.opacity===0), `${label}: pending board flashed before assets ready`);
     assert(moving.every(f=>f.controls), `${label}: controls escaped moving board`);
     const last=frames.at(-1); assert(Math.abs(last.x)<.1 && last.opacity===1 && last.state==='false', `${label}: board did not settle: ${JSON.stringify(last)}`);
@@ -98,13 +104,13 @@ let ws;
   await cdp('Page.navigate', { url: base });
   await wait(`!!document.querySelector('[data-action="settings"]') && !!document.querySelector('.menu-moon')`);
   await wait(`[...document.querySelectorAll('.menu-scenery img')].every(e=>e.complete&&e.naturalWidth>0)`);
-  for (const [width,height] of [[1280,720],[1672,941]]) {
+  for (const [width,height] of [[1280,720],[1672,941],[390,844],[844,390]]) {
     await viewport(width,height);
     const original=await scenery(); assert((await remember())>10,'missing ambient animations');
     await observeEntry(); await click('[data-action="settings"]'); await checkEntry(`${width} entry`);
     assert.deepEqual(await scenery(), original, `${width}: menu/settings scenery geometry or animation declarations differ`);
     await continuity('settings entry');
-    await screenshot(`settings-${width}`);
+    await screenshot(`settings-${width}x${height}`);
     for (const selector of ['[data-setting="en"]','[data-setting="large"]','[data-setting="ru"]','[data-setting="normal"]']) {
       await observeEntry(); await click(selector); await ready(); await sleep(100);
       assert(!(await evaluate('motionEntryChanges')).includes('true'),'setting change replayed entry');
@@ -118,9 +124,11 @@ let ws;
     await cdp('Input.dispatchMouseEvent',{type:'mouseReleased',x:r.x+r.w*.8,y:r.y+r.h/2,button:'left',buttons:0,clickCount:1});
     assert(Math.abs(await evaluate(`+document.querySelector('[data-action="music-volume"]').value`)-80)<=3,'native range drag');
     assert(!(await evaluate('motionEntryChanges')).includes('true'),'drag replayed entry'); await continuity('drag');
+    await observeEntry();
     await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
+    await checkSceneryFrames(`${width} exit`);
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
-    check(`${width}×${height}: same scene/images/layout/ambient animations; slide/fade; native controls; settings and drag preserve timelines`);
+    check(`${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
   await evaluate(`window.freezeOnEntry=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){freezeOnEntry.disconnect();window.dispatchEvent(new Event('blur'))}});freezeOnEntry.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,attributeFilter:['data-entering']})`);
@@ -146,6 +154,7 @@ let ws;
   assert((await evaluate('motionFrames')).every(f=>f.state!=='true'&&Math.abs(f.x)<.1&&f.opacity===1),'reduced motion moved board');
   await screenshot('reduced-motion'); check('reduced motion immediately displays settled controls');
   assert.deepEqual(runtimeErrors,[],'browser runtime errors');
+  fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,runtimeErrors},null,2));
   await send('Browser.close'); ws.close();
 })().catch(error => { console.error(error); process.exitCode = 1; })
   .finally(async () => { if (ws) ws.close(); await testBrowser.cleanup(); })
