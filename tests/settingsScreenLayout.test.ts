@@ -41,6 +41,94 @@ describe('shared settings artwork and native control geometry', () => {
     expect(portrait.orientation).toBe('portrait');
   });
 
+  it.each(['normal', 'large'] as const)('uses phone portrait height without a reserved desktop top area (%s)', size => {
+    for (const [width, height] of [[320, 568], [390, 844], [430, 932]] as const) {
+      const layout = settingsLayout(width, height, size, true);
+      expect(layout.mobile).toBe(true);
+      expect(layout.title.y * layout.scale).toBeLessThan(30);
+      expect(layout.choices.on.y * layout.scale).toBeLessThan(110);
+      expect(layout.height * layout.scale).toBeCloseTo(height, 5);
+      const backBottom = (layout.choices.back.y + layout.choices.back.height) * layout.scale;
+      expect(height - backBottom).toBeGreaterThanOrEqual(16);
+      expect(height - backBottom).toBeLessThan(30);
+    }
+  });
+
+  it.each(['normal', 'large'] as const)('uses both phone landscape columns and keeps back visible (%s)', size => {
+    for (const [width, height] of [[844, 390], [1024, 768]] as const) {
+      const layout = settingsLayout(width, height, size, true);
+      expect(layout.compact).toBe(true);
+      expect(layout.height * layout.scale).toBeCloseTo(height, 5);
+      expect((layout.sliders.effects.x + layout.sliders.effects.width) * layout.scale).toBeLessThan(width / 2);
+      expect(layout.choices.ru.x * layout.scale).toBeGreaterThan(width / 2);
+      expect((layout.choices.en.x + layout.choices.en.width) * layout.scale).toBeGreaterThan(width * .9);
+      expect((layout.choices.back.x + layout.choices.back.width / 2) * layout.scale).toBeCloseTo(width / 2);
+      expect((layout.choices.back.y + layout.choices.back.height) * layout.scale).toBeLessThan(height);
+    }
+    const short = settingsLayout(568, 320, size, true);
+    expect(short.height * short.scale).toBeGreaterThan(320);
+    expect(short.choices.back.height * short.scale).toBeGreaterThanOrEqual(44);
+  });
+
+  it('keeps desktop artwork coordinates and scaling when the window becomes narrow', () => {
+    for (const [width, height] of [[844, 390], [1280, 720], [1672, 941]] as const) {
+      const layout = settingsLayout(width, height, 'normal', false);
+      expect(layout.mobile).toBe(false);
+      expect(layout.compact).toBe(false);
+      expect(layout.scale).toBe(Math.min(width / 1280, Math.max(.8, height / 720)));
+      expect(layout.title).toEqual({ x: 158, y: 48, width: 324, height: 48 });
+      expect(layout.choices.on).toEqual({ x: 300, y: 144, width: 128, height: Math.max(48, 44 / layout.scale) });
+      expect(layout.sliders.music.x).toBe(318);
+      expect(layout.choices.en.x + layout.choices.en.width).toBe(584);
+    }
+  });
+
+  it.each(['normal', 'large'] as const)('separates native slider hit areas in a narrow desktop window (%s)', size => {
+    for (const width of [844, 829]) {
+      const layout = settingsLayout(width, 390, size, false);
+      const musicCenter = (layout.sliders.music.y + layout.sliders.music.height / 2) * layout.scale;
+      const effectsCenter = (layout.sliders.effects.y + layout.sliders.effects.height / 2) * layout.scale;
+      expect(effectsCenter - musicCenter).toBeGreaterThanOrEqual(47.99);
+      expect(layout.mobile).toBe(false);
+      expect(layout.choices.on.x).toBe(300);
+      expect(layout.sliders.music.x).toBe(318);
+    }
+    const ordinary = settingsLayout(1000, 700, size, false);
+    expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBe(64);
+  });
+
+  it.each(['normal', 'large'] as const)('leaves readable RU/EN lettering in compact phone controls (%s)', size => {
+    const labels = { on: ['ВКЛ', 'ON'], off: ['ВЫКЛ', 'OFF'], auto: ['АВТО', 'AUTO'], ru: ['РУССКИЙ', 'RUSSIAN'], en: ['ENGLISH'], normal: ['ОБЫЧНЫЙ', 'NORMAL'], large: ['КРУПНЫЙ', 'LARGE'] } as const;
+    for (const [width, height] of [[568, 320], [844, 390]] as const) {
+      const layout = settingsLayout(width, height, size, true);
+      for (const key of Object.keys(labels) as (keyof typeof labels)[]) {
+        for (const label of labels[key]) {
+          // Nine glyph rows must fit at 14 CSS pixels, retaining the frame's 22-unit inset.
+          expect((layout.choices[key].width - 22) * layout.scale, label).toBeGreaterThanOrEqual(settingsTextWidth(label, 14 / 9));
+        }
+      }
+      expect(layout.headings.sound.x + settingsTextWidth('SOUND', 2 * layout.textScale)).toBeLessThan(layout.choices.on.x);
+      expect(layout.headings.language.x + settingsTextWidth('LANGUAGE', 2 * layout.textScale)).toBeLessThan(layout.choices.auto.x);
+    }
+  });
+
+  it('preserves the full desktop layout at its original 1280×720 size', () => {
+    expect(settingsLayout(1280, 720, 'normal', false)).toEqual({
+      orientation: 'landscape', compact: false, mobile: false, width: 1280, height: 720, scale: 1, textScale: 1,
+      title: { x: 158, y: 48, width: 324, height: 48 },
+      headings: { sound: { x: 56, y: 159 }, music: { x: 56, y: 237 }, effects: { x: 56, y: 301 }, language: { x: 56, y: 382 }, text: { x: 56, y: 505 } },
+      values: { music: { x: 290, y: 240 }, effects: { x: 290, y: 304 } },
+      choices: {
+        on: { x: 300, y: 144, width: 128, height: 48 }, off: { x: 448, y: 144, width: 136, height: 48 },
+        auto: { x: 56, y: 420, width: 160, height: 48 }, ru: { x: 240, y: 420, width: 164, height: 48 }, en: { x: 428, y: 420, width: 156, height: 48 },
+        normal: { x: 220, y: 490, width: 174, height: 48 }, large: { x: 412, y: 490, width: 172, height: 48 }, back: { x: 140, y: 616, width: 360, height: 64 }
+      },
+      sliders: { music: { x: 318, y: 251, width: 266, height: 10 }, effects: { x: 318, y: 315, width: 266, height: 10 } },
+      dividers: [{ x: 56, y: 118, width: 528, height: 1 }, { x: 56, y: 356, width: 528, height: 1 }, { x: 56, y: 558, width: 528, height: 1 }],
+      footer: { x: 320, ys: [578] }
+    });
+  });
+
   it('large text increases visible type without shrinking interaction targets', () => {
     for (const [w, h] of viewports) {
       const normal = settingsLayout(w, h, 'normal'), large = settingsLayout(w, h, 'large');

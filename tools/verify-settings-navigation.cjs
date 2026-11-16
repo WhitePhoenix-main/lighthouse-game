@@ -78,9 +78,9 @@ let ws;
     await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
     await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
-  const viewport = async (width, height) => {
-    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 900 });
-    await cdp('Emulation.setTouchEmulationEnabled', { enabled: width < 900 });
+  const viewport = async (width, height, touch = width < 900) => {
+    await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await sleep(120);
   };
   const menuReady = () => wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
@@ -197,18 +197,18 @@ let ws;
   await wait('!!window.settingsTest');await menuReady();
   await evaluate(`settingsTest.backCalls=0;settingsTest.originalBack=settingsTest.application.back.bind(settingsTest.application);settingsTest.application.back=()=>{settingsTest.backCalls++;return settingsTest.originalBack()}`);
   assert((await remember())>10,'ambient CSS animations absent');
-  for(const [w,h] of [[1280,720],[390,844],[844,390]]) {
-    await viewport(w,h);await open(w<900,w===1280,w===1280);await screenshot(`settings-${w}x${h}`);
+  for(const [w,h,touch] of [[1280,720,false],[844,390,false],[390,844,true],[844,390,true]]) {
+    await viewport(w,h,touch);await open(touch,w===1280,w===1280);await screenshot(`settings-${touch?'mobile':'desktop'}-${w}x${h}`);
     await evaluate(`document.querySelector('[data-action="music-volume"]').focus({preventScroll:true})`);
     await key('Home');await key('ArrowRight');
     assert.equal(await evaluate(`+document.querySelector('[data-action="music-volume"]').value`),1,'native range keys');
-    await close(false,w<900,true);
-    await open(w<900);await close(true,false,true);
+    await close(false,touch,true);
+    await open(touch);await close(true,false,true);
     assert.equal(await evaluate('document.activeElement?.dataset.action'),'settings',`${w}×${h}: Settings focus was not restored after Escape/menu intro`);
     // No explicit .focus(): Enter must activate the button restored by navigation.
     await open(false,'restored');await close(true);
-    await screenshot(`roundtrip-${w}x${h}`);
-    check(`${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
+    await screenshot(`roundtrip-${touch?'mobile':'desktop'}-${w}x${h}`);
+    check(`${touch?'mobile':'desktop'} ${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
   }
   // Force a real locale rerender while all three entrance animations are live.
   await evaluate(`(()=>{window.navRerendered=false;window.navRerenderObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p?.dataset.entering==='true'){navRerenderObserver.disconnect();window.navOldBoard=p.querySelector('.settings-board');window.navOldGhost=document.querySelector('[data-settings-menu-ghost]');requestAnimationFrame(()=>requestAnimationFrame(()=>{settingsTest.application.setLanguage('en');window.navRerendered=true}))}});navRerenderObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,childList:true})})()`);

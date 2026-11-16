@@ -68,8 +68,9 @@ let ws;
     await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
     await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
-  const viewport = async (width, height) => {
-    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 900 });
+  const viewport = async (width, height, touch = width < 900) => {
+    await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await sleep(120);
   };
   // Layout registration and timeline identity are checked separately; never seek animations.
@@ -104,13 +105,13 @@ let ws;
   await cdp('Page.navigate', { url: base });
   await wait(`!!document.querySelector('[data-action="settings"]') && !!document.querySelector('.menu-moon')`);
   await wait(`[...document.querySelectorAll('.menu-scenery img')].every(e=>e.complete&&e.naturalWidth>0)`);
-  for (const [width,height] of [[1280,720],[1672,941],[390,844],[844,390]]) {
-    await viewport(width,height);
+  for (const [width,height,touch] of [[1280,720,false],[1672,941,false],[844,390,false],[390,844,true],[844,390,true]]) {
+    await viewport(width,height,touch);
     const original=await scenery(); assert((await remember())>10,'missing ambient animations');
     await observeEntry(); await click('[data-action="settings"]'); await checkEntry(`${width} entry`);
     assert.deepEqual(await scenery(), original, `${width}: menu/settings scenery geometry or animation declarations differ`);
     await continuity('settings entry');
-    await screenshot(`settings-${width}x${height}`);
+    await screenshot(`settings-${touch?'mobile':'desktop'}-${width}x${height}`);
     for (const selector of ['[data-setting="en"]','[data-setting="large"]','[data-setting="ru"]','[data-setting="normal"]']) {
       await observeEntry(); await click(selector); await ready(); await sleep(100);
       assert(!(await evaluate('motionEntryChanges')).includes('true'),'setting change replayed entry');
@@ -128,7 +129,7 @@ let ws;
     await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
     await checkSceneryFrames(`${width} exit`);
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
-    check(`${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
+    check(`${touch?'mobile':'desktop'} ${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
   await evaluate(`window.freezeOnEntry=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){freezeOnEntry.disconnect();window.dispatchEvent(new Event('blur'))}});freezeOnEntry.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,attributeFilter:['data-entering']})`);

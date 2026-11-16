@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const { createTestBrowser } = require('./browser-profile.cjs');
-const base = process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.0.0.1:5186';
+const base = process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.0.0.1:5173';
 const out = path.resolve('test-results', `settings-screen-${Date.now()}-${process.pid}`);
 fs.mkdirSync(out, { recursive: true });
 const testBrowser = createTestBrowser(out);
@@ -80,8 +80,8 @@ let ws;
     await sleep(100);
   };
   const viewport = async (width, height, touch = false) => {
-    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await sleep(100); await ready();
   };
   const screenshot = async name => {
@@ -99,9 +99,29 @@ let ws;
     }
     for (let i = 0; i < g.controls.length; i++) for (let j = i + 1; j < g.controls.length; j++) {
       const a = g.controls[i], b = g.controls[j];
-      assert(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)<=.5 || Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)<=.5, `${label}: overlap ${a.name}/${b.name}`);
+      assert(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)<=.5 || Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)<=.5, `${label}: overlap ${a.name}/${b.name} ${JSON.stringify({a,b})}`);
     }
     return g.controls;
+  };
+  const validateLayout = async (label, mobile) => {
+    const layout=await evaluate(`(()=>{const p=document.querySelector('.reference-settings'),b=p.querySelector('.settings-board');const box=s=>{const r=p.querySelector(s).getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};return{mode:p.dataset.layout,coarse:matchMedia('(hover: none) and (pointer: coarse)').matches,width:p.clientWidth,height:p.clientHeight,scale:+getComputedStyle(p).getPropertyValue('--settings-ui-scale'),board:box('.settings-board'),on:box('[data-setting="on"]'),ru:box('[data-setting="ru"]'),back:box('[data-setting="back"]'),scroll:p.scrollTop}})()`);
+    assert.equal(layout.coarse,mobile,`${label}: wrong input emulation`);
+    assert.equal(layout.mode,mobile?'mobile':'desktop',`${label}: wrong settings layout`);
+    if(mobile){
+      assert(layout.on.y<layout.height*.3,`${label}: obsolete portrait top gap`);
+      if(layout.width>=375&&layout.width<=410&&layout.height>=800)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: tall phone does not use full viewport without scrolling`);
+      if(layout.width>layout.height){
+        assert(layout.ru.x>layout.width*.5,`${label}: landscape settings do not occupy right column`);
+        if(layout.width>=800)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: Back needs avoidable landscape scrolling`);
+      }
+    } else {
+      const expectedScale=Math.min(layout.width/1280,Math.max(.8,layout.height/720));
+      assert(Math.abs(layout.scale-expectedScale)<.001,`${label}: original desktop scale changed`);
+      assert(Math.abs(layout.on.x-300*layout.scale)<1,`${label}: desktop panel moved from original left position`);
+      assert(Math.abs(layout.on.w-128*layout.scale)<1,`${label}: desktop button scale changed`);
+      assert(layout.ru.x<layout.width*.4,`${label}: desktop settings moved to right column`);
+    }
+    return layout;
   };
   const rangeValue = name => evaluate(`Number(document.querySelector('[data-action="${name}-volume"]').value)`);
   const key = async (name, value) => {
@@ -137,9 +157,10 @@ let ws;
   await wait('!!window.settingsTest && !!document.querySelector(\'[data-action="settings"]\')');
   await click('[data-action="settings"]'); await ready();
   const originalGeometry = await validateGeometry('initial desktop');
-  for (const [name, w, h] of [['desktop',1280,720],['portrait',390,844],['landscape',844,390],['compact',320,568],['tablet',768,1024],['tablet-landscape',1024,768],['wide',1672,941],['small-landscape',568,320],['medium',1000,700]]) {
-    await viewport(w,h); await validateGeometry(name);
+  for (const [name, w, h, touch] of [['desktop',1280,720,false],['narrow-desktop',844,390,false],['portrait',390,844,true],['landscape',844,390,true],['compact',320,568,true],['tablet',768,1024,true],['tablet-landscape',1024,768,true],['wide',1672,941,false],['small-landscape',568,320,true],['medium',1000,700,false]]) {
+    await viewport(w,h,touch); await validateGeometry(name);
     await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
+    await validateLayout(name,touch);
     await screenshot(name);
     if (['landscape','compact','tablet'].includes(name)) {
       await rect('[data-setting="back"]');
@@ -147,14 +168,14 @@ let ws;
       await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
     }
   }
-  await viewport(844,390);
+  await viewport(844,390,true);
   await click('[data-setting="large"]'); await ready();
   const scrollBefore = await evaluate(`document.querySelector('.reference-settings').scrollTop`);
   await click('[data-setting="normal"]'); await ready();
   const scrollAfter = await evaluate(`document.querySelector('.reference-settings').scrollTop`);
   assert(Math.abs(scrollBefore-scrollAfter)<2,'short landscape scroll resets after text change');
   await viewport(1280,720); assert.deepEqual(await validateGeometry('returned desktop'), originalGeometry);
-  check('44px controls, no overlap/clipping; nine viewports and reversible rotation');
+  check('44px controls, no overlap/clipping; ten viewports, original desktop panel and fullscreen mobile layouts; reversible rotation');
   const hover = await rect('[data-setting="off"]');
   await cdp('Input.dispatchMouseEvent', { type:'mouseMoved', x:hover.x+hover.width/2, y:hover.y+hover.height/2 });
   assert.equal(await evaluate(`document.querySelector('[data-setting="off"]').matches(':hover')`), true);
@@ -234,6 +255,7 @@ let ws;
   await screenshot('artwork-recovered');
   check('blocked artwork fallback exposes labels/ranges/selection; resize after unblock hides obsolete error');
   assert.deepEqual(runtimeErrors,[],'browser runtime errors');
+  fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,runtimeErrors},null,2));
   await send('Browser.close'); ws.close();
 })().catch(error => { console.error(error); process.exitCode = 1; })
   .finally(async () => { if (ws) ws.close(); await testBrowser.cleanup(); })

@@ -43,7 +43,9 @@ export function layoutReferenceSettings(root: HTMLElement, view: ApplicationView
   // A newly visible scrollbar can change available width on the first pass.
   for (let pass = 0; pass < 2; pass++) {
     const width = page.clientWidth;
-    layout = settingsLayout(width, page.clientHeight, view.settings.textSize);
+    const mobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      && Math.min(width, page.clientHeight) < 800;
+    layout = settingsLayout(width, page.clientHeight, view.settings.textSize, mobile);
     board.style.width = `${layout.width * layout.scale}px`;
     board.style.height = `${Math.ceil(layout.height * layout.scale)}px`;
     if (page.clientWidth === width) break;
@@ -52,6 +54,7 @@ export function layoutReferenceSettings(root: HTMLElement, view: ApplicationView
   page.style.setProperty('--settings-ui-scale', String(current.scale));
   page.style.setProperty('--settings-content-height', `${Math.ceil(current.height * current.scale)}px`);
   page.dataset.orientation = current.orientation;
+  page.dataset.layout = current.mobile ? 'mobile' : 'desktop';
   page.dataset.compact = String(current.compact);
   for (const [label, rect] of Object.entries(current.choices)) {
     position(board.querySelector<HTMLElement>(`[data-setting="${label}"]`)!, rect, current.scale);
