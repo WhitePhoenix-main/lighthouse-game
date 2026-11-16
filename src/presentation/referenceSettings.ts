@@ -1,7 +1,7 @@
 import type { ApplicationView } from '../contracts';
 import { resolveLanguage, translate } from './localization';
 import { loadSettingsAssets, paintSettingsArtwork, type SettingsAssets } from './settingsArtwork';
-import { settingsLayout, type SettingsChoice, type SettingsLayout, type SettingsRect, type SettingsVolume } from './settingsLayout';
+import { settingsLayout, usesMobileSettingsLayout, type SettingsChoice, type SettingsLayout, type SettingsRect, type SettingsVolume } from './settingsLayout';
 
 const words: Record<SettingsChoice, string> = {
   on: 'ВКЛ', off: 'ВЫКЛ', auto: 'АВТОМАТИЧЕСКИ', ru: 'РУССКИЙ', en: 'ENGLISH', normal: 'ОБЫЧНЫЙ', large: 'КРУПНЫЙ', back: 'НАЗАД'
@@ -43,8 +43,8 @@ export function layoutReferenceSettings(root: HTMLElement, view: ApplicationView
   // A newly visible scrollbar can change available width on the first pass.
   for (let pass = 0; pass < 2; pass++) {
     const width = page.clientWidth;
-    const mobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches
-      && Math.min(width, page.clientHeight) < 800;
+    const mobile = usesMobileSettingsLayout(width, page.clientHeight,
+      window.matchMedia('(pointer: coarse)').matches, navigator.maxTouchPoints);
     layout = settingsLayout(width, page.clientHeight, view.settings.textSize, mobile);
     board.style.width = `${layout.width * layout.scale}px`;
     board.style.height = `${Math.ceil(layout.height * layout.scale)}px`;

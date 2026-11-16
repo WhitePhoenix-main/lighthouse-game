@@ -22,15 +22,21 @@ export interface SettingsLayout {
   footer: { x: number; ys: readonly number[] };
 }
 
+/** Viewport shape also covers responsive previews that retain a mouse pointer. */
+export function usesMobileSettingsLayout(width: number, height: number, coarsePointer: boolean, touchPoints: number): boolean {
+  return width <= 600 || (height >= width && width < 1000)
+    || (width <= 1100 && Math.min(width, height) < 800 && (coarsePointer || touchPoints > 0));
+}
+
 /** Virtual artwork coordinates and native control rectangles share one layout. */
 export function settingsLayout(viewportWidth: number, viewportHeight: number, textSize: TextSize, mobileViewport?: boolean): SettingsLayout {
   const orientation = viewportHeight >= viewportWidth ? 'portrait' : 'landscape';
-  const mobile = mobileViewport ?? (orientation === 'portrait' || viewportWidth < 1000);
+  const mobile = mobileViewport ?? usesMobileSettingsLayout(viewportWidth, viewportHeight, false, 0);
   const compact = mobile && orientation === 'landscape';
-  const scale = mobile && orientation === 'portrait' ? Math.min(viewportWidth / 390, 1.75)
+  const scale = mobile && orientation === 'portrait' ? Math.min(viewportWidth / 390, viewportHeight / (414 + 5 * 48), 1.75)
     : compact ? Math.min(viewportWidth / 600, 1)
       : Math.min(viewportWidth / 1120, Math.max(.8, viewportHeight / 630));
-  const width = viewportWidth / scale;
+  const width = mobile ? viewportWidth / scale : 640;
   const controlHeight = Math.max(48, 44 / scale);
   const textScale = Math.max(1, 14 / (18 * scale)) * (textSize === 'large' ? 1.12 : 1);
   const rect = (x: number, y: number, w: number, h = controlHeight): SettingsRect => ({ x, y, width: w, height: h });
@@ -113,7 +119,7 @@ export function settingsLayout(viewportWidth: number, viewportHeight: number, te
   const minimumHeight = desktopRows(0).back + backHeight + 40;
   const extraHeight = Math.max(0, viewportHeight / scale - minimumHeight);
   // Ignore subpixel aspect-ratio rounding at the reference ratio.
-  const gap = extraHeight >= 1 ? extraHeight / 6 : 0;
+  const gap = extraHeight >= 1 ? Math.min(extraHeight / 6, 8 / scale) : 0;
   const { sound, music, effects, firstDivider, languageHeading, language, text, lastDivider, footer, back } = desktopRows(gap);
   return {
     orientation, compact, mobile, width, scale, textScale,

@@ -79,8 +79,9 @@ let ws;
     }
     await sleep(100);
   };
-  const viewport = async (width, height, touch = false, dpr = 1) => {
+  const viewport = async (width, height, touch = false, dpr = 1, touchPoints = touch ? 1 : 0) => {
     await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await evaluate(`Object.defineProperty(navigator,'maxTouchPoints',{configurable:true,get:()=>${touchPoints}})`);
     await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: dpr, mobile: touch });
     await sleep(100); await ready();
   };
@@ -103,13 +104,13 @@ let ws;
     }
     return g.controls;
   };
-  const validateLayout = async (label, mobile) => {
+  const validateLayout = async (label, mobile, coarse = mobile) => {
     const layout=await evaluate(`(()=>{const p=document.querySelector('.reference-settings'),b=p.querySelector('.settings-board');const box=s=>{const r=p.querySelector(s).getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};return{mode:p.dataset.layout,coarse:matchMedia('(hover: none) and (pointer: coarse)').matches,width:p.clientWidth,height:p.clientHeight,scale:+getComputedStyle(p).getPropertyValue('--settings-ui-scale'),board:box('.settings-board'),on:box('[data-setting="on"]'),ru:box('[data-setting="ru"]'),back:box('[data-setting="back"]'),scroll:p.scrollTop}})()`);
-    assert.equal(layout.coarse,mobile,`${label}: wrong input emulation`);
+    assert.equal(layout.coarse,coarse,`${label}: wrong input emulation`);
     assert.equal(layout.mode,mobile?'mobile':'desktop',`${label}: wrong settings layout`);
     if(mobile){
       assert(layout.on.y<layout.height*.3,`${label}: obsolete portrait top gap`);
-      if(layout.width>=375&&layout.width<=410&&layout.height>=800)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: tall phone does not use full viewport without scrolling`);
+      if(layout.width>=375&&layout.height>=700&&layout.height>=layout.width)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: tall phone does not use full viewport without scrolling`);
       if(layout.width>layout.height){
         assert(layout.ru.x>layout.width*.5,`${label}: landscape settings do not occupy right column`);
         if(layout.width>=800)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: Back needs avoidable landscape scrolling`);
@@ -124,6 +125,8 @@ let ws;
         assert(layout.scale>oldScale*1.1,`${label}: desktop UI was not enlarged`);
         assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: enlarged desktop Back clips below viewport`);
       }
+      assert(layout.board.w<=640*layout.scale+1,`${label}: desktop canvas exceeds the left panel`);
+      assert(layout.back.y+layout.back.h<=630*layout.scale+49,`${label}: desktop vertical gaps grew beyond density cap`);
       assert(layout.ru.x<layout.width*.4,`${label}: desktop settings moved to right column`);
     }
     return layout;
@@ -162,10 +165,10 @@ let ws;
   await wait('!!window.settingsTest && !!document.querySelector(\'[data-action="settings"]\')');
   await click('[data-action="settings"]'); await ready();
   const originalGeometry = await validateGeometry('initial desktop');
-  for (const [name, w, h, touch] of [['desktop',1280,720,false],['tall-desktop',1280,1024,false],['narrow-desktop',844,390,false],['portrait',390,844,true],['landscape',844,390,true],['compact',320,568,true],['tablet',768,1024,true],['tablet-landscape',1024,768,true],['wide',1672,941,false],['small-landscape',568,320,true],['medium',1000,700,false]]) {
-    await viewport(w,h,touch); await validateGeometry(name);
+  for (const [name, w, h, touch, mobile=touch, touchPoints=touch?1:0] of [['desktop',1280,720,false],['tall-desktop',1280,1024,false],['narrow-desktop',844,390,false],['portrait',390,844,true],['landscape',844,390,true],['compact',320,568,true],['tablet',768,1024,true],['tablet-landscape',1024,768,true],['wide',1672,941,false],['small-landscape',568,320,true],['medium',1000,700,false],['fine-phone',390,844,false,true],['fine-portrait',795,1543,false,true],['fine-portrait-933',933,1051,false,true],['fine-touch-landscape',844,390,false,true,5],['wide-hybrid-desktop',1280,720,false,false,5]]) {
+    await viewport(w,h,touch,1,touchPoints); await validateGeometry(name);
     await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
-    await validateLayout(name,touch);
+    await validateLayout(name,mobile,touch);
     await screenshot(name);
     if (['landscape','compact','tablet'].includes(name)) {
       await rect('[data-setting="back"]');
@@ -173,6 +176,21 @@ let ws;
       await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
     }
   }
+  for(const [width,height,touch] of [[390,844,false],[795,1543,false],[933,1051,false],[844,390,true]]) {
+    await viewport(width,height,touch);
+    for(const language of ['ru','en']) {
+      await click(`[data-setting="${language}"]`);await ready();
+      for(const size of ['normal','large']) {
+        await click(`[data-setting="${size}"]`);await ready();
+        await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
+        await validateGeometry(`${width}x${height} ${language} ${size}`);
+        await validateLayout(`${width}x${height} ${language} ${size}`,true,touch);
+      }
+    }
+    await screenshot(`mobile-${width}x${height}-en-large`);
+  }
+  await click('[data-setting="auto"]');await ready();await click('[data-setting="normal"]');await ready();
+  check('RU/EN normal/large mobile geometry keeps 44px controls and fully visible Back, including fine-pointer 795/933 portraits');
   await viewport(844,390,true);
   await click('[data-setting="large"]'); await ready();
   const scrollBefore = await evaluate(`document.querySelector('.reference-settings').scrollTop`);
@@ -180,7 +198,7 @@ let ws;
   const scrollAfter = await evaluate(`document.querySelector('.reference-settings').scrollTop`);
   assert(Math.abs(scrollBefore-scrollAfter)<2,'short landscape scroll resets after text change');
   await viewport(1280,720); assert.deepEqual(await validateGeometry('returned desktop'), originalGeometry);
-  check('44px controls, no overlap/clipping; eleven viewports, enlarged desktop panel and fullscreen mobile layouts; reversible rotation');
+  check('44px controls, no overlap/clipping; sixteen viewports including fine-pointer phones, enlarged bounded desktop panel and fullscreen mobile layouts; reversible rotation');
   const hover = await rect('[data-setting="off"]');
   await cdp('Input.dispatchMouseEvent', { type:'mouseMoved', x:hover.x+hover.width/2, y:hover.y+hover.height/2 });
   assert.equal(await evaluate(`document.querySelector('[data-setting="off"]').matches(':hover')`), true);

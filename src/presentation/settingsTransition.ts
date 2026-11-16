@@ -211,17 +211,15 @@ export function mountSettingsTransition(overlay: HTMLElement): {
     for (const motion of [current, scrimAnimation, ghostAnimation]) {
       if (!motion) continue;
       motion.currentTime = elapsed;
-      if (paused) motion.pause();
-      else if (typeof start === 'number') motion.startTime = start - elapsed;
+      if (typeof start === 'number') motion.startTime = start - elapsed;
     }
     current.onfinish = () => {
       if (!destroyed && animation === current) finish();
     };
   };
-  const distance = (): number => Math.min(640, Math.max(360, overlay.clientWidth * 0.52));
   // The extra CSS pixel clears the clip edge even at fractional viewport/DPR sizes.
   const offscreenTransform = (): string => page?.dataset.layout === 'mobile'
-    ? 'translateY(calc(100% + 1px))' : `translateX(-${distance()}px)`;
+    ? 'translateY(calc(100% + 1px))' : 'translateX(calc(-100% - 1px))';
   const restingTransform = (): string => page?.dataset.layout === 'mobile' ? 'translateY(0)' : 'translateX(0)';
   const reveal = (): void => {
     if (destroyed || animation) return;
@@ -229,7 +227,7 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       if (!menu) { if (!committing) abort(); return; }
       menu.dataset.menuTransition = 'in';
       busy(menu, true);
-      if (reducedMotion.matches || typeof menu.animate !== 'function') { finish(); return; }
+      if (paused || reducedMotion.matches || typeof menu.animate !== 'function') { finish(); return; }
       run(menu, [{ opacity: 0 }, { opacity: 1 }], menuDuration);
       return;
     }
@@ -238,7 +236,7 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       page.dataset.entering = 'false';
       page.dataset.exiting = 'true';
       busy(page, true);
-      if (reducedMotion.matches || typeof board.animate !== 'function') { finish(); return; }
+      if (paused || reducedMotion.matches || typeof board.animate !== 'function') { finish(); return; }
       run(board, [exitFrom, { transform: offscreenTransform(), opacity: 0 }], duration,
         [{ opacity: scrimFrom }, { opacity: 0 }]);
       return;
@@ -251,6 +249,9 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       page.dataset.entering = 'pending';
       return;
     }
+    // UI navigation settles on focus loss; a background asset load must not
+    // start a new animation or leave translucent controls over the next screen.
+    if (paused) { finish(); return; }
     page.dataset.entering = 'true';
     run(board, [{ transform: offscreenTransform(), opacity: 0 },
       { transform: restingTransform(), opacity: 1 }], duration, [{ opacity: 0 }, { opacity: 1 }]);
@@ -333,10 +334,9 @@ export function mountSettingsTransition(overlay: HTMLElement): {
     setPaused(value) {
       if (destroyed || paused === value) return;
       paused = value;
-      for (const motion of [animation, scrimAnimation, ghostAnimation]) {
-        if (!motion) continue;
-        if (paused) motion.pause(); else motion.play();
-      }
+      // Battle/audio/scenery keep their own lifecycle pause policy. A partially
+      // visible navigation surface should never remain frozen in a background tab.
+      if (paused && animation) finish();
     },
     destroy() {
       if (destroyed) return;

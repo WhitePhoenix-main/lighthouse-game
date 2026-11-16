@@ -70,6 +70,7 @@ let ws;
   };
   const viewport = async (width, height, touch = width < 900) => {
     await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await evaluate(`Object.defineProperty(navigator,'maxTouchPoints',{configurable:true,get:()=>${touch?1:0}})`);
     await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await sleep(120);
   };
@@ -152,25 +153,26 @@ let ws;
   const tallScenery=await scenery();await remember();await observeEntry();
   await click('[data-action="settings"]');await checkEntry('tall desktop');
   const tallBack=await evaluate(`(()=>{const r=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:innerHeight}})()`);
-  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom>tallBack.height*.9,'tall desktop Back must occupy lower viewport without clipping');
+  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom<=630*(1280/1120)+49,'tall desktop spacing exceeds density cap');
   assert.deepEqual(await scenery(),tallScenery);await continuity('tall desktop');
   await screenshot('settings-desktop-1280x1024');
   await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
-  check('1280×1024 desktop preserves width/left motion and fills available height');
+  check('1280×1024 desktop preserves left motion and bounded density');
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
   for(const [width,height] of [[844,390],[390,844]]) {
   await viewport(width,height,true);
   await evaluate(`window.freezeOnEntry=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){freezeOnEntry.disconnect();window.dispatchEvent(new Event('blur'))}});freezeOnEntry.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,attributeFilter:['data-entering']})`);
   await click('[data-action="settings"]');
-  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true' && !!document.querySelector('.menu-motion-paused')`);
+  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='false' && !!document.querySelector('.menu-motion-paused')`);
   await sleep(60);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.settings-board')).opacity`),'1','blur retained partial settings opacity');
   const paused=await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`);
   await sleep(200);
-  assert.deepEqual(await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`),paused,'blur did not freeze scene and entry');
+  assert.deepEqual(await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`),paused,'blur did not settle UI and freeze scene');
   await evaluate(`window.dispatchEvent(new Event('focus'))`); await ready();
   await continuity('resume');
   await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
-  check(`${width}×${height}: blur/focus freezes and resumes backdrop and vertical entrance without catch-up`);
+  check(`${width}×${height}: blur settles vertical entrance and freezes/resumes backdrop without catch-up`);
   }
   await click('[data-action="settings"]');await ready();
   await viewport(844,390); await ready();
