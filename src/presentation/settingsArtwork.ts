@@ -4,10 +4,6 @@ import type { SettingsChoice, SettingsLayout, SettingsRect } from './settingsLay
 import { drawSettingsPixelText, settingsTextWidth } from './settingsLettering';
 
 export interface SettingsAssets {
-  background: HTMLImageElement;
-  moon: HTMLImageElement;
-  ship: HTMLImageElement;
-  sail: HTMLImageElement;
   frame: HTMLImageElement;
   labelsRu: HTMLImageElement;
   labelsEn: HTMLImageElement;
@@ -23,13 +19,11 @@ function loadImage(path: string): Promise<HTMLImageElement> {
 }
 export function loadSettingsAssets(): Promise<SettingsAssets> {
   assetsPromise ??= Promise.all([
-    loadImage('menu-sprites/background.png'), loadImage('menu-sprites/moon.png'),
-    loadImage('menu-sprites/ship.png'), loadImage('menu-sprites/sail.png'),
     loadImage('menu-buttons-v2/frame-states.png'), loadImage('menu-buttons-v2/labels-ru.png'),
     loadImage('menu-buttons-v2/labels-en.png')
-  ]).then(([background, moon, ship, sail, frame, labelsRu, labelsEn]) => {
-    if (!background || !moon || !ship || !sail || !frame || !labelsRu || !labelsEn) throw new Error('Incomplete settings artwork');
-    return { background, moon, ship, sail, frame, labelsRu, labelsEn };
+  ]).then(([frame, labelsRu, labelsEn]) => {
+    if (!frame || !labelsRu || !labelsEn) throw new Error('Incomplete settings artwork');
+    return { frame, labelsRu, labelsEn };
   }).catch((error: unknown) => { assetsPromise = undefined; throw error; });
   return assetsPromise;
 }
@@ -76,24 +70,6 @@ function slider(ctx: CanvasRenderingContext2D, rect: SettingsRect, volume: numbe
   pixelDisc(ctx, cx, cy - 1, 9, '#ffc671', 2);
   pixelDisc(ctx, cx - 3, cy - 4, 3, '#ffe3ad');
 }
-function scenery(ctx: CanvasRenderingContext2D, layout: SettingsLayout, assets: SettingsAssets): void {
-  const { width, height } = layout;
-  const portrait = layout.orientation === 'portrait';
-  // The portrait composition is anchored to the approved 390x844 camera, so
-  // scrolling or large text cannot move the lantern and moon behind the title.
-  const scale = portrait ? 984 / 640 : layout.compact ? Math.max(width / 640, height / 540) : Math.max(width / 640, height / 360);
-  const ox = portrait ? width / 2 - 444 * scale : layout.compact ? width * .85 - 390 * scale : 0;
-  const oy = portrait ? -140 : -100 * scale;
-  ctx.fillStyle = '#071321'; ctx.fillRect(0, 0, width, height);
-  ctx.drawImage(assets.background, ox, oy, 640 * scale, 640 * scale);
-  const objects: readonly [HTMLImageElement, number, number][] = [[assets.moon, 514, 128], [assets.ship, 500, 318], [assets.sail, 500, 318]];
-  for (const [image, x, y] of objects) ctx.drawImage(image, 0, 0, 64, 64, ox + x * scale, oy + y * scale, 64 * scale, 64 * scale);
-  const shade = portrait ? ctx.createLinearGradient(0, 0, 0, 844) : ctx.createLinearGradient(0, 0, layout.compact ? width : 1040, 0);
-  const stops: readonly [number, number][] = portrait ? [[0, .04], [.19, .08], [.30, .70], [.43, .85], [1, .94]]
-    : layout.compact ? [[0, .97], [.52, .9], [.72, .65], [1, .12]] : [[0, .94], [.52, .78], [.72, .22], [1, .08]];
-  for (const [offset, opacity] of stops) shade.addColorStop(offset, `rgba(3,10,19,${opacity})`);
-  ctx.fillStyle = shade; ctx.fillRect(0, 0, width, height);
-}
 const copy = {
   ru: { sound: 'ЗВУК', music: 'МУЗЫКА', effects: 'ЗВУКИ', language: 'ЯЗЫК', text: 'ТЕКСТ', on: 'ВКЛ', off: 'ВЫКЛ', auto: 'АВТО', ru: 'РУССКИЙ', en: 'ENGLISH', normal: 'ОБЫЧНЫЙ', large: 'КРУПНЫЙ', back: 'НАЗАД', footer: ['СОХРАНЯЕТСЯ', 'АВТОМАТИЧЕСКИ'] },
   en: { sound: 'SOUND', music: 'MUSIC', effects: 'EFFECTS', language: 'LANGUAGE', text: 'TEXT', on: 'ON', off: 'OFF', auto: 'AUTO', ru: 'RUSSIAN', en: 'ENGLISH', normal: 'NORMAL', large: 'LARGE', back: 'BACK', footer: ['SAVED', 'AUTOMATICALLY'] }
@@ -104,7 +80,6 @@ export function paintSettingsArtwork(
   language: Language, assets: SettingsAssets, saved: boolean
 ): void {
   ctx.save(); ctx.imageSmoothingEnabled = false;
-  scenery(ctx, layout, assets);
   const words = copy[language], textScale = 2 * layout.textScale;
   const title = layout.title;
   ctx.save(); ctx.globalAlpha = .9;

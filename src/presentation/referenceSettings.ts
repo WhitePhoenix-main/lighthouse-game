@@ -19,7 +19,7 @@ export function referenceSettings(view: ApplicationView): string {
     `<button class="settings-control" data-setting="${label}" data-action="${action}" ${data} aria-label="${t(words[label])}" aria-pressed="${selected}" ${disabled}><span class="settings-accessible-label settings-native-label">${label === 'auto' ? language === 'ru' ? 'АВТО' : 'AUTO' : t(words[label])}</span></button>`;
   const slider = (label: SettingsVolume, word: string, value: number): string =>
     `<label class="settings-control settings-slider" data-setting="${label}"><span class="settings-accessible-label settings-native-label">${t(word)}</span><input aria-label="${t(word)}" aria-valuetext="${value}%" data-action="${label}-volume" type="range" min="0" max="100" step="1" value="${value}" ${disabled}></label>`;
-  return `<section class="reference-settings" aria-labelledby="settings-title"><div class="settings-board"><canvas class="settings-art" aria-hidden="true"></canvas><h1 id="settings-title" class="settings-accessible-label" tabindex="-1">${t('Настройки')}</h1>
+  return `<section class="reference-settings" aria-labelledby="settings-title"><div class="settings-scrim" aria-hidden="true"></div><div class="settings-board"><canvas class="settings-art" aria-hidden="true"></canvas><h1 id="settings-title" class="settings-accessible-label" tabindex="-1">${t('Настройки')}</h1>
     ${choice('on', 'sound-toggle', 'data-enabled="true"', view.settings.soundEnabled)}${choice('off', 'sound-toggle', 'data-enabled="false"', !view.settings.soundEnabled)}
     ${slider('music', 'Музыка', view.settings.musicVolume)}${slider('effects', 'Звуки', view.settings.effectsVolume)}
     ${choice('auto', 'language', 'data-language="auto"', view.settings.language === 'auto')}${choice('ru', 'language', 'data-language="ru"', view.settings.language === 'ru')}${choice('en', 'language', 'data-language="en"', view.settings.language === 'en')}
@@ -49,6 +49,8 @@ export function layoutReferenceSettings(root: HTMLElement, view: ApplicationView
     if (page.clientWidth === width) break;
   }
   const current = layout!;
+  page.style.setProperty('--settings-ui-scale', String(current.scale));
+  page.style.setProperty('--settings-content-height', `${Math.ceil(current.height * current.scale)}px`);
   page.dataset.orientation = current.orientation;
   page.dataset.compact = String(current.compact);
   for (const [label, rect] of Object.entries(current.choices)) {

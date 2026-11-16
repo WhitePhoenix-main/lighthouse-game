@@ -1,5 +1,5 @@
 /** Starts the title reveal only after the current menu's sprite is decoded. */
-export function mountMenuTitle(overlay: HTMLElement): { destroy(): void } {
+export function mountMenuTitle(overlay: HTMLElement, backgroundRoot: HTMLElement = overlay): { destroy(): void } {
   let generation = 0;
   let current: HTMLElement | null = null;
   let destroyed = false;
@@ -14,7 +14,7 @@ export function mountMenuTitle(overlay: HTMLElement): { destroy(): void } {
     if (!match?.[1]) return;
     const image = new Image();
     image.src = match[1];
-    const background = overlay.querySelector<HTMLImageElement>('img.menu-background');
+    const background = backgroundRoot.querySelector<HTMLImageElement>('img.menu-background');
     void Promise.all([image.decode(), background?.decode() ?? Promise.resolve()]).then(() => {
       if (!destroyed && generation === request && current === title && overlay.contains(title)) {
         title.classList.add('menu-title-ready');

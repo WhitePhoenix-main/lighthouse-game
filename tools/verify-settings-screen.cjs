@@ -59,7 +59,7 @@ let ws;
     throw Error(`Timeout: ${expression}\n${await evaluate('JSON.stringify({url:location.href,title:document.title,body:document.body.innerText.slice(0,4000),html:document.body.innerHTML.slice(0,1500)})')}`);
   };
   const ready = async () => {
-    await wait(`document.querySelector('.reference-settings')?.dataset.ready==='true' && document.querySelector('.reference-settings').dataset.orientation===(innerHeight>=innerWidth?'portrait':'landscape')`);
+    await wait(`document.querySelector('.reference-settings')?.dataset.ready==='true' && !['pending','true'].includes(document.querySelector('.reference-settings').dataset.entering) && document.querySelector('.reference-settings').dataset.orientation===(innerHeight>=innerWidth?'portrait':'landscape')`);
     await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
   };
   const rect = async selector => {

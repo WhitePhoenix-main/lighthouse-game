@@ -15,6 +15,8 @@ import { layoutReferenceMenu, mountMenuMotion } from './referenceMenu';
 import { mountMenuWindows } from './menuWindows';
 import { mountMenuTitle } from './menuTitle';
 import { mountMenuButtons } from './menuButtons';
+import { menuScenery, layoutMenuScenery } from './menuScenery';
+import { mountSettingsTransition } from './settingsTransition';
 import { renderPlacementPreview } from './preparation';
 import { screenContent } from './screens';
 import { drawCombatFeedback } from './feedback';
@@ -49,10 +51,24 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   const menuAudio = mountMenuAudio(root, application);
   const effectsAudio = mountEffectsAudio(root, application);
   const overlay = find('[data-overlay]');
-  const menuWindows = mountMenuWindows(overlay);
-  const menuTitle = mountMenuTitle(overlay);
+  // One connected scene survives menu/settings replacement and retains its timelines.
+  const sceneryLayer = document.createElement('div');
+  sceneryLayer.className = 'menu-scene-layer';
+  sceneryLayer.setAttribute('aria-hidden', 'true');
+  sceneryLayer.innerHTML = menuScenery();
+  overlay.before(sceneryLayer);
+  let sceneryActive = false;
+  let lifecyclePaused = false;
+  const menuWindows = mountMenuWindows(sceneryLayer);
+  const menuTitle = mountMenuTitle(overlay, sceneryLayer);
   const menuButtons = mountMenuButtons(overlay);
-  const menuMotion = mountMenuMotion(root, (paused) => { menuWindows.setPaused(paused); menuButtons.setPaused(paused); });
+  const settingsTransition = mountSettingsTransition(overlay);
+  const menuMotion = mountMenuMotion(root, (paused) => {
+    lifecyclePaused = paused;
+    menuWindows.setPaused(paused || !sceneryActive);
+    menuButtons.setPaused(paused);
+    settingsTransition.setPaused(paused);
+  });
   const devicePanel = find('[data-battle-devices]');
   const flashButton = find<HTMLButtonElement>('[data-action="flash"]');
   const flashStatus = find('[data-flash-status]');
@@ -93,10 +109,31 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     if (width > 0 && height > 0 && (scale.width !== width || scale.height !== height)) scale.resize(width, height);
   }
 
+  function layoutSharedScenery(view: ApplicationView): void {
+    const width = sceneryLayer.clientWidth, height = sceneryLayer.clientHeight;
+    layoutMenuScenery(sceneryLayer, width, height);
+    // Preserve the approved mobile camera; desktop always uses the menu camera.
+    if (view.screen === 'settings' && height >= width) {
+      const page = overlay.querySelector<HTMLElement>('.reference-settings');
+      const scale = Number(page?.style.getPropertyValue('--settings-ui-scale')) || 1;
+      const scene = sceneryLayer.querySelector<HTMLElement>('.menu-scenery')!;
+      const worldScale = 984 / 640 * scale;
+      scene.style.left = `${(page?.clientWidth ?? width) / 2 - 444 * worldScale}px`;
+      scene.style.top = `${-140 * scale}px`;
+      scene.style.width = scene.style.height = `${640 * worldScale}px`;
+      scene.style.setProperty('--menu-world-scale', String(worldScale));
+    }
+  }
+
   function renderHud(view: ApplicationView): void {
     const { config, battle } = view;
     shell.classList.toggle('is-main-menu', view.screen === 'menu');
     shell.classList.toggle('is-settings', view.screen === 'settings');
+    sceneryActive = view.screen === 'menu' || view.screen === 'settings';
+    shell.classList.toggle('has-menu-scenery', sceneryActive);
+    sceneryLayer.classList.toggle('is-inactive', !sceneryActive);
+    sceneryLayer.classList.toggle('menu-motion-paused', !sceneryActive);
+    menuWindows.setPaused(lifecyclePaused || !sceneryActive);
     menuAudio.sync();
     effectsAudio.sync();
     if (view.screen !== 'battle') { selectedDevice = null; choosingTarget = false; rememberedTarget = null; targetNotice = ''; pendingTarget = null; }
@@ -192,8 +229,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     canvasHost.setAttribute('aria-hidden', String(!isBattle));
     overlay.className = 'overlay screen-' + view.screen + (view.screen === 'preparation' ? ' preparation' : '');
     overlay.innerHTML = screenContent(view, selectedUpgrade, confirmAbandon);
+    // Standalone menu markup includes a scene; the game uses its persistent sibling.
+    overlay.querySelector('.avalon-menu > .menu-scenery')?.remove();
     layoutReferenceMenu(overlay);
     layoutReferenceSettings(overlay, view);
+    layoutSharedScenery(view);
+    settingsTransition.sync();
     for (const element of root.querySelectorAll<HTMLElement>('[data-action]')) {
       element.dataset.focusKey = [element.dataset.action, element.dataset.upgrade ?? element.dataset.lensUpgrade ?? element.dataset.lens ?? element.dataset.night ?? element.dataset.kind ?? element.dataset.deviceId ?? element.dataset.size ?? element.dataset.enabled ?? element.dataset.language ?? ''].join(':');
     }
@@ -723,7 +764,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   // Explicit host sizing avoids RESIZE mode overwriting resize() with its
   // cached parent size when a screen transition changes layout within a frame.
   const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: false, antialias: true, scale: { mode: Phaser.Scale.NONE, width: canvasHost.clientWidth, height: canvasHost.clientHeight }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
-  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); });
+  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutSharedScenery(application.view); });
   resize.observe(canvasHost);
   resize.observe(shell);
   const placementPoint = (map: SVGSVGElement, x: number, y: number): DOMPoint | null => {
@@ -928,5 +969,5 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   root.addEventListener('pointermove', placementMove);
   window.addEventListener('keydown', keydown);
   renderHud(application.view);
-  return { destroy() { menuAudio.destroy(); effectsAudio.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
+  return { destroy() { menuAudio.destroy(); effectsAudio.destroy(); settingsTransition.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
 }
