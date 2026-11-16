@@ -126,7 +126,7 @@ let ws;
         assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: enlarged desktop Back clips below viewport`);
       }
       assert(layout.board.w<=640*layout.scale+1,`${label}: desktop canvas exceeds the left panel`);
-      assert(layout.back.y+layout.back.h<=630*layout.scale+49,`${label}: desktop vertical gaps grew beyond density cap`);
+      if(layout.board.h<=layout.height+1)assert(Math.abs(layout.back.y+layout.back.h-(layout.height-40*layout.scale))<=1,`${label}: desktop Back must leave exactly the scaled 40px bottom margin`);
       assert(layout.ru.x<layout.width*.4,`${label}: desktop settings moved to right column`);
     }
     return layout;
@@ -165,7 +165,7 @@ let ws;
   await wait('!!window.settingsTest && !!document.querySelector(\'[data-action="settings"]\')');
   await click('[data-action="settings"]'); await ready();
   const originalGeometry = await validateGeometry('initial desktop');
-  for (const [name, w, h, touch, mobile=touch, touchPoints=touch?1:0] of [['desktop',1280,720,false],['tall-desktop',1280,1024,false],['narrow-desktop',844,390,false],['portrait',390,844,true],['landscape',844,390,true],['compact',320,568,true],['tablet',768,1024,true],['tablet-landscape',1024,768,true],['wide',1672,941,false],['small-landscape',568,320,true],['medium',1000,700,false],['fine-phone',390,844,false,true],['fine-portrait',795,1543,false,true],['fine-portrait-933',933,1051,false,true],['fine-touch-landscape',844,390,false,true,5],['wide-hybrid-desktop',1280,720,false,false,5]]) {
+  for (const [name, w, h, touch, mobile=touch, touchPoints=touch?1:0] of [['desktop',1280,720,false],['tall-desktop',1280,1024,false],['screenshot-desktop',2048,1548,false],['narrow-desktop',844,390,false],['portrait',390,844,true],['landscape',844,390,true],['compact',320,568,true],['tablet',768,1024,true],['tablet-landscape',1024,768,true],['wide',1672,941,false],['small-landscape',568,320,true],['medium',1000,700,false],['fine-phone',390,844,false,true],['fine-portrait',795,1543,false,true],['fine-portrait-933',933,1051,false,true],['fine-touch-landscape',844,390,false,true,5],['wide-hybrid-desktop',1280,720,false,false,5]]) {
     await viewport(w,h,touch,1,touchPoints); await validateGeometry(name);
     await evaluate(`document.querySelector('.reference-settings').scrollTop=0`);
     await validateLayout(name,mobile,touch);
@@ -198,7 +198,7 @@ let ws;
   const scrollAfter = await evaluate(`document.querySelector('.reference-settings').scrollTop`);
   assert(Math.abs(scrollBefore-scrollAfter)<2,'short landscape scroll resets after text change');
   await viewport(1280,720); assert.deepEqual(await validateGeometry('returned desktop'), originalGeometry);
-  check('44px controls, no overlap/clipping; sixteen viewports including fine-pointer phones, enlarged bounded desktop panel and fullscreen mobile layouts; reversible rotation');
+  check('44px controls, no overlap/clipping; seventeen viewports including fine-pointer phones, enlarged full-height desktop panel and fullscreen mobile layouts; reversible rotation');
   const hover = await rect('[data-setting="off"]');
   await cdp('Input.dispatchMouseEvent', { type:'mouseMoved', x:hover.x+hover.width/2, y:hover.y+hover.height/2 });
   assert.equal(await evaluate(`document.querySelector('[data-setting="off"]').matches(':hover')`), true);
