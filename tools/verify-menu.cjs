@@ -151,7 +151,7 @@ const base = (process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.
         await title.focus();
         assert.equal(await title.evaluate(element => document.activeElement === element), true);
         await page.keyboard.press('Tab');
-        assert.equal(await page.locator('[data-action="preparation"]').evaluate(element => document.activeElement === element), true);
+        assert.equal(await page.locator('[data-action="game-menu"]').evaluate(element => document.activeElement === element), true);
         const titleSprite = await page.locator('.menu-title-sprite').evaluate(async element => {
           const style = getComputedStyle(element), image = new Image();
           image.src = /^url\(["']?(.*?)["']?\)$/.exec(style.backgroundImage)[1]; await image.decode();
@@ -399,8 +399,8 @@ const base = (process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.
         await page.locator('.reference-settings').waitFor();
         await page.keyboard.press('Escape');
         await page.locator('.avalon-menu').waitFor();
-        if (touch) await page.locator('[data-action="preparation"]').tap(); else await page.locator('[data-action="preparation"]').click();
-        await page.locator('.preparation-panel').waitFor();
+        if (touch) await page.locator('[data-action="game-menu"]').tap(); else await page.locator('[data-action="game-menu"]').click();
+        await page.locator('.reference-game-menu').waitFor();
         await page.keyboard.press('Escape');
         await page.locator('.avalon-menu').waitFor();
         await page.setViewportSize({ width: height, height: width });

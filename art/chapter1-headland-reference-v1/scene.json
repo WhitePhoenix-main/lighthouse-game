@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "status": "reference-only-not-integrated",
+  "chapter": "misty-shore",
+  "geometry": {
+    "approvedShape": "broad-gentle-headland",
+    "coordinates": "lighthouse origin, land x <= shore(y), sea x > shore(y)",
+    "shore": "x = 60 - 110 * (y / 400)^2",
+    "worldRadius": 400,
+    "lighthouseFootprintRadius": 30,
+    "projectionY": 0.84,
+    "numericalStatus": "provisional-art-layout"
+  },
+  "sources": {
+    "props": "art/chapter1-headland-reference-v1/sources/props.png",
+    "ground": "art/chapter1-headland-reference-v1/sources/ground.png",
+    "water": "art/chapter1-headland-reference-v1/sources/water.png"
+  },
+  "propsGrid": { "columns": 3, "rows": 2, "order": ["lighthouse", "shore-rocks", "ruined-arch", "grass", "surf", "rubble"] },
+  "spriteCanvases": {
+    "lighthouse": [96, 144],
+    "shore-rocks": [64, 48],
+    "ruined-arch": [64, 80],
+    "grass": [32, 24],
+    "surf": [64, 32],
+    "rubble": [48, 32]
+  },
+  "views": {
+    "field": [800, 640],
+    "portrait": [360, 640]
+  },
+  "constraints": [
+    "Compose actual separate raster sprites and masks; do not use a flattened generated gameplay scene.",
+    "No sky, horizon, moon, UI, text, enemies, devices or directed combat beam in this clean field reference.",
+    "World positions and the coast are identical in both views. Fit the entire active worldRadius into portrait; never crop away the marine half.",
+    "Lighthouse near center, on land; keep the active area mostly clear. High decorative ruins live outside the active disk.",
+    "Cold blue/slate sea and stone, muted dark vegetation, amber windows; match existing sprites/background.png pixel scale and materials.",
+    "Use nearest-neighbor scaling. Full art is a design reference; no live placement, movement or saves are changed."
+  ]
+}

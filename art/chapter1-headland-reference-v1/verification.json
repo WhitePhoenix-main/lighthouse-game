@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "command": "pwsh -File tools/prepare-headland-reference.ps1",
+  "composition": "separate source-derived raster sprites over source-derived tiled materials with geometric shore and relief masks",
+  "shore": "x = 60 - 110 * (y / 400)^2",
+  "projectionY": 0.84,
+  "worldRadius": 400,
+  "seaFractionOfActiveDisk": 0.4626908729171848,
+  "sharedWorldPlacements": true,
+  "views": [
+    {
+      "id": "field",
+      "size": [
+        800,
+        640
+      ],
+      "scale": 0.875,
+      "origin": [
+        400,
+        344
+      ],
+      "activeDiskBounds": [
+        50.0,
+        50.0,
+        750.0,
+        638.0
+      ],
+      "entireDiskFits": true
+    },
+    {
+      "id": "portrait",
+      "size": [
+        360,
+        640
+      ],
+      "scale": 0.405,
+      "origin": [
+        180,
+        344
+      ],
+      "activeDiskBounds": [
+        18.0,
+        207.92,
+        342.0,
+        480.08000000000004
+      ],
+      "entireDiskFits": true
+    }
+  ],
+  "sourceHashes": [
+    {
+      "id": "props",
+      "sha256": "5B6DA24DB1D8DFC96B9CD3BE9728CB13E880EDE793D1FE5A35F9C87645204D77"
+    },
+    {
+      "id": "ground",
+      "sha256": "A984DD56B853BB7D2CC808B6CF8D6EEE37266F20DFE1216FD2460C3C72422899"
+    },
+    {
+      "id": "water",
+      "sha256": "A2056C4985B9DA4773D214336F5919C22930D33C61B21671E2DDB66FED614764"
+    }
+  ],
+  "limitations": [
+    "Texture seamlessness and balance values are provisional.",
+    "This reference does not change gameplay or integrate art into Phaser.",
+    "PNG fit checks are mathematical viewport checks, not physical phone testing."
+  ]
+}

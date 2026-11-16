@@ -1,0 +1,540 @@
+{
+  "version": 1,
+  "status": "art-reference-only",
+  "scene": "art/chapter1-headland-reference-v1/scene.json",
+  "filter": "nearest-neighbor",
+  "alphaCutoff": 180,
+  "surfOpacity": 0.58,
+  "atlasExtractionNote": "Tower extends into nominal second row; lighthouse region extends to60% height and grass starts at62.5% height.",
+  "textureTileSize": 128,
+  "textureWorldSize": 256,
+  "seamlessness": "provisional",
+  "sprites": [
+    {
+      "id": "lighthouse",
+      "file": "sprites/chapter1-headland-v1/lighthouse.png",
+      "canvas": [
+        96,
+        144
+      ],
+      "sourceRect": [
+        122,
+        48,
+        293,
+        521
+      ]
+    },
+    {
+      "id": "shore-rocks",
+      "file": "sprites/chapter1-headland-v1/shore-rocks.png",
+      "canvas": [
+        64,
+        48
+      ],
+      "sourceRect": [
+        566,
+        240,
+        384,
+        248
+      ]
+    },
+    {
+      "id": "ruined-arch",
+      "file": "sprites/chapter1-headland-v1/ruined-arch.png",
+      "canvas": [
+        64,
+        80
+      ],
+      "sourceRect": [
+        1072,
+        145,
+        390,
+        340
+      ]
+    },
+    {
+      "id": "grass",
+      "file": "sprites/chapter1-headland-v1/grass.png",
+      "canvas": [
+        32,
+        24
+      ],
+      "sourceRect": [
+        162,
+        749,
+        189,
+        133
+      ]
+    },
+    {
+      "id": "surf",
+      "file": "sprites/chapter1-headland-v1/surf.png",
+      "canvas": [
+        64,
+        32
+      ],
+      "sourceRect": [
+        561,
+        766,
+        389,
+        102
+      ]
+    },
+    {
+      "id": "rubble",
+      "file": "sprites/chapter1-headland-v1/rubble.png",
+      "canvas": [
+        48,
+        32
+      ],
+      "sourceRect": [
+        1106,
+        734,
+        304,
+        153
+      ]
+    }
+  ],
+  "placements": [
+    {
+      "id": "grass",
+      "x": -798.9712443310658,
+      "y": -1040.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": -503.875,
+      "y": -900.0,
+      "width": 68.0,
+      "height": 47.599999999999994,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": -475.875,
+      "y": -882.0,
+      "width": 38.0,
+      "height": 13.68,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -516.5791568877551,
+      "y": -866.0,
+      "width": 36.0,
+      "height": 27.0,
+      "flip": false
+    },
+    {
+      "id": "rubble",
+      "x": -453.8427499999999,
+      "y": -862.0,
+      "width": 50.0,
+      "height": 33.0,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -393.01968183106584,
+      "y": -725.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": -283.619,
+      "y": -708.0,
+      "width": 82.0,
+      "height": 57.4,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": -263.619,
+      "y": -684.0,
+      "width": 72.0,
+      "height": 25.919999999999998,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": -174.3046875,
+      "y": -575.0,
+      "width": 61.0,
+      "height": 42.699999999999996,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": -146.3046875,
+      "y": -557.0,
+      "width": 52.0,
+      "height": 18.72,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": -141.99275,
+      "y": -538.0,
+      "width": 52.0,
+      "height": 36.4,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -305.0,
+      "y": -516.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -216.0,
+      "y": -455.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "rubble",
+      "x": -266.0,
+      "y": -392.0,
+      "width": 64.0,
+      "height": 43.0,
+      "flip": false
+    },
+    {
+      "id": "rubble",
+      "x": -39.32275,
+      "y": -382.0,
+      "width": 74.0,
+      "height": 48.84,
+      "flip": false
+    },
+    {
+      "id": "ruined-arch",
+      "x": -320.0,
+      "y": -380.0,
+      "width": 100.0,
+      "height": 125.0,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": -19.32275,
+      "y": -358.0,
+      "width": 49.0,
+      "height": 17.64,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -61.34965688775512,
+      "y": -348.0,
+      "width": 36.0,
+      "height": 27.0,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": -28.355999999999995,
+      "y": -344.0,
+      "width": 55.0,
+      "height": 38.5,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": -0.35599999999999454,
+      "y": -326.0,
+      "width": 66.0,
+      "height": 23.759999999999998,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -510.0,
+      "y": -320.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -365.0,
+      "y": -245.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": 31.656000000000006,
+      "y": -192.0,
+      "width": 81.0,
+      "height": 56.699999999999996,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": 42.282812500000006,
+      "y": -165.0,
+      "width": 50.0,
+      "height": 35.0,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": 62.282812500000006,
+      "y": -141.0,
+      "width": 63.0,
+      "height": 22.68,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -414.0,
+      "y": -100.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "lighthouse",
+      "x": 0.0,
+      "y": 0.0,
+      "width": 100.0,
+      "height": 150.0,
+      "flip": false
+    },
+    {
+      "id": "rubble",
+      "x": 51.78725,
+      "y": 42.0,
+      "width": 69.0,
+      "height": 45.54,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": 79.78725,
+      "y": 60.0,
+      "width": 43.0,
+      "height": 15.479999999999999,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": 53.436,
+      "y": 72.0,
+      "width": 52.0,
+      "height": 36.4,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -410.0,
+      "y": 125.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -0.2750000000000057,
+      "y": 216.0,
+      "width": 36.0,
+      "height": 27.0,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": 27.724999999999994,
+      "y": 220.0,
+      "width": 84.0,
+      "height": 58.8,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": 47.724999999999994,
+      "y": 244.0,
+      "width": 40.0,
+      "height": 14.399999999999999,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": 4.355249999999998,
+      "y": 266.0,
+      "width": 57.0,
+      "height": 39.9,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": 32.35525,
+      "y": 284.0,
+      "width": 57.0,
+      "height": 20.52,
+      "flip": false
+    },
+    {
+      "id": "ruined-arch",
+      "x": -390.0,
+      "y": 340.0,
+      "width": 86.0,
+      "height": 108.0,
+      "flip": true
+    },
+    {
+      "id": "rubble",
+      "x": -333.0,
+      "y": 359.0,
+      "width": 74.0,
+      "height": 49.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -305.0,
+      "y": 368.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "rubble",
+      "x": -58.568749999999994,
+      "y": 410.0,
+      "width": 73.0,
+      "height": 48.18,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": -70.89275,
+      "y": 438.0,
+      "width": 51.0,
+      "height": 35.699999999999996,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": -50.89275000000001,
+      "y": 462.0,
+      "width": 54.0,
+      "height": 19.439999999999998,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -175.0,
+      "y": 470.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "grass",
+      "x": -460.0,
+      "y": 515.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -194.46718750000002,
+      "y": 565.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": false
+    },
+    {
+      "id": "shore-rocks",
+      "x": -194.5,
+      "y": 600.0,
+      "width": 78.0,
+      "height": 54.599999999999994,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": -166.5,
+      "y": 618.0,
+      "width": 71.0,
+      "height": 25.56,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -480.0,
+      "y": 690.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -374.61875000000003,
+      "y": 766.0,
+      "width": 36.0,
+      "height": 27.0,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": -350.61875000000003,
+      "y": 770.0,
+      "width": 62.0,
+      "height": 43.4,
+      "flip": true
+    },
+    {
+      "id": "rubble",
+      "x": -383.4109999999999,
+      "y": 804.0,
+      "width": 50.0,
+      "height": 33.0,
+      "flip": false
+    },
+    {
+      "id": "surf",
+      "x": -363.4109999999999,
+      "y": 828.0,
+      "width": 68.0,
+      "height": 24.48,
+      "flip": true
+    },
+    {
+      "id": "shore-rocks",
+      "x": -567.46875,
+      "y": 950.0,
+      "width": 80.0,
+      "height": 56.0,
+      "flip": true
+    },
+    {
+      "id": "grass",
+      "x": -635.0,
+      "y": 960.0,
+      "width": 62.0,
+      "height": 46.0,
+      "flip": true
+    },
+    {
+      "id": "surf",
+      "x": -539.46875,
+      "y": 968.0,
+      "width": 48.0,
+      "height": 17.28,
+      "flip": false
+    }
+  ]
+}

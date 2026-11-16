@@ -50,7 +50,7 @@ const directory = path.resolve('test-results/menu-buttons');
         position: button.querySelector('.menu-button-frame').style.backgroundPositionX,
         transform: getComputedStyle(button.querySelector('.menu-button-label-art')).transform,
         scale: Number.parseFloat(getComputedStyle(button).getPropertyValue('--menu-scale')) }));
-      const departed = async () => { await page.locator('.preparation-panel').waitFor();
+      const departed = async () => { await page.locator('.reference-game-menu').waitFor();
         await page.waitForTimeout(550);
         assert.equal((await page.evaluate(() => window.__buttonCheck.departures)).length, 1, 'Exactly one menu departure'); };
       const blur = () => page.evaluate(() => window.dispatchEvent(new Event('blur')));
@@ -158,7 +158,7 @@ const directory = path.resolve('test-results/menu-buttons');
       await focus(); await departed();
     });
     await check('reduced-motion', async ({ page, play, departed }) => {
-      await play.click(); await page.locator('.preparation-panel').waitFor();
+      await play.click(); await page.locator('.reference-game-menu').waitFor();
       const data = await page.evaluate(() => window.__buttonCheck);
       const start = data.events.find(event => event.type === 'click').time;
       assert(data.departures[0] - start < 150, 'Reduced motion has no 480 ms delay');
@@ -201,7 +201,7 @@ const directory = path.resolve('test-results/menu-buttons');
       if (await menuPresent()) {
         assert.equal((await read()).pressed, false, 'No stranded press after multi-touch');
         await touch('touchStart', [{ ...point, id: 8 }]); await touch('touchEnd'); await departed();
-      } else assert.equal(await page.locator('.preparation-panel').count(), 1, 'Secondary finger must not activate settings');
+      } else assert.equal(await page.locator('.reference-game-menu').count(), 1, 'Secondary finger must not activate settings');
     }, { touch: true });
   } finally {
     await fs.writeFile(path.join(directory, 'report.json'), JSON.stringify({ base, generatedAt: new Date().toISOString(), checks: report }, null, 2));

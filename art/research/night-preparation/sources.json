@@ -1,0 +1,24 @@
+{
+  "purpose": "Reference-only analysis for night-preparation UI. These external images are not game assets and must not be shipped under public/.",
+  "rights": "Copyright remains with the respective owners; no redistribution license has been established.",
+  "files": [
+    {
+      "file": "isle-of-arrows-steam1.png",
+      "url": "https://gridpop.co/isle/screenshots/steam1.png",
+      "sourcePage": "https://gridpop.co/isle/press.html",
+      "publisher": "Gridpop"
+    },
+    {
+      "file": "isle-of-arrows-steam7.png",
+      "url": "https://gridpop.co/isle/screenshots/steam7.png",
+      "sourcePage": "https://gridpop.co/isle/press.html",
+      "publisher": "Gridpop"
+    },
+    {
+      "file": "thronefall-official.jpg",
+      "url": "https://cdn.akamai.steamstatic.com/steam/apps/2239150/ss_3b012d5fd2e39bc69d1eebd2b7dd70ee28c3bfdb.1920x1080.jpg",
+      "sourcePage": "https://store.steampowered.com/app/2239150/Thronefall/",
+      "publisher": "GrizzlyGames / Mythwright"
+    }
+  ]
+}

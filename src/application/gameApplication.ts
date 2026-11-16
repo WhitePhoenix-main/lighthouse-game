@@ -1,7 +1,6 @@
-import { isLateNight, lateNightModeOptions, resolveLateNight } from '../content/lateModes';
 import {getBossRules} from '../content/boss';
 import {createLensViews, getLensAvailability, getLensUpgradeAvailability} from '../progression/lenses';
-import type { DevicePlacement, LateNightMode, LensId, LensUpgradeId,ApplicationScreen, ApplicationView, BattleCommand, BattleState, DeviceKind, GameApplication, NightConfig, NightDefinition, NightId, PlacementCheck, SaveStore, AudioSettings, LanguagePreference, UserSettings, TextSize, UpgradeId} from '../contracts';
+import type { DevicePlacement, LensId, LensUpgradeId,ApplicationScreen, ApplicationView, BattleCommand, BattleState, DeviceKind, GameApplication, NightConfig, NightDefinition, NightId, PlacementCheck, SaveStore, AudioSettings, LanguagePreference, UserSettings, TextSize, UpgradeId} from '../contracts';
 import {createBattle, stepBattle} from '../simulation/battle';
 import {calculateNightConfig, createUpgradeViews, getUpgradeAvailability} from '../progression/upgrades';
 import {SaveRepository, emptySave} from './saves';
@@ -23,7 +22,6 @@ export class LighthouseApplication implements GameApplication {
     private commands: BattleCommand[] = [];
     private attemptId: string | null = null;
     private baseConfig: NightConfig;
-    private selectedLateMode: LateNightMode = 'transition';
     private readonly catalog: readonly NightDefinition[];
     private attemptConfig: NightConfig | null = null;
     private attemptDeviceSnapshot: ReturnType<typeof deviceDeployments> | null = null;
@@ -39,7 +37,6 @@ export class LighthouseApplication implements GameApplication {
     private developmentOrigin: 'menu' | 'preparation' | 'result' = 'menu';
     private settingsOrigin: Exclude<ApplicationScreen, 'settings'> = 'menu';
     private pendingPreparation = false;
-    private pendingNewGame: object | null = null;
     private pendingAbandon: 'menu' | 'preparation' | null = null;
 
     constructor(store: SaveStore, config: NightConfig, private readonly identity: () => AttemptIdentity,
@@ -66,14 +63,13 @@ export class LighthouseApplication implements GameApplication {
         this.view.hasProgress = this.saves.hasProfile;
         this.view.nights = this.catalog.map(night => {
             const available = night.requires === null || this.view.profile.wonNightIds.includes(night.requires);
-            return { id: night.id, name: night.name, description: isLateNight(night.id) && this.selectedLateMode === 'transition' ? lateNightModeOptions(night.config)[0]!.description : night.description, chapter: night.chapter, optional: night.optional,
+            return { id: night.id, name: night.name, description: night.description, chapter: night.chapter, optional: night.optional,
                 ...(night.config.boss ? {bossLevel:this.view.profile.bossLevel,materialReward:getBossRules(this.view.profile.bossLevel).materialReward}:{}), available, completed: this.view.profile.wonNightIds.includes(night.id), reason: available ? '' : `Требуется победа: ${this.catalog.find(item => item.id === night.requires)!.name}` };
         });
-        this.view.lateNightModes = lateNightModeOptions(this.baseConfig);
         this.view.lenses = createLensViews(this.view.profile, this.view.selectedLensId);
         this.view.upgrades = createUpgradeViews(this.view.profile, this.baseConfig);
         if (!this.attemptConfig && this.view.screen !== 'battle' && !(this.view.screen === 'settings' && this.settingsOrigin === 'battle')) {
-            this.view.config = calculateNightConfig(resolveLateNight(this.baseConfig, this.selectedLateMode), this.view.profile.purchasedUpgrades, this.view.profile.legacyEquipment, this.loadout());
+            this.view.config = calculateNightConfig(this.baseConfig, this.view.profile.purchasedUpgrades, this.view.profile.legacyEquipment, this.loadout());
         }
         this.refreshPreparation();
     }
@@ -97,25 +93,13 @@ export class LighthouseApplication implements GameApplication {
     }
 
     selectNight(id: NightId): void {
-        if (!this.canNavigate() || !['menu', 'preparation', 'result', 'trials'].includes(this.view.screen) || this.hasLiveBattle()) return;
+        if (!this.canNavigate() || !['menu', 'preparation', 'result'].includes(this.view.screen) || this.hasLiveBattle()) return;
         const night = this.catalog.find(item => item.id === id);
-        if (!night || !this.view.nights.find(item => item.id === id)?.available
-            || (this.view.screen === 'trials' && !night.optional)
-            || (id === this.view.selectedNightId && this.view.screen !== 'trials')) return;
-        if (this.view.screen === 'trials') this.view.screen = 'preparation';
+        if (!night || !this.view.nights.find(item => item.id === id)?.available || id === this.view.selectedNightId) return;
         if (this.view.result) { this.clearAttempt(); this.view.screen = 'preparation'; }
         this.view.selectedNightId = id;
         this.baseConfig = structuredClone(night.config);
         this.view.preparation.selectedType = null;
-        this.view.preparation.preview = null;
-        this.refreshProfile();
-    }
-
-    selectLateMode(mode: LateNightMode): void {
-        if (!this.canNavigate() || !['menu', 'preparation'].includes(this.view.screen) || this.hasLiveBattle()
-            || !isLateNight(this.view.selectedNightId) || !['transition', 'assault'].includes(mode)
-            || mode === this.selectedLateMode) return;
-        this.selectedLateMode = mode;
         this.view.preparation.preview = null;
         this.refreshProfile();
     }
@@ -253,69 +237,6 @@ export class LighthouseApplication implements GameApplication {
         this.completePreparation();
     }
 
-    private selectCampaignContinuation(): void {
-        const available = this.catalog.filter(night => !night.optional && this.view.nights.find(item => item.id === night.id)?.available);
-        const night = available.find(item => !this.view.profile.wonNightIds.includes(item.id)) ?? available.at(-1);
-        if (!night) return;
-        this.view.selectedNightId = night.id;
-        this.baseConfig = structuredClone(night.config);
-        this.view.preparation.selectedType = null;
-        this.view.preparation.preview = null;
-        this.refreshProfile();
-    }
-
-    openGameMenu(): void {
-        if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'menu') return;
-        this.selectCampaignContinuation();
-        this.view.screen = 'game-menu';
-    }
-
-    continueGame(): void {
-        if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'game-menu' || !this.view.hasProgress) return;
-        this.selectCampaignContinuation();
-        this.openPreparation();
-    }
-
-    openTrials(): void {
-        if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'game-menu') return;
-        this.view.screen = 'trials';
-    }
-
-    startNewGame(confirmedReset = false): void {
-        if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'game-menu'
-            || (this.view.hasProgress && !confirmedReset)) return;
-        this.pendingNewGame = {};
-        this.completeNewGame();
-    }
-
-    private completeNewGame(): void {
-        if (!this.pendingNewGame) return;
-        try {
-            this.saves.resetProfile(this.pendingNewGame);
-            this.clearAttempt();
-            this.view.selectedLensId = this.saves.current.profile.selectedLensId;
-            this.selectedLateMode = 'transition';
-            this.refreshProfile();
-            this.selectCampaignContinuation();
-            this.view.screen = 'preparation';
-            this.view.error = null;
-            this.pendingNewGame = null;
-        } catch (error) { this.fail(error); }
-    }
-
-    cancelNewGame(): void {
-        if (!this.pendingNewGame || this.view.screen !== 'game-menu' || this.hasLiveBattle()) return;
-        try {
-            if (this.saves.cancelReset(this.pendingNewGame) === 'completed') {
-                this.completeNewGame();
-                return;
-            }
-            this.pendingNewGame = null;
-            this.view.error = null;
-            this.refreshProfile();
-        } catch (error) { this.fail(error); }
-    }
-
     private completePreparation(): void {
         try {
             this.saves.ensureProfile();
@@ -357,10 +278,6 @@ export class LighthouseApplication implements GameApplication {
         } else if (this.view.screen === 'development' && this.canNavigate()) {
             this.view.screen = this.developmentOrigin;
             this.refreshProfile();
-        } else if (this.canNavigate() && this.view.screen === 'game-menu') {
-            this.view.screen = 'menu';
-        } else if (this.canNavigate() && this.view.screen === 'trials') {
-            this.view.screen = 'game-menu';
         }
     }
 
@@ -459,7 +376,7 @@ export class LighthouseApplication implements GameApplication {
         if (!this.view.preparation.canStart) return;
         try {
             const identity = this.identity();
-            const config = calculateNightConfig(resolveLateNight(this.baseConfig, this.selectedLateMode), this.saves.current.profile.purchasedUpgrades, this.saves.current.profile.legacyEquipment, this.loadout());
+            const config = calculateNightConfig(this.baseConfig, this.saves.current.profile.purchasedUpgrades, this.saves.current.profile.legacyEquipment, this.loadout());
             const placements = battleDeviceDeployments(this.saves.current.profile, config.devices.definitions);
             const cost = 0;
             const battle = createBattle(config, identity.seed, undefined, placements);
@@ -475,7 +392,7 @@ export class LighthouseApplication implements GameApplication {
         const { identity, config, battle, cost } = this.pendingStart;
         try {
             const snapshot = deviceDeployments(this.saves.current.profile);
-            this.saves.begin({...identity, placementCost: cost, deviceSnapshot: snapshot, nightId: this.view.selectedNightId, ...(config.lateMode ? {lateMode: config.lateMode} : {}), lensId: config.lens?.id ?? 'basic', ...(config.boss && this.view.selectedNightId === 'abyss-warden' ? {bossLevel:config.boss.level,bossReward:config.boss.materialReward}:{})});
+            this.saves.begin({...identity, placementCost: cost, deviceSnapshot: snapshot, nightId: this.view.selectedNightId, lensId: config.lens?.id ?? 'basic', ...(config.boss && this.view.selectedNightId === 'abyss-warden' ? {bossLevel:config.boss.level,bossReward:config.boss.materialReward}:{})});
             this.attemptId = identity.id;
             this.attemptConfig = config;
             this.attemptDeviceSnapshot = snapshot;
@@ -547,9 +464,7 @@ export class LighthouseApplication implements GameApplication {
             this.commands = this.commands.filter(item => item.type !== 'aim');
         }
         if (command.type === 'callWave' && this.commands.some(item => item.type === 'callWave')) return;
-        // A queued targeted cast owns its input snapshot until the next fixed step.
-        this.commands.push(command.type === 'use-ability'
-            ? { ...command, ...(command.target ? { target: { ...command.target } } : {}) } : command);
+        this.commands.push(command);
     }
 
     advance(deltaMs: number): void {
@@ -573,7 +488,7 @@ export class LighthouseApplication implements GameApplication {
             const totalResources = battle.earnedResources + battle.earnedBonus + battle.earnedRescue + victoryReward;
             this.view.screen = 'result';
             this.view.result = {
-                attemptId: this.attemptId!, outcome: battle.outcome, ...(config.lateMode ? {lateMode: config.lateMode} : {}),
+                attemptId: this.attemptId!, outcome: battle.outcome,
                 victoryReward, totalResources,
                 resources: battle.earnedResources, bonus: battle.earnedBonus, kills: battle.kills, saved: false, nightId: this.view.selectedNightId, rescue: battle.earnedRescue, bossDefeated: battle.boss?.health === 0, bossMaterials: battle.outcome === 'victory' && this.view.selectedNightId === 'abyss-warden' ? config.boss?.materialReward ?? 0 : 0
             };
@@ -610,7 +525,6 @@ export class LighthouseApplication implements GameApplication {
 
     retrySave(): void {
         if (!this.initialized) this.initialize();
-        else if (this.pendingNewGame) this.completeNewGame();
         else if (this.pendingPreparation) this.completePreparation();
         else if (this.pendingAbandon) this.completeAbandon();
         else if (this.view.result && !this.view.result.saved) this.finish();

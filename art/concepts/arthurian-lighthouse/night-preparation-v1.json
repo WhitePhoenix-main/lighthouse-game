@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "date": "2026-11-16",
+  "status": "superseded-after-concept-and-sprite-review-not-implemented",
+  "reviewDate": "2026-11-16",
+  "reviewCorrections": [
+    "Show multiple distinct resource balances: current shards and Deep Pearls; do not constrain future resource composition.",
+    "Include the selected ability alongside the lens and device types.",
+    "Water is a playable area and will support device placement later. Never treat the sea as permanent empty space for a UI panel.",
+    "Use the actual project sprite assets and pixel lettering. This imagegen board is a flattened illustration, not a sprite-built reference or production art.",
+    "Reuse menu-buttons-v2 and game-menu sprite components where appropriate. Combat lighthouse, device and resource sprites still need separate production.",
+    "The original prompts remain below for history; their single-currency, land-only and sea-panel constraints are obsolete."
+  ],
+  "generator": "built-in image_gen",
+  "outputs": [
+    {
+      "file": "night-preparation-mobile-v1.png",
+      "description": "Three portrait states: first entry, equipped preparation, selected device",
+      "prompt": "Use case: ui-mockup.\nAsset type: High-fidelity concept reference board for the mobile night-preparation interface of an existing Russian pixel-art lighthouse defense game, \"Свет Авалона\". This is a design study, not a gameplay screenshot.\nPrimary request: Create a wide comparison board containing THREE clean, equally sized portrait 9:16 game screens side by side, without physical phone bezels. Short captions outside above each screen: \"ПЕРВЫЙ ВХОД\", \"ПОДГОТОВКА\", \"ВЫБОР УСТРОЙСТВА\". Use a plain deep navy surrounding background and modest gutters. Each portrait is a coherent full-screen playable coast viewed from a high oblique top-down game camera, not a horizon landscape or an illustration postcard. The terrain is mostly land on LEFT and sea on RIGHT, divided by a near vertical shore. A compact stone lighthouse stands near the center on that shoreline. Small legible rocks, grass, surf. Keep decorative detail subordinate to tactical readability.\nStyle/medium: Crisp carefully handcrafted pixel art matching dark Arthurian fantasy, muted navy blue, slate stone, desaturated moss green ground, warm golden lighthouse windows, copper edging on dark navy panels, warm parchment readable Cyrillic lettering. No parchment book, no level-selection cards, no realistic smooth 3D. Soft evening, the terrain is sufficiently bright to place devices; no enemies or battle effects. The lighthouse should be modest and not obstruct the ground. Visible field occupies most of each screen.\nCOMPOSITION FIRST SCREEN: narrow top header with menu icon, small two-line exact text \"ГЛАВА I\" / \"ПЕРВЫЙ СВЕТ\" and crystal icon with \"0\". A tiny secondary label \"ПОДГОТОВКА\". Empty coast with lighthouse, no placed devices and no sprawling disabled item catalogue. In the bottom fifth a small unobtrusive tip \"Направляй свет на угрозы\", then short helper text \"Устройства откроются в развитии\". Large bottom copper-accented button \"НАЧАТЬ НОЧЬ\". The combat has not started.\nSECOND SCREEN: top header menu, \"ГЛАВА I\" / \"РАЗБИТЫЙ БЕРЕГ\", crystal icon \"136\", secondary \"ПОДГОТОВКА · 4 ВОЛНЫ\". In the field, two compact cannons and one low stone barrier all on dry land left of lighthouse, each with subtle HP bar. One cannon partially damaged, other objects healthy. Small secondary top control \"РАЗВЕДКА\". Bottom compact dock with short counts \"На поле 3/4 · Типы 2/2\", and THREE large labeled icon buttons \"УСТРОЙСТВА\", \"ЛИНЗА\", \"РАЗВИТИЕ\". Separate full-width clear copper button below \"НАЧАТЬ НОЧЬ\". No automatic repair or payments.\nTHIRD SCREEN: same field/header/positions/balance as second, selected damaged cannon on the left marked with thin warm ring and a faint range ellipse. A compact bottom sheet only in lower quarter, leaving lighthouse and selected cannon visible above it. Exact text \"ПУШКА #1\", \"Прочность 42/70\". Two clearly separated action buttons \"РЕМОНТ · 2 ◈\" and \"В ЗАПАС\", small close X. Normal dock may be replaced by the contextual sheet here. Do not show any hero avatar.\nUI constraints: Portrait phone readability; minimum button touch-height visually around 48 CSS pixels at 390px phone width. Use big readable restrained text. Do not put a large title or sky taking the field's space. No map-grid cells, no predefined build sockets, no characters, no monsters, no extra currencies, no countdown. Distinguish proposed UI from existing gameplay by small board footer outside screens \"КОНЦЕПТ ПОДГОТОВКИ\". Text should be carefully legible, no gibberish. Show polished but feasible UI; proportions are more important than ornament."
+    },
+    {
+      "file": "night-preparation-landscape-v1.png",
+      "description": "Desktop landscape counterpart",
+      "styleReference": "night-preparation-mobile-v1.png",
+      "prompt": "Use case: ui-mockup. Asset type: desktop landscape high-fidelity reference for the night-preparation game scene of \"Свет Авалона\".\nInput image is a STYLE AND UI REFERENCE ONLY: the generated three-state mobile board. Create one desktop screen in 16:9 landscape, NOT three screens. Preserve the crisp pixel-art aesthetic, navy/slate panels with copper highlights, readable warm Russian text, high oblique game-camera coast, grass and rocks on LEFT, dark navy sea on RIGHT, squat stone lighthouse on the shoreline. This is a proposed gameplay-preparation interface, not a horizon landscape, no sky or large moon. The coastline must run vertically close to the CENTER of the playable field. Lighthouse near center; keep the world geometry compatible with a straight shore rather than a whole new island.\nHeader narrow along top: menu button left, \"ГЛАВА I · РАЗБИТЫЙ БЕРЕГ\", small tag \"ПОДГОТОВКА\", crystal resource counter \"136\" at right.\nMost of screen is the tactical field: lighthouse shore in center, two small cannons and a low stone barrier on dry land to its left, readable separate silhouettes. One cannon HP partially damaged 42/70, others healthy. No creatures or combat projectiles. Entire placement area should be visually unobstructed.\nA compact dock along the bottom on the LEFT, not full page overlay: THREE labeled icon buttons \"УСТРОЙСТВА\", \"ЛИНЗА\", \"РАЗВИТИЕ\"; tiny line \"На поле 3/4 · Типы 2/2\". On lower RIGHT large main copper button \"НАЧАТЬ НОЧЬ\", and small control \"РАЗВЕДКА · 4 ВОЛНЫ\" above. Do not put huge explanation text, catalogue, disabled towers, level cards or minimap on the field.\nShow selection contextual interaction as a small anchored panel in the empty SEA at upper RIGHT so it does not cover dry-land placement: \"ПУШКА #1\", \"Прочность 42/70\", button \"РЕМОНТ · 2 ◈\", button \"В ЗАПАС\", small X. Selected damaged cannon at upper-left of lighthouse has a thin amber ring and a faint range ellipse. Device panel must clearly relate to that selected cannon using only consistent icon/selection, not a long leader line across screen.\nFeasible game UI, no gold purchase or repair-all, no timer, no hero, no freeform extra currencies, no book. The tall lighthouse and effects must not cover units. Keep ornaments restrained and terrain uncluttered with enough contrast. A tiny unobtrusive caption at the very bottom \"КОНЦЕПТ ПОДГОТОВКИ\". Ensure all text spelled correctly and readable."
+    }
+  ],
+  "scope": "Proposed presentation of existing night-preparation rules, not approval of a new gameplay or save model.",
+  "notes": [
+    "Continue/New Game should lead to the playable coast in preparation state. This visual proposal does not auto-start battle.",
+    "The application currently selects the first available uncompleted mandatory night, not a persistently remembered selected night.",
+    "First entry has zero resources, no devices, basic lens. Do not show a catalogue of unavailable devices on the main field.",
+    "Current implementation uses separate SVG placement; moving placement onto the Phaser game scene is a proposed change, not a completed feature.",
+    "136 resources and cannon health 42/70 illustrate a hypothetical saved profile. The example repair price is 2: ceil(20 * 0.25 * (28/70)).",
+    "Type slots (2/2) differ from placed objects (3/4). This example has two cannons and one barrier.",
+    "Illustration crop and sprite scales are provisional. Portrait and landscape must preserve world geometry, not resize/reposition placements.",
+    "Full playable field, touch sizes, modal placement, unknown-enemy concealment and safe areas require future interactive testing.",
+    "Do not auto-repair or buy charges; purchases remain deliberate individual actions.",
+    "No game code or canonical rules changed by the research."
+  ],
+  "competitors": [
+    {
+      "name": "Thronefall",
+      "url": "https://store.steampowered.com/app/2239150/Thronefall/",
+      "pattern": "Build by day, defend by night; spatial continuity between preparation and defense."
+    },
+    {
+      "name": "Isle of Arrows",
+      "url": "https://gridpop.co/isle/press.html",
+      "mobileSource": "https://apps.apple.com/us/app/isle-of-arrows-tower-defense/id1607942817",
+      "pattern": "Field-dominant layout, compact tile cards and explicit Start Wave control. Inspected PC screenshots; no claim of mobile usability testing."
+    },
+    {
+      "name": "Kingdom Rush",
+      "url": "https://www.kingdomrush.com/kingdom-rush-presskit",
+      "pattern": "In-field towers, upgrades and contextual defense management. General genre reference; exact menu interaction not verified in this research."
+    }
+  ],
+  "verification": {
+    "codeAudit": true,
+    "typecheck": "fails on existing integration/type inconsistencies",
+    "browserPreview": "not completed: IAB localhost timeout; native Chrome computer-use access not approved",
+    "generatedImages": "visually inspected as concept art only"
+  }
+}

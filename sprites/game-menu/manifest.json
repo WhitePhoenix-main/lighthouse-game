@@ -1,0 +1,89 @@
+{
+  "source": "art/game-menu-v1/source.png",
+  "reference": "art/play-screen-exploration-2026-11-16/03-tidal-stones-engraved.png",
+  "states": [
+    "idle",
+    "hover",
+    "pressed",
+    "disabled"
+  ],
+  "sprites": {
+    "continue-desktop": {
+      "frameWidth": 256,
+      "frameHeight": 128,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 45,
+        "top": 38,
+        "width": 720,
+        "height": 362
+      }
+    },
+    "trials-desktop": {
+      "frameWidth": 224,
+      "frameHeight": 96,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 800,
+        "top": 100,
+        "width": 700,
+        "height": 290
+      }
+    },
+    "new-game-desktop": {
+      "frameWidth": 224,
+      "frameHeight": 96,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 45,
+        "top": 438,
+        "width": 670,
+        "height": 278
+      }
+    },
+    "continue-mobile": {
+      "frameWidth": 320,
+      "frameHeight": 136,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 744,
+        "top": 510,
+        "width": 755,
+        "height": 174
+      }
+    },
+    "secondary-mobile": {
+      "frameWidth": 320,
+      "frameHeight": 64,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 744,
+        "top": 510,
+        "width": 755,
+        "height": 174
+      }
+    },
+    "back": {
+      "frameWidth": 48,
+      "frameHeight": 40,
+      "frames": 4,
+      "sourceCrop": {
+        "left": 130,
+        "top": 786,
+        "width": 180,
+        "height": 170
+      }
+    },
+    "floor-desktop": {
+      "frameWidth": 768,
+      "frameHeight": 108,
+      "frames": 1,
+      "sourceCrop": {
+        "left": 425,
+        "top": 800,
+        "width": 1060,
+        "height": 166
+      }
+    }
+  }
+}
