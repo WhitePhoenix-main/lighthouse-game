@@ -137,6 +137,7 @@ export function mountSettingsTransition(overlay: HTMLElement): {
     cancelAnimation();
     removeGhost();
     release();
+    if (page) delete page.dataset.departed;
     navigate = null;
     menuTemplate = null;
     concurrentReturn = false;
@@ -146,6 +147,10 @@ export function mountSettingsTransition(overlay: HTMLElement): {
   };
   const finish = (): void => {
     const finishedPhase = phase;
+    const departingPage = finishedPhase === 'exit' ? page : null;
+    // cancel() removes the filled final frame. Hide the retiring surface first,
+    // so its untransformed canvas/header cannot reappear during DOM handoff.
+    if (departingPage) departingPage.dataset.departed = 'true';
     cancelAnimation();
     removeGhost();
     release();
@@ -166,10 +171,18 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       const target = menu === currentMenu ? menu?.querySelector<HTMLElement>('[data-action="settings"]') : null;
       if (!destroyed && target?.isConnected) target.focus({ preventScroll: true });
     }
-    if (!callback) return;
+    if (!callback) {
+      if (departingPage) delete departingPage.dataset.departed;
+      return;
+    }
     // sync() may run inside the callback. It must recognize this as our navigation.
     committing = true;
-    try { callback(); } finally { committing = false; }
+    try { callback(); } finally {
+      committing = false;
+      // Navigation can be rejected (for example by a save error). Restore a
+      // retained settings surface, but never reveal a detached retiring page.
+      if (departingPage && overlay.querySelector('.reference-settings') === departingPage) delete departingPage.dataset.departed;
+    }
     if (!destroyed) sync();
     if (finishedPhase === 'exit') {
       menuTemplate = null;
@@ -206,9 +219,9 @@ export function mountSettingsTransition(overlay: HTMLElement): {
     };
   };
   const distance = (): number => Math.min(640, Math.max(360, overlay.clientWidth * 0.52));
-  // The full sheet height also clears the viewport when short-screen content is scrolled.
+  // The extra CSS pixel clears the clip edge even at fractional viewport/DPR sizes.
   const offscreenTransform = (): string => page?.dataset.layout === 'mobile'
-    ? 'translateY(100%)' : `translateX(-${distance()}px)`;
+    ? 'translateY(calc(100% + 1px))' : `translateX(-${distance()}px)`;
   const restingTransform = (): string => page?.dataset.layout === 'mobile' ? 'translateY(0)' : 'translateX(0)';
   const reveal = (): void => {
     if (destroyed || animation) return;

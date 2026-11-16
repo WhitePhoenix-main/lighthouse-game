@@ -78,9 +78,9 @@ let ws;
     await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', ...point, button: 'left', buttons: 1, clickCount: 1 });
     await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', buttons: 0, clickCount: 1 });
   };
-  const viewport = async (width, height, touch = width < 900) => {
+  const viewport = async (width, height, touch = width < 900, dpr = 1) => {
     await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
-    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: dpr, mobile: touch });
     await sleep(120);
   };
   const menuReady = () => wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
@@ -90,13 +90,24 @@ let ws;
     for (const type of ['keyDown','keyUp']) await cdp('Input.dispatchKeyEvent', {type,key:name,code:name,windowsVirtualKeyCode:code,...(name==='Enter'&&type==='keyDown'?{text:'\r',unmodifiedText:'\r'}:{})});
   };
   const record = () => evaluate(`(()=>{
-    window.navFrames=[]; const token=window.navToken=(window.navToken||0)+1;
+    window.navFrames=[];window.navCancelSnapshots=[];
+    if(!window.navOriginalCancel){
+      window.navOriginalCancel=Animation.prototype.cancel;
+      Animation.prototype.cancel=function(){
+        const target=this.effect?.target,page=target?.closest?.('.reference-settings'),time=this.currentTime;
+        const completedExit=target?.classList?.contains('settings-board')&&page?.dataset.exiting==='true'&&typeof time==='number'&&time>=559;
+        const result=navOriginalCancel.call(this);
+        if(completedExit){const style=getComputedStyle(target);navCancelSnapshots.push({layout:page.dataset.layout,connected:target.isConnected,visibility:style.visibility,transform:style.transform,opacity:style.opacity,departed:page.dataset.departed,time});}
+        return result;
+      };
+    }
+    const token=window.navToken=(window.navToken||0)+1;
     function sample(){
       const p=document.querySelector('.reference-settings'),g=document.querySelector('[data-settings-menu-ghost]'),ghost=g?.querySelector('.settings-menu-outgoing'),m=ghost||document.querySelector('.menu-artboard'),b=p?.querySelector('.settings-board'),s=p?.querySelector('.settings-scrim');
       const style=b&&getComputedStyle(b), menu=m&&getComputedStyle(m);
       const timing=e=>{const a=e?.getAnimations()[0];return a?{start:a.startTime,time:a.currentTime,duration:a.effect.getTiming().duration,state:a.playState}:null};
       const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);
-      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,layout:p?.dataset.layout,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,y:style?new DOMMatrix(style.transform).m42:null,exitTarget:b?.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
+      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,layout:p?.dataset.layout,scrollTop:p?.scrollTop,boardTop:b?.getBoundingClientRect().top,viewportHeight:p?.clientHeight,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,y:style?new DOMMatrix(style.transform).m42:null,exitTarget:b?.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
       if(token===navToken)requestAnimationFrame(sample);
     } sample();requestAnimationFrame(sample);
   })()`);
@@ -166,9 +177,20 @@ let ws;
     assert(exit.every(f=>!f.screen||f.screen==='settings'),'route changed while exiting');
     checkAxis(exit,'exit');
     assert(exit.some(f=>displacement(f)>40&&f.opacity<.8),'settings board did not exit in its layout direction and fade');
-    assert(exit.filter(f=>f.layout==='mobile').every(f=>f.exitTarget==='translateY(100%)'),'mobile exit must hide the full panel height, including scrolled compact layouts');
+    assert(exit.filter(f=>f.layout==='mobile').every(f=>f.exitTarget==='translateY(calc(100% + 1px))'),'mobile exit must hide the full panel height, including scrolled compact layouts');
     assert(displacement(exit.at(-1))>displacement(exit[0])&&exit.at(-1).opacity<exit[0].opacity,'settings exit did not progress');
     assert(exit.at(-1).scrim<exit[0].scrim,'scrim did not fade out');
+    const mobileExit=exit.filter(f=>f.layout==='mobile');
+    if(mobileExit.length){
+      assert(mobileExit.every(f=>Math.abs(f.scrollTop-mobileExit[0].scrollTop)<.5),'mobile scrollTop shifted during exit');
+      const tail=mobileExit.at(-1);
+      assert(tail.boardTop>=tail.viewportHeight-2,'mobile final exit frame retained a bottom header tail');
+    }
+    const canceled=await evaluate('navCancelSnapshots');
+    assert(canceled.length>0,'completed-exit cancellation handoff was not sampled');
+    assert(canceled.every(f=>!f.connected||f.visibility==='hidden'),'cancel exposed the old connected settings header');
+    timeline({phase:'cancel-handoff',snapshots:canceled});
+    assert.equal(await evaluate('document.querySelectorAll(".reference-settings,.settings-board,.settings-art").length'),0,'settings header/artwork remained after navigation');
     assert.equal(intro.length,0,'real menu must appear settled without a second intro');
     assert(exit.every(f=>f.ghost&&f.ghostSafe&&f.ghostSibling&&f.settingsPages===1&&f.settingsControls===10&&f.menuActions===0&&!f.duplicateIds),'exit ghost duplicated actions/IDs/pages or was unsafe');
     assert(exit.every(f=>f.menuDuration===560&&f.boardTiming?.duration===560&&f.scrimTiming?.duration===560),'exit board/scrim/menu must share 560ms');
@@ -203,8 +225,8 @@ let ws;
   await wait('!!window.settingsTest');await menuReady();
   await evaluate(`settingsTest.backCalls=0;settingsTest.originalBack=settingsTest.application.back.bind(settingsTest.application);settingsTest.application.back=()=>{settingsTest.backCalls++;return settingsTest.originalBack()}`);
   assert((await remember())>10,'ambient CSS animations absent');
-  for(const [w,h,touch] of [[1280,720,false],[844,390,false],[390,844,true],[844,390,true],[568,320,true]]) {
-    await viewport(w,h,touch);await open(touch,w===1280,w===1280);await screenshot(`settings-${touch?'mobile':'desktop'}-${w}x${h}`);
+  for(const [w,h,touch,dpr=1] of [[1280,720,false],[844,390,false],[390,844,true],[844,390,true],[568,320,true],[390,844,true,1.25],[844,390,true,1.25]]) {
+    await viewport(w,h,touch,dpr);await open(touch,w===1280,w===1280);await screenshot(`settings-${touch?'mobile':'desktop'}-${w}x${h}-dpr-${dpr}`);
     await evaluate(`document.querySelector('[data-action="music-volume"]').focus({preventScroll:true})`);
     await key('Home');await key('ArrowRight');
     assert.equal(await evaluate(`+document.querySelector('[data-action="music-volume"]').value`),1,'native range keys');
@@ -214,7 +236,7 @@ let ws;
     // No explicit .focus(): Enter must activate the button restored by navigation.
     await open(false,'restored');await close(true);
     await screenshot(`roundtrip-${touch?'mobile':'desktop'}-${w}x${h}`);
-    check(`${touch?'mobile':'desktop'} ${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit on the layout axis; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
+    check(`${touch?'mobile':'desktop'} ${w}×${h} DPR${dpr}: immediate activation; synchronous menu/settings entry and mirrored exit on the layout axis; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
   }
   await viewport(844,390,true);
   // Force a real locale rerender while all three entrance animations are live.

@@ -82,7 +82,7 @@ let ws;
     assert(result.time >= result.previous && result.phases, `${label}: ambient timeline reset`);
     await evaluate('motionMoonTime=motionMoon.currentTime;motionTimes=motionAnimations.map(a=>a.currentTime)');
   };
-  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,exit:p.dataset.exiting,layout:p.dataset.layout,x:new DOMMatrix(c.transform).m41,y:new DOMMatrix(c.transform).m42,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
+  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,exit:p.dataset.exiting,layout:p.dataset.layout,scrollTop:p.scrollTop,boardTop:b.getBoundingClientRect().top,viewportHeight:p.clientHeight,x:new DOMMatrix(c.transform).m41,y:new DOMMatrix(c.transform).m42,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
   const checkSceneryFrames = async label => {
     const frames=await evaluate('motionSceneryFrames');
     assert(frames.length>=3, `${label}: missing backdrop frames`);
@@ -113,6 +113,12 @@ let ws;
     await observeEntry(); await click('[data-action="settings"]'); await checkEntry(`${width} entry`);
     assert.deepEqual(await scenery(), original, `${width}: menu/settings scenery geometry or animation declarations differ`);
     await continuity('settings entry');
+    if(!touch&&width>=1000){
+      const ui=await evaluate(`(()=>{const on=document.querySelector('[data-setting="on"]').getBoundingClientRect(),back=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{onWidth:on.width,bottom:back.bottom,height:innerHeight}})()`);
+      const oldScale=Math.min(width/1280,Math.max(.8,height/720));
+      assert(ui.onWidth>128*oldScale*1.1,'standard desktop controls were not enlarged');
+      assert(ui.bottom<=ui.height+1,'enlarged desktop controls overflow viewport');
+    }
     await screenshot(`settings-${touch?'mobile':'desktop'}-${width}x${height}`);
     for (const selector of ['[data-setting="en"]','[data-setting="large"]','[data-setting="ru"]','[data-setting="normal"]']) {
       await observeEntry(); await click(selector); await ready(); await sleep(100);
@@ -134,6 +140,11 @@ let ws;
     timelines.push({label:`${width} exit`,frames:exitFrames});
     assert(exitFrames.some(f=>f.layout==='mobile'?f.y>40:f.x<-40),'exit did not move in its layout direction');
     assert(exitFrames.every(f=>f.layout==='mobile'?Math.abs(f.x)<.1&&f.y>=0:Math.abs(f.y)<.1&&f.x<=0),'exit used wrong axis/direction');
+    const mobileExit=exitFrames.filter(f=>f.layout==='mobile');
+    if(mobileExit.length){
+      assert(mobileExit.every(f=>Math.abs(f.scrollTop-mobileExit[0].scrollTop)<.5),'mobile exit changed scrollTop');
+      assert(mobileExit.at(-1).boardTop>=mobileExit.at(-1).viewportHeight-2,'mobile exit left bottom header tail');
+    }
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
     check(`${touch?'mobile':'desktop'} ${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }

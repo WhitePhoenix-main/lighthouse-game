@@ -70,14 +70,14 @@ describe('shared settings artwork and native control geometry', () => {
     expect(short.choices.back.height * short.scale).toBeGreaterThanOrEqual(44);
   });
 
-  it('keeps desktop artwork coordinates and scaling when the window becomes narrow', () => {
+  it('keeps the enlarged desktop panel on the left when the window becomes narrow', () => {
     for (const [width, height] of [[844, 390], [1280, 720], [1672, 941]] as const) {
       const layout = settingsLayout(width, height, 'normal', false);
       expect(layout.mobile).toBe(false);
       expect(layout.compact).toBe(false);
-      expect(layout.scale).toBe(Math.min(width / 1280, Math.max(.8, height / 720)));
-      expect(layout.title).toEqual({ x: 158, y: 48, width: 324, height: 48 });
-      expect(layout.choices.on).toEqual({ x: 300, y: 144, width: 128, height: Math.max(48, 44 / layout.scale) });
+      expect(layout.scale).toBe(Math.min(width / 1120, Math.max(.8, height / 630)));
+      expect(layout.title).toEqual({ x: 158, y: 32, width: 324, height: 48 });
+      expect(layout.choices.on).toEqual({ x: 300, y: 118, width: 128, height: Math.max(48, 44 / layout.scale) });
       expect(layout.sliders.music.x).toBe(318);
       expect(layout.choices.en.x + layout.choices.en.width).toBe(584);
     }
@@ -94,7 +94,7 @@ describe('shared settings artwork and native control geometry', () => {
       expect(layout.sliders.music.x).toBe(318);
     }
     const ordinary = settingsLayout(1000, 700, size, false);
-    expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBe(64);
+    expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBeCloseTo(60, 8);
   });
 
   it.each(['normal', 'large'] as const)('fills a tall desktop panel with section spacing while retaining control sizes (%s)', size => {
@@ -140,21 +140,15 @@ describe('shared settings artwork and native control geometry', () => {
     }
   });
 
-  it('preserves the full desktop layout at its original 1280×720 size', () => {
-    expect(settingsLayout(1280, 720, 'normal', false)).toEqual({
-      orientation: 'landscape', compact: false, mobile: false, width: 1280, height: 720, scale: 1, textScale: 1,
-      title: { x: 158, y: 48, width: 324, height: 48 },
-      headings: { sound: { x: 56, y: 159 }, music: { x: 56, y: 237 }, effects: { x: 56, y: 301 }, language: { x: 56, y: 382 }, text: { x: 56, y: 505 } },
-      values: { music: { x: 290, y: 240 }, effects: { x: 290, y: 304 } },
-      choices: {
-        on: { x: 300, y: 144, width: 128, height: 48 }, off: { x: 448, y: 144, width: 136, height: 48 },
-        auto: { x: 56, y: 420, width: 160, height: 48 }, ru: { x: 240, y: 420, width: 164, height: 48 }, en: { x: 428, y: 420, width: 156, height: 48 },
-        normal: { x: 220, y: 490, width: 174, height: 48 }, large: { x: 412, y: 490, width: 172, height: 48 }, back: { x: 140, y: 616, width: 360, height: 64 }
-      },
-      sliders: { music: { x: 318, y: 251, width: 266, height: 10 }, effects: { x: 318, y: 315, width: 266, height: 10 } },
-      dividers: [{ x: 56, y: 118, width: 528, height: 1 }, { x: 56, y: 356, width: 528, height: 1 }, { x: 56, y: 558, width: 528, height: 1 }],
-      footer: { x: 320, ys: [578] }
-    });
+  it.each([[1280, 720], [1672, 941], [1920, 1080]])('enlarges desktop controls and type while fitting %i×%i', (width, height) => {
+    const layout = settingsLayout(width, height, 'normal', false);
+    const previousScale = Math.min(width / 1280, Math.max(.8, height / 720));
+    expect(layout.scale / previousScale).toBeCloseTo(8 / 7, 2);
+    expect(layout.choices.on.width * layout.scale).toBeGreaterThan(128 * previousScale * 1.13);
+    expect(18 * layout.textScale * layout.scale).toBeGreaterThan(18 * previousScale * 1.13);
+    expect((layout.choices.en.x + layout.choices.en.width) * layout.scale).toBeLessThan(width * .53);
+    expect(layout.height * layout.scale).toBeCloseTo(height, 4);
+    expect((layout.choices.back.y + layout.choices.back.height) * layout.scale).toBeLessThan(height);
   });
 
   it('large text increases visible type without shrinking interaction targets', () => {

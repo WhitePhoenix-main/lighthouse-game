@@ -29,7 +29,7 @@ export function settingsLayout(viewportWidth: number, viewportHeight: number, te
   const compact = mobile && orientation === 'landscape';
   const scale = mobile && orientation === 'portrait' ? Math.min(viewportWidth / 390, 1.75)
     : compact ? Math.min(viewportWidth / 600, 1)
-      : Math.min(viewportWidth / 1280, Math.max(.8, viewportHeight / 720));
+      : Math.min(viewportWidth / 1120, Math.max(.8, viewportHeight / 630));
   const width = viewportWidth / scale;
   const controlHeight = Math.max(48, 44 / scale);
   const textScale = Math.max(1, 14 / (18 * scale)) * (textSize === 'large' ? 1.12 : 1);
@@ -103,22 +103,22 @@ export function settingsLayout(viewportWidth: number, viewportHeight: number, te
   }
   const backHeight = Math.max(64, controlHeight);
   const desktopRows = (gap: number) => {
-    const sound = 144 + gap, music = sound + controlHeight + 45 + gap;
-    const effects = music + Math.max(64, 48 / scale);
-    const firstDivider = effects + 55 + gap, languageHeading = firstDivider + 26, language = languageHeading + 38;
-    const text = language + controlHeight + 22 + gap, lastDivider = text + controlHeight + 20 + gap;
-    const footer = lastDivider + 20, back = footer + 38 + gap;
+    const sound = 118 + gap, music = sound + controlHeight + 32 + gap;
+    const effects = music + Math.max(60, 48 / scale);
+    const firstDivider = effects + 46 + gap, languageHeading = firstDivider + 20, language = languageHeading + 30;
+    const text = language + controlHeight + 18 + gap, lastDivider = text + controlHeight + 12 + gap;
+    const footer = lastDivider + 16, back = footer + 30 + gap;
     return { sound, music, effects, firstDivider, languageHeading, language, text, lastDivider, footer, back };
   };
   const minimumHeight = desktopRows(0).back + backHeight + 40;
   const extraHeight = Math.max(0, viewportHeight / scale - minimumHeight);
-  // Ignore subpixel aspect-ratio rounding so the original 720-unit composition stays exact.
+  // Ignore subpixel aspect-ratio rounding at the reference ratio.
   const gap = extraHeight >= 1 ? extraHeight / 6 : 0;
   const { sound, music, effects, firstDivider, languageHeading, language, text, lastDivider, footer, back } = desktopRows(gap);
   return {
     orientation, compact, mobile, width, scale, textScale,
     height: Math.max(viewportHeight / scale, back + backHeight + 40),
-    title: rect(158, 48, 324, 48),
+    title: rect(158, 32, 324, 48),
     headings: {
       sound: { x: 56, y: sound + (controlHeight - 18 * textScale) / 2 },
       music: { x: 56, y: music }, effects: { x: 56, y: effects },
@@ -131,7 +131,7 @@ export function settingsLayout(viewportWidth: number, viewportHeight: number, te
       normal: rect(220, text, 174), large: rect(412, text, 172), back: rect(140, back, 360, backHeight)
     },
     sliders: { music: rect(318, music + 14, 266, 10), effects: rect(318, effects + 14, 266, 10) },
-    dividers: [rect(56, 118, 528, 1), rect(56, firstDivider, 528, 1), rect(56, lastDivider, 528, 1)],
+    dividers: [rect(56, 98, 528, 1), rect(56, firstDivider, 528, 1), rect(56, lastDivider, 528, 1)],
     footer: { x: 320, ys: [footer] }
   };
 }

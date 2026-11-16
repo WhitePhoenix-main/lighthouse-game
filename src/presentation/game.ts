@@ -18,7 +18,7 @@ import { mountMenuButtons } from './menuButtons';
 import { menuScenery, layoutMenuScenery } from './menuScenery';
 import { mountSettingsTransition } from './settingsTransition';
 import { renderPlacementPreview } from './preparation';
-import { screenContent, nightLabel } from './screens';
+import { screenContent } from './screens';
 import { drawCombatFeedback } from './feedback';
 import { battleDevicePanel } from './devices';
 import { drawCoast } from './coast';
@@ -169,7 +169,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     flashStatus.textContent = config.flash.enabled === false ? 'Закрыта · открой в развитии' : battle && battle.flash.cooldownRemaining > 0 ? 'Готова через ' + Math.ceil(battle.flash.cooldownRemaining) + ' с' : 'Готова · урон + оглушение';
     flashButton.title = config.flash.enabled === false ? 'Открой вспышку на экране развития маяка' : 'Радиус ' + config.flash.radius + ' · урон ' + config.flash.damage + ' · оглушение ' + config.flash.stunDuration + ' с';
     shieldStatus.textContent = shieldStatusText(battle, config);
-    find('[data-night-label]').textContent = nightLabel(view);
+    find('[data-night-label]').textContent = view.nights.find(night => night.id === view.selectedNightId)?.name ?? '';
     const rescue = find('[data-ship-status]');
     rescue.textContent = battle?.ship ? shipStatus(battle.ship, config) : '';
     rescue.hidden = view.screen !== 'battle' || !battle?.ship;
@@ -219,7 +219,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     root.querySelector('.lighthouse-app')?.classList.toggle('screen-page', !isBattle);
     for (const selector of ['.statusbar', '.battle-controls', '.legend', '.map-label', '.range-label', '.battle-devices', '.shield-status']) find(selector).hidden = !isBattle;
     devicePanel.hidden = !isBattle || view.paused;
-    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.lateNightModes, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon]);
+    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon]);
     if (key === overlayKey || (view.screen === 'settings' && settingsPointerHeld && !view.settingsError)) { renderPlacementPreview(overlay, view); localize(); return; }
     const scrollSurface = overlay.querySelector<HTMLElement>('.reference-settings') ?? overlay;
     const scrollTop = scrollSurface.scrollTop;
@@ -843,12 +843,6 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       case 'purchase-lens-upgrade': {
         const node = application.view.lenses.flatMap(lens => lens.upgrades).find(entry => entry.definition.id === button.dataset.lensUpgrade);
         if (application.view.screen === 'development' && node?.status === 'available') application.purchaseLensUpgrade(node.definition.id);
-        break;
-      }
-      case 'select-late-mode': {
-        const mode = application.view.lateNightModes?.find(entry => entry.id === button.dataset.mode);
-        if (mode && ['preparation', 'result'].includes(application.view.screen) && !application.view.error
-          && (application.view.screen !== 'result' || application.view.result?.saved)) application.selectLateMode(mode.id);
         break;
       }
       case 'select-night': {

@@ -3,6 +3,11 @@
 .is-settings .play-area { margin:0; border:0; border-radius:0; background:#071321; }
 .is-settings .overlay.screen-settings { padding:0; overflow:hidden; background:transparent; display:block; }
 .reference-settings { position:relative; width:100%; height:100%; overflow:auto; overflow-x:hidden; background:transparent; scrollbar-width:thin; scrollbar-color:#c48456 #142d4c; }
+/* A translated sheet enlarges scrollable overflow. Freeze its current scroll
+   offset while moving so touch momentum/anchoring cannot chase the canvas. */
+.reference-settings[data-layout="mobile"][data-entering="true"], .reference-settings[data-layout="mobile"][data-exiting="true"] { overflow-y:hidden; overflow-anchor:none; }
+/* Keep the retired canvas hidden while WAAPI fill is cancelled and DOM changes. */
+.reference-settings[data-departed="true"] { visibility:hidden; }
 .settings-scrim { position:absolute; inset:0 0 auto; height:var(--settings-content-height,100%); pointer-events:none; background:linear-gradient(90deg,rgba(3,10,19,.94),rgba(3,10,19,.78) 42%,rgba(3,10,19,.22) 59%,transparent 82%); }
 .reference-settings[data-layout="mobile"] .settings-scrim { background:linear-gradient(to bottom,rgba(3,10,19,.76),rgba(3,10,19,.88)); }
 .reference-settings[data-entering="pending"] .settings-board, .reference-settings[data-entering="pending"] .settings-scrim { opacity:0; pointer-events:none; }
