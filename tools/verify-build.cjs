@@ -67,7 +67,7 @@ if (!urls.length) urls.push(process.env.LIGHTHOUSE_TEST_URL || 'http://127.0.0.1
         await title.focus();
         assert.equal(await title.evaluate(element => document.activeElement === element), true);
         await page.keyboard.press('Tab');
-        assert.equal(await page.locator('[data-action="preparation"]').evaluate(element => document.activeElement === element), true);
+        assert.equal(await page.locator('[data-action="game-menu"]').evaluate(element => document.activeElement === element), true);
         const titleGeometry = await page.locator('.menu-title-sprite').evaluate(async element => {
           const style = getComputedStyle(element), image = new Image();
           image.src = /^url\(["']?(.*?)["']?\)$/.exec(style.backgroundImage)[1]; await image.decode();
