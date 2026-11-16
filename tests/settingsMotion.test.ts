@@ -30,7 +30,7 @@ function fixture(reduced = false) {
     return { dataset: { ready, entering: '' }, board, querySelector: (selector: string) => selector === '.settings-board' ? board : selector === '.settings-scrim' ? scrim : null };
   }
   let page: ReturnType<typeof makePage> | null = makePage();
-  const overlay = { clientWidth: 1280, querySelector: () => page } as unknown as HTMLElement;
+  const overlay = { clientWidth: 1280, querySelector: (selector: string) => selector === '.reference-settings' ? page : null } as unknown as HTMLElement;
   const transition = mountSettingsTransition(overlay);
   return {
     transition, media, animations, scrimAnimations, get page() { return page!; },

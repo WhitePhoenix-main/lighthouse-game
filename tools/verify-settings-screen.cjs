@@ -190,6 +190,7 @@ let ws;
   const tick = await evaluate('settingsTest.application.view.battle.tick');
   await sleep(200); assert.equal(await evaluate('settingsTest.application.view.battle.tick'),tick);
   await click('[data-setting="back"]');
+  await wait('settingsTest.application.view.screen==="battle"');
   assert.deepEqual(await evaluate('({screen:settingsTest.application.view.screen,paused:settingsTest.application.view.paused,tick:settingsTest.application.view.battle.tick})'),{screen:'battle',paused:true,tick});
   check('return to same paused battle, no tick advancement');
   await evaluate('settingsTest.application.openSettings()'); await ready();

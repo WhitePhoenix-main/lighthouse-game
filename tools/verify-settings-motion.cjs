@@ -118,7 +118,7 @@ let ws;
     await cdp('Input.dispatchMouseEvent',{type:'mouseReleased',x:r.x+r.w*.8,y:r.y+r.h/2,button:'left',buttons:0,clickCount:1});
     assert(Math.abs(await evaluate(`+document.querySelector('[data-action="music-volume"]').value`)-80)<=3,'native range drag');
     assert(!(await evaluate('motionEntryChanges')).includes('true'),'drag replayed entry'); await continuity('drag');
-    await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]')`);
+    await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
     check(`${width}×${height}: same scene/images/layout/ambient animations; slide/fade; native controls; settings and drag preserve timelines`);
   }
@@ -137,7 +137,7 @@ let ws;
   await evaluate(`document.querySelector('.reference-settings').scrollTop=10000`); await sleep(100);
   assert.deepEqual(await scenery(),beforeScroll,'settings scroll moved backdrop');
   await viewport(390,844); await ready(); await continuity('orientation resize');
-  await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]')`);
+  await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
   await continuity('portrait return');
   check('stationary backdrop on settings scroll; scene and CSS timelines survive orientation resize');
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
