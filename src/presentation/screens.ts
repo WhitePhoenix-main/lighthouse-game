@@ -3,6 +3,7 @@ import { preparationDevices } from './preparation';
 import { lensDevelopment, lensSelection, materialName } from './lenses';
 import { referenceSettings } from './referenceSettings';
 import { referenceMenu } from './referenceMenu';
+import { referenceGameMenu } from './gameMenu';
 
 const escape = (text: string): string => text.replace(/[&<>"']/g, (letter) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[letter] ?? letter);
 export const upgradeValue = (stat: UpgradeStat, amount: number): string => {
@@ -134,9 +135,11 @@ function upgradeDetails(node: UpgradeNodeView, nodes: readonly UpgradeNodeView[]
   return `<section class="node-details" id="upgrade-details" aria-live="polite" aria-atomic="true"><div class="eyebrow">ВЫБРАННОЕ УЛУЧШЕНИЕ</div><h2>${escape(definition.name)}</h2><span class="upgrade-status">${statuses[status]}</span><dl class="detail-values"><div><dt>Цена</dt><dd>${definition.cost} ◈</dd></div><div><dt>Эффект</dt><dd>${unlock ? 'закрыто → открыто' : (definition.effect.stat === 'bellDamageReduction' ? `−${Math.round(definition.effect.amount * 100)}% входящего урона` : definition.effect.stat === 'bellFirstPulseReduction' ? `−${Math.round(definition.effect.amount * 100)}% скорости первого импульса` : ['repairCostReduction', 'rechargeCostReduction'].includes(definition.effect.stat) ? '−' + Math.round(definition.effect.amount * 100) + ' п.п. коэффициента стоимости' : definition.effect.stat.endsWith('Reduction') && !["beamArmorBonus","beamExecuteBonus","litDeviceDamageBonus","lighthouseDamageReduction","lighthouseHeavyReduction","lighthouseEmergencyReduction","lighthouseWaveRepair","shieldRestoreReduction"].includes(definition.effect.stat) ? '−' + value(definition.effect.stat, definition.effect.amount) + ' к интервалу' : (['flashDamagedArmorBonus', 'deviceHealthBonus'].includes(definition.effect.stat) ? '' : '+') + value(definition.effect.stat, definition.effect.amount))}</dd></div><div><dt>${status === 'purchased' ? 'Текущее значение' : 'Сейчас → после покупки'}</dt><dd>${value(definition.effect.stat, node.currentValue)}${status === 'purchased' ? '' : ` → ${value(definition.effect.stat, node.nextValue)}`}</dd></div><div><dt>Требования</dt><dd>${requires.length ? requires.map(escape).join(', ') : 'Без требований'}</dd></div></dl><p>${escape(node.reason)}</p><p>${escape(upgradeExplanation(definition.effect.stat))}</p><button class="primary" data-action="upgrade" data-upgrade="${definition.id}" ${status !== 'available' || blocked ? 'disabled' : ''}>${status === 'purchased' ? '✓ Куплено' : `Купить · ${definition.cost} ◈`}</button></section>`;
 }
 
-export function screenContent(view: ApplicationView, selectedId: UpgradeId | undefined, confirmAbandon: boolean): string {
+export function screenContent(view: ApplicationView, selectedId: UpgradeId | undefined, confirmAbandon: boolean, confirmNewGame = false): string {
   const { config } = view;
   if (view.screen === 'menu') return mainMenu(view);
+  if (view.screen === 'game-menu') return referenceGameMenu(view, confirmNewGame);
+  if (view.screen === 'trials') return `<section class="panel trials-panel">${button('back', '← Назад', !!view.error)}${heading('ОТДЕЛЬНЫЕ НОЧИ', 'Испытания')}<p>Необязательные ночи. Условия открытия сохраняются.</p><div class="night-options">${view.nights.filter(night => night.optional).map(night => `<button class="night-option" data-action="select-night" data-night="${night.id}" ${!night.available || view.error ? 'disabled' : ''}><strong>${escape(night.name)}</strong><small>${escape(night.description)}</small><small>${night.available ? night.completed ? 'Пройдена · можно повторить' : 'Доступна' : escape(night.reason)}</small></button>`).join('')}</div></section>`;
   if (view.screen === 'development') return development(view, selectedId);
   if (view.screen === 'settings') return settings(view);
   if (view.screen === 'preparation') {

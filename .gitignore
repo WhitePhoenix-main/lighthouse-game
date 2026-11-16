@@ -363,8 +363,6 @@ test-results/
 /tests/browser/expansion-frame.html
 /tests/browser/expansion-frame.ts
 /tests/browser/fixture.ts
-/tests/browser/game-menu-frame.html
-/tests/browser/game-menu-frame.ts
 /tests/browser/index.html
 /tests/browser/late-modes-frame.html
 /tests/browser/late-modes-frame.ts
@@ -393,9 +391,6 @@ test-results/
 /tests/helpers/auditFs.d.ts
 /tests/helpers/balance200Policy.ts
 /tests/helpers/balancePolicy.ts
-/tests/helpers/devices.ts
-/tests/helpers/lateBuilds.ts
-/tests/helpers/latePressureBuilds.ts
 /tests/abilities.test.ts
 /tests/application.test.ts
 /tests/balance200Audit.test.ts
@@ -429,13 +424,10 @@ test-results/
 /tests/expansionPresentation.test.ts
 /tests/feedback.test.ts
 /tests/focusCombat.test.ts
-/tests/gameMenuApplication.test.ts
-/tests/gameMenuPresentation.test.ts
 /tests/harpoon.test.ts
 /tests/indicatorLayout.test.ts
 /tests/lateModeBalance.test.ts
 /tests/lateModePresentation.test.ts
-/tests/lateModes.test.ts
 /tests/latePressure.test.ts
 /tests/lateThreats.test.ts
 /tests/lensCombat.test.ts

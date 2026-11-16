@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test game
+        run: pnpm test
+
       - name: Build game
         run: pnpm build
 

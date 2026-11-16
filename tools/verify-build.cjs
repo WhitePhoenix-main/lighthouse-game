@@ -92,8 +92,23 @@ if (!urls.length) urls.push(process.env.LIGHTHOUSE_TEST_URL || 'http://127.0.0.1
         await page.evaluate(async () => { await Promise.all([...document.images].map(image => image.decode())); });
         await page.keyboard.press('Escape');
         await page.locator('.menu-title').waitFor();
+        await page.waitForFunction(() => !document.querySelector('.menu-artboard')?.inert);
+        await page.evaluate(() => { window.productionMenuScene = document.querySelector('.menu-scenery'); });
+        await page.locator('[data-action="game-menu"]').click();
+        await page.waitForFunction(() => document.querySelector('.reference-game-menu')?.dataset.ready === 'true' && !document.querySelector('.reference-game-menu')?.inert);
+        assert.equal(await page.locator('[data-action="continue-game"]').isDisabled(), true);
+        assert.equal(await page.evaluate(() => document.querySelector('.menu-scenery') === window.productionMenuScene), true);
+        await page.locator('.game-menu-sprite').evaluateAll(async elements => {
+          for (const element of elements) {
+            const match = /^url\(["']?(.*?)["']?\)$/.exec(getComputedStyle(element).backgroundImage);
+            if (!match) throw Error('Missing game menu sprite');
+            const image = new Image(); image.src = match[1]; await image.decode();
+            if (!image.naturalWidth || image.naturalWidth % 4) throw Error('Invalid game menu atlas');
+          }
+        });
+        await page.keyboard.press('Escape'); await page.locator('.menu-title').waitFor();
         assert.deepEqual(errors, [], url);
-        console.log(`${url}: PASS (JavaScript, CSS, images, font, settings, no 404 or page errors)`);
+        console.log(`${url}: PASS (JavaScript, CSS, sprites, font, settings, game menu, persistent scenery, no 404 or page errors)`);
       } finally { await context.close(); }
     }
   } finally { await browser.close(); }

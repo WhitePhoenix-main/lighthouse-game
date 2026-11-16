@@ -6,5 +6,5 @@
     "noFallthroughCasesInSwitch": true, "isolatedModules": true, "skipLibCheck": true,
     "allowImportingTsExtensions": true, "noEmit": true
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
 }

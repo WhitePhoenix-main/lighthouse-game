@@ -1,4 +1,5 @@
-import type { AttemptRecord, DeviceDeployment, DeviceKind, DevicePlacement, NightConfig, OwnedDevice, Profile, EnemyKind, NightId, LensId, LensUpgradeId, SaveData, SaveStore, SettledAttempt, UpgradeId } from '../contracts';
+import { isLateNight } from '../content/lateModes';
+import type { AttemptRecord, DeviceDeployment, DeviceKind, DevicePlacement, NightConfig, OwnedDevice, Profile, EnemyKind, NightId, LateNightMode, LensId, LensUpgradeId, SaveData, SaveStore, SettledAttempt, UpgradeId } from '../contracts';
 import { DEVICE_RULES } from '../content/devices';
 import { DEVICE_KINDS, deviceDeployments, rechargeCost, repairCost, remainingTrapCharges, trapChargeCapacity, unlockedDeviceKinds } from '../progression/devices';
 import { checkDraft } from './placement';
@@ -92,6 +93,8 @@ export function decodeSave(raw: string): SaveData {
     const active = value.activeAttempt, settled = value.lastSettled;
     if (active !== null && (!record(active) || !identifier(active.id) || !natural(active.seed) || active.seed > 0xffffffff || !natural(active.placementCost) || (!legacy && (typeof active.nightId !== 'string' || !(modern ? NIGHT_IDS : oldNightIds).includes(active.nightId as never)))))
         throw new Error('Повреждена запись попытки.');
+    if (record(active) && active.lateMode !== undefined && (!['transition', 'assault'].includes(active.lateMode as string) || !isLateNight(active.nightId as NightId)))
+        throw new Error('Неверный режим поздней ночи.');
     if (!modern && record(active) && (['lensId', 'bossLevel', 'bossReward'].some(key => key in active) || (legacy && 'nightId' in active)))
         throw new Error('Поля новой схемы в старой попытке.');
     if (settled !== null && (!record(settled) || !identifier(settled.id) || !natural(settled.reward) || typeof settled.outcome !== 'string' || !['victory', 'defeat', 'interrupted'].includes(settled.outcome)))
@@ -157,7 +160,7 @@ export function decodeSave(raw: string): SaveData {
         }
         else if ('bossLevel' in active || 'bossReward' in active)
             throw new Error('Босс в обычной ночи.');
-        next.activeAttempt = { id: active.id as string, seed: active.seed as number, placementCost: active.placementCost as number, nightId: legacy ? 'first-light' : active.nightId as NightId, lensId: lensId as LensId, ...(active.bossLevel !== undefined ? { bossLevel: active.bossLevel as number, bossReward: active.bossReward as number } : {}) };
+        next.activeAttempt = { id: active.id as string, seed: active.seed as number, placementCost: active.placementCost as number, nightId: legacy ? 'first-light' : active.nightId as NightId, lensId: lensId as LensId, ...(active.lateMode !== undefined ? {lateMode: active.lateMode as LateNightMode} : {}), ...(active.bossLevel !== undefined ? { bossLevel: active.bossLevel as number, bossReward: active.bossReward as number } : {}) };
     }
     if (next.activeAttempt) {
         if (!persistent) next.activeAttempt.legacyRental = true;
@@ -177,15 +180,37 @@ export function decodeSave(raw: string): SaveData {
     return next;
 }
 export class SaveRepository {
+    private readonly completedResets = new WeakSet<object>();
+    private readonly cancelledResets = new WeakSet<object>();
     private raw: string | null = null;
     private data: SaveData = emptySave();
     private pending: {
         raw: string;
         data: SaveData;
+        resetOperation?: object;
     } | null = null;
     constructor(private readonly store: SaveStore) { }
     get current(): SaveData { return structuredClone(this.data); }
     get hasProfile(): boolean { return this.raw !== null; }
+    // Retain the operation identity across retries of writes with uncertain acknowledgement.
+    resetProfile(operation: object): void {
+        if (this.cancelledResets.has(operation)) throw new Error('Сброс профиля отменён.');
+        if (this.completedResets.has(operation)) return;
+        this.resolvePending();
+        if (this.completedResets.has(operation)) return;
+        if (this.data.activeAttempt) throw new Error('Нельзя сбросить активную попытку.');
+        this.commit(emptySave(), operation);
+        this.completedResets.add(operation);
+    }
+    cancelReset(operation: object): 'cancelled' | 'completed' {
+        this.resolvePending();
+        // Read-only cancellation must still detect unreadable storage and concurrent changes.
+        if (this.store.read() !== this.raw)
+            throw new Error('Сохранение изменилось в другой вкладке. Перезагрузите игру.');
+        if (this.completedResets.has(operation)) return 'completed';
+        this.cancelledResets.add(operation);
+        return 'cancelled';
+    }
     ensureProfile(): void { this.resolvePending(); if (!this.hasProfile)
         this.commit(this.current); }
     load(): void { const raw = this.store.read(), next = raw === null ? emptySave() : decodeSave(raw); this.raw = raw; this.data = next; this.pending = null; if (raw !== null && (JSON.parse(raw) as {
@@ -197,11 +222,12 @@ export class SaveRepository {
         return; const stored = this.store.read(); if (stored === this.pending.raw) {
         this.raw = this.pending.raw;
         this.data = this.pending.data;
+        if (this.pending.resetOperation) this.completedResets.add(this.pending.resetOperation);
     }
     else if (stored !== this.raw)
         throw new Error('Сохранение изменилось в другой вкладке. Перезагрузите игру.'); this.pending = null; }
-    private commit(next: SaveData): void { if (this.store.read() !== this.raw)
-        throw new Error('Сохранение изменилось в другой вкладке. Перезагрузите игру.'); const serialized = JSON.stringify(next); decodeSave(serialized); this.pending = { raw: serialized, data: next }; try {
+    private commit(next: SaveData, resetOperation?: object): void { if (this.store.read() !== this.raw)
+        throw new Error('Сохранение изменилось в другой вкладке. Перезагрузите игру.'); const serialized = JSON.stringify(next); decodeSave(serialized); this.pending = { raw: serialized, data: next, ...(resetOperation ? {resetOperation} : {}) }; try {
         this.store.write(serialized);
     }
     catch (error) {
@@ -286,7 +312,9 @@ export class SaveRepository {
         this.resolvePending();
         if (attempt.placementCost !== 0 || attempt.legacyRental !== undefined) throw new Error('Новая попытка не оплачивает аренду.');
         const normalized = { ...structuredClone(attempt), deviceSnapshot: structuredClone(attempt.deviceSnapshot ?? deviceDeployments(this.data.profile)), nightId: attempt.nightId ?? 'first-light' as const, lensId: attempt.lensId ?? 'basic' as const }, active = this.data.activeAttempt;
-        if (active && active.id === normalized.id && active.seed === normalized.seed && active.placementCost === normalized.placementCost && active.nightId === normalized.nightId && (active.lensId ?? 'basic') === normalized.lensId && active.bossLevel === normalized.bossLevel && active.bossReward === normalized.bossReward && sameDeployments(active.deviceSnapshot ?? [], normalized.deviceSnapshot))
+        if (normalized.lateMode !== undefined && (!isLateNight(normalized.nightId) || !['transition', 'assault'].includes(normalized.lateMode)))
+            throw new Error('Неверный режим поздней ночи.');
+        if (active && active.id === normalized.id && active.seed === normalized.seed && active.placementCost === normalized.placementCost && active.nightId === normalized.nightId && (active.lensId ?? 'basic') === normalized.lensId && (active.lateMode ?? 'assault') === (normalized.lateMode ?? 'assault') && active.bossLevel === normalized.bossLevel && active.bossReward === normalized.bossReward && sameDeployments(active.deviceSnapshot ?? [], normalized.deviceSnapshot))
             return;
         if (active)
             throw new Error('Предыдущая попытка ещё активна.');
