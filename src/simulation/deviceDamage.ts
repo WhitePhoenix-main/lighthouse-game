@@ -2,6 +2,7 @@ import type { BattleState, DeviceState, NightConfig } from '../contracts';
 import { emitCombatEvent } from './events';
 import { delayShieldRecovery, isProtected, syncShield } from './shield';
 import { applyMovementSlow } from './slows';
+import { bastionDamage } from './abilityEffects';
 
 /** Body protection never changes damage dealt to the field or lighthouse. */
 export function incomingDeviceDamage(device: Pick<DeviceState, 'kind'>, config: NightConfig, amount: number, charged = false): number {
@@ -33,10 +34,11 @@ function slowOnBarrierBreak(state: BattleState, config: NightConfig, device: Dev
 }
 
 /** One path for ordinary attacks and boss strikes, including destruction side effects. */
-export function damageDevice(state: BattleState, config: NightConfig, device: DeviceState, amount: number, charged = false): void {
+export function damageDevice(state: BattleState, config: NightConfig, device: DeviceState, amount: number, charged = false, heavy = charged): void {
   if (device.health <= 0 || device.consumed || amount <= 0) return;
   const before = device.health;
-  device.health = Math.max(0, before - incomingDeviceDamage(device, config, amount, charged));
+  device.health = Math.max(0, before - bastionDamage(state, config, amount,
+    incomingDeviceDamage(device, config, amount, charged), 'device', heavy));
   if (device.health === 0 && device.kind === 'generator' && config.devices.generator.lastStandEnabled && !device.lastStandUsed) {
     device.lastStandUsed = true;
     device.health = Math.min(before, 1);

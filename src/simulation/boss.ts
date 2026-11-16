@@ -1,7 +1,9 @@
+import { damageLighthouse } from './lighthouse';
+import { sealSlowMultiplier } from './seal';
 import type { BattleState, BossState, DeviceState, NightConfig } from '../contracts';
 import { emitCombatEvent } from './events';
 import { contactFraction } from './geometry';
-import { delayShieldRecovery, hitShield, isProtected } from './shield';
+import { hitShield, isProtected } from './shield';
 import { movementSlowMultiplier } from './slows';
 import { damageDevice } from './deviceDamage';
 
@@ -38,7 +40,8 @@ export function moveTentacles(state: BattleState, config: NightConfig, litIds: r
   for (const zone of boss.tentacles) {
     zone.attackCooldown = Math.max(0, zone.attackCooldown - config.stepSeconds);
     const distance = Math.hypot(zone.x, zone.y);
-    const multiplier = Math.min(movementSlowMultiplier(zone, state.tick), litIds.includes(zone.id) ? Math.min(rules.litSpeedMultiplier, config.lens?.slowMultiplier ?? 1) : 1);
+    const multiplier = Math.min(movementSlowMultiplier(zone, state.tick), sealSlowMultiplier(zone, state, config),
+      litIds.includes(zone.id) ? Math.min(rules.litSpeedMultiplier, config.lens?.slowMultiplier ?? 1) : 1);
     const next = Math.max(config.lighthouseRadius + rules.radius, distance - rules.speed * multiplier * config.stepSeconds);
     const scale = distance > next ? next / distance - 1 : 0;
     const dx = zone.x * scale, dy = zone.y * scale;
@@ -67,17 +70,12 @@ export function attackTentacles(state: BattleState, config: NightConfig, contact
     const target = contacts.get(zone.id);
     if (target === 'shield') {
       if (state.shield.current <= 0) continue;
-      hitShield(state, config, rules.attackDamage, zone.x, zone.y);
+      hitShield(state, config, rules.attackDamage, zone.x, zone.y, true);
     } else if (target) {
       if (target.health <= 0 || target.consumed || (state.shield.current > 0 && isProtected(target, config))) continue;
-      damageDevice(state, config, target, rules.attackDamage);
+      damageDevice(state, config, target, rules.attackDamage, false, true);
     } else if (Math.hypot(zone.x, zone.y) <= config.lighthouseRadius + rules.radius + 1e-9) {
-      const before = state.lighthouseHealth;
-      state.lighthouseHealth = Math.max(0, before - rules.attackDamage);
-      if (before > state.lighthouseHealth) {
-        delayShieldRecovery(state, config);
-        emitCombatEvent(state, { type: 'lighthouse-hit', damage: before - state.lighthouseHealth, x: 0, y: 0 });
-      }
+      damageLighthouse(state, config, rules.attackDamage, true);
     } else continue;
     zone.attackCooldown = rules.attackInterval;
   }

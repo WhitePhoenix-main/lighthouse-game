@@ -6,7 +6,7 @@ import { ENEMIES } from './enemies';
  * equipment gates and victory economy in nights.ts. This fixture baseline has
  * no victory payout. All balance remains provisional. */
 export const NIGHT_CONFIG: NightConfig = {
-  id: 'first-light', rulesVersion: 'prototype-14-lens-completion', stepSeconds: 1 / 30,
+  id: 'first-light', rulesVersion: 'prototype-22-late-modes', stepSeconds: 1 / 30,
   devices: DEVICE_RULES,
   shield: { radius: 155, capacityPerGenerator: 90, regenerationDelay: 4, regenerationPerSecond: 15 },
   flash: { radius: 210, damage: 22, stunDuration: 2, cooldown: 18 },

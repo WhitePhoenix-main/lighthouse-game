@@ -253,7 +253,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     settingsTransition.sync();
     gameMenuTransition.sync();
     for (const element of root.querySelectorAll<HTMLElement>('[data-action]')) {
-      element.dataset.focusKey = [element.dataset.action, element.dataset.upgrade ?? element.dataset.lensUpgrade ?? element.dataset.lens ?? element.dataset.night ?? element.dataset.kind ?? element.dataset.deviceId ?? element.dataset.size ?? element.dataset.enabled ?? element.dataset.language ?? ''].join(':');
+      element.dataset.focusKey = [element.dataset.action, element.dataset.upgrade ?? element.dataset.lensUpgrade ?? element.dataset.lens ?? element.dataset.mode ?? element.dataset.night ?? element.dataset.kind ?? element.dataset.deviceId ?? element.dataset.size ?? element.dataset.enabled ?? element.dataset.language ?? ''].join(':');
     }
     if (!overlay.hidden) {
       const restoreKey = screenChanged ? returnFocus.get(view.screen) : focusKey;
@@ -881,8 +881,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       }
       case 'select-late-mode': {
         const mode = application.view.lateNightModes?.find(entry => entry.id === button.dataset.mode);
-        if (mode && ['preparation', 'result'].includes(application.view.screen) && !application.view.error
-          && (application.view.screen !== 'result' || application.view.result?.saved)) application.selectLateMode(mode.id);
+        if (mode && application.view.screen === 'preparation' && !application.view.error) application.selectLateMode(mode.id);
         break;
       }
       case 'select-night': {

@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { settingsLayout, type SettingsRect } from '../src/presentation/settingsLayout';
+import { settingsLayout, usesMobileSettingsLayout, type SettingsRect } from '../src/presentation/settingsLayout';
 import { settingsTextWidth } from '../src/presentation/settingsLettering';
 
 const viewports = [[320, 568], [390, 844], [568, 320], [844, 390], [1000, 700], [1280, 720], [1672, 941], [768, 1024], [1024, 768]] as const;
 
 describe('shared settings artwork and native control geometry', () => {
+  it.each([
+    [390, 844, false, 0, true], [795, 1543, false, 0, true], [933, 1051, false, 0, true],
+    [568, 320, false, 0, true], [844, 390, false, 0, false],
+    [844, 390, false, 5, true], [844, 390, true, 0, true],
+    [1024, 768, false, 0, false], [1024, 768, false, 10, true], [1920, 1080, true, 10, false],
+    [1280, 720, false, 5, false], [1366, 768, true, 10, false],
+  ] as const)('chooses responsive layout for %i×%i, coarse=%s, touchPoints=%i', (width, height, coarse, touchPoints, mobile) => {
+    expect(usesMobileSettingsLayout(width, height, coarse, touchPoints)).toBe(mobile);
+    if (!coarse && !touchPoints) expect(settingsLayout(width, height, 'normal').mobile).toBe(mobile);
+  });
+
   for (const [width, height] of viewports) for (const size of ['normal', 'large'] as const) {
     it(`${width}×${height}, ${size}: reachable 44px targets without collisions`, () => {
       const layout = settingsLayout(width, height, size);
@@ -54,6 +65,23 @@ describe('shared settings artwork and native control geometry', () => {
     }
   });
 
+  it.each(['normal', 'large'] as const)('fits tablet portrait controls and Back within the viewport (%s)', size => {
+    for (const [width, height] of [[933, 1051], [768, 1024]] as const) {
+      const layout = settingsLayout(width, height, size);
+      expect(layout.mobile).toBe(true);
+      expect(layout.orientation).toBe('portrait');
+      expect(layout.scale).toBeLessThan(1.75);
+      expect(layout.height * layout.scale).toBeCloseTo(height, 5);
+      expect(layout.width * layout.scale).toBeCloseTo(width, 5);
+      for (const control of Object.values(layout.choices)) {
+        expect((control.y + control.height) * layout.scale).toBeLessThan(height);
+        expect(control.height * layout.scale).toBeGreaterThanOrEqual(44);
+      }
+      const back = layout.choices.back;
+      expect(height - (back.y + back.height) * layout.scale).toBeCloseTo(24 * layout.scale, 5);
+    }
+  });
+
   it.each(['normal', 'large'] as const)('uses both phone landscape columns and keeps back visible (%s)', size => {
     for (const [width, height] of [[844, 390], [1024, 768]] as const) {
       const layout = settingsLayout(width, height, size, true);
@@ -70,16 +98,20 @@ describe('shared settings artwork and native control geometry', () => {
     expect(short.choices.back.height * short.scale).toBeGreaterThanOrEqual(44);
   });
 
-  it('keeps desktop artwork coordinates and scaling when the window becomes narrow', () => {
+  it('keeps the enlarged desktop panel on the left when the window becomes narrow', () => {
     for (const [width, height] of [[844, 390], [1280, 720], [1672, 941]] as const) {
       const layout = settingsLayout(width, height, 'normal', false);
       expect(layout.mobile).toBe(false);
       expect(layout.compact).toBe(false);
-      expect(layout.scale).toBe(Math.min(width / 1280, Math.max(.8, height / 720)));
-      expect(layout.title).toEqual({ x: 158, y: 48, width: 324, height: 48 });
-      expect(layout.choices.on).toEqual({ x: 300, y: 144, width: 128, height: Math.max(48, 44 / layout.scale) });
+      expect(layout.scale).toBe(Math.min(width / 1120, Math.max(.8, height / 630)));
+      expect(layout.title).toEqual({ x: 158, y: 32, width: 324, height: 48 });
+      expect(layout.choices.on).toEqual({ x: 300, y: 118, width: 128, height: Math.max(48, 44 / layout.scale) });
       expect(layout.sliders.music.x).toBe(318);
       expect(layout.choices.en.x + layout.choices.en.width).toBe(584);
+      expect(layout.width).toBe(640);
+      for (const control of [...Object.values(layout.choices), ...Object.values(layout.sliders)]) {
+        expect(control.x + control.width).toBeLessThanOrEqual(layout.width);
+      }
     }
   });
 
@@ -94,18 +126,23 @@ describe('shared settings artwork and native control geometry', () => {
       expect(layout.sliders.music.x).toBe(318);
     }
     const ordinary = settingsLayout(1000, 700, size, false);
-    expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBe(64);
+    expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBeCloseTo(60, 8);
   });
 
-  it.each(['normal', 'large'] as const)('fills a tall desktop panel with section spacing while retaining control sizes (%s)', size => {
+  it.each(['normal', 'large'] as const)('keeps tall desktop panels dense while retaining control sizes (%s)', size => {
     for (const [width, height] of [[1280, 1024], [1000, 1000]] as const) {
-      const base = settingsLayout(width, 720, size, false);
+      const base = settingsLayout(width, width * 630 / 1120, size, false);
       const layout = settingsLayout(width, height, size, false);
       expect(layout.scale).toBe(base.scale);
       expect(layout.textScale).toBe(base.textScale);
       expect(layout.title).toEqual(base.title);
       expect(layout.height * layout.scale).toBeCloseTo(height, 5);
-      expect(layout.choices.back.y + layout.choices.back.height).toBeCloseTo(height / layout.scale - 40, 5);
+      expect(layout.width).toBe(640);
+      const extraGap = layout.choices.on.y - base.choices.on.y;
+      expect(extraGap * layout.scale).toBeGreaterThan(0);
+      expect(extraGap * layout.scale).toBeLessThanOrEqual(8.001);
+      expect((layout.choices.back.y - base.choices.back.y) * layout.scale).toBeLessThanOrEqual(48.001);
+      expect(layout.choices.back).toEqual(settingsLayout(width, height * 2, size, false).choices.back);
       for (const name of Object.keys(base.choices) as (keyof typeof base.choices)[]) {
         expect(layout.choices[name].x).toBe(base.choices[name].x);
         expect(layout.choices[name].width).toBe(base.choices[name].width);
@@ -140,21 +177,15 @@ describe('shared settings artwork and native control geometry', () => {
     }
   });
 
-  it('preserves the full desktop layout at its original 1280×720 size', () => {
-    expect(settingsLayout(1280, 720, 'normal', false)).toEqual({
-      orientation: 'landscape', compact: false, mobile: false, width: 1280, height: 720, scale: 1, textScale: 1,
-      title: { x: 158, y: 48, width: 324, height: 48 },
-      headings: { sound: { x: 56, y: 159 }, music: { x: 56, y: 237 }, effects: { x: 56, y: 301 }, language: { x: 56, y: 382 }, text: { x: 56, y: 505 } },
-      values: { music: { x: 290, y: 240 }, effects: { x: 290, y: 304 } },
-      choices: {
-        on: { x: 300, y: 144, width: 128, height: 48 }, off: { x: 448, y: 144, width: 136, height: 48 },
-        auto: { x: 56, y: 420, width: 160, height: 48 }, ru: { x: 240, y: 420, width: 164, height: 48 }, en: { x: 428, y: 420, width: 156, height: 48 },
-        normal: { x: 220, y: 490, width: 174, height: 48 }, large: { x: 412, y: 490, width: 172, height: 48 }, back: { x: 140, y: 616, width: 360, height: 64 }
-      },
-      sliders: { music: { x: 318, y: 251, width: 266, height: 10 }, effects: { x: 318, y: 315, width: 266, height: 10 } },
-      dividers: [{ x: 56, y: 118, width: 528, height: 1 }, { x: 56, y: 356, width: 528, height: 1 }, { x: 56, y: 558, width: 528, height: 1 }],
-      footer: { x: 320, ys: [578] }
-    });
+  it.each([[1280, 720], [1672, 941], [1920, 1080]])('enlarges desktop controls and type while fitting %i×%i', (width, height) => {
+    const layout = settingsLayout(width, height, 'normal', false);
+    const previousScale = Math.min(width / 1280, Math.max(.8, height / 720));
+    expect(layout.scale / previousScale).toBeCloseTo(8 / 7, 2);
+    expect(layout.choices.on.width * layout.scale).toBeGreaterThan(128 * previousScale * 1.13);
+    expect(18 * layout.textScale * layout.scale).toBeGreaterThan(18 * previousScale * 1.13);
+    expect((layout.choices.en.x + layout.choices.en.width) * layout.scale).toBeLessThan(width * .53);
+    expect(layout.height * layout.scale).toBeCloseTo(height, 4);
+    expect((layout.choices.back.y + layout.choices.back.height) * layout.scale).toBeLessThan(height);
   });
 
   it('large text increases visible type without shrinking interaction targets', () => {

@@ -10,19 +10,6 @@ export function resolveLanguage(preference: LanguagePreference, platformLanguage
 
 // Presentation-only dictionary. Content identifiers and simulation data remain language independent.
 const entries = `
-Выбор игры|Choose game
-Не удалось начать игру|Could not start the game
-Испытания|Trials
-Новая игра|New game
-Сохранения нет|No saved game
-Продолжить — сохранения нет|Continue — no saved game
-Сохранения пока нет. Начните новую игру.|No saved game yet. Start a new game.
-Начать новую игру?|Start a new game?
-Текущее прохождение, ресурсы и улучшения будут удалены. Настройки сохранятся.|Your campaign, resources and upgrades will be deleted. Settings will be kept.
-Начать заново|Start over
-Не удалось загрузить оформление меню. Обновите страницу.|Menu artwork could not load. Refresh the page.
-ОТДЕЛЬНЫЕ НОЧИ|OPTIONAL NIGHTS
-Необязательные ночи. Условия открытия сохраняются.|Optional nights. Unlock requirements still apply.
 Награда включает существ и победу; досрочные бонусы отдельно.|Rewards include enemies and victory; early-wave bonuses are extra.
 Переходный|Transition
 Штурм|Assault

@@ -1,13 +1,15 @@
 import { validateLensOwnership } from './lenses';
-import type { LensId, LensUpgradeId, DeviceKind, NightConfig, Profile, UpgradeAvailability, UpgradeDefinition, UpgradeId, UpgradeNodeView, UpgradeStat } from '../contracts';
+import type { CombatUpgradeStat, LensId, LensUpgradeId, DeviceKind, NightConfig, Profile, UpgradeAvailability, UpgradeDefinition, UpgradeId, UpgradeNodeView, UpgradeStat } from '../contracts';
 import { LENSES, LENS_UPGRADES } from '../content/lenses';
 import { getBossRules } from '../content/boss';
 import { UPGRADES } from '../content/upgrades';
-import { NIGHT_CATALOG } from '../content/nights';
-import { DEVICE_KINDS, LEGACY_DEVICE_KINDS } from './devices';
-const nightIds = ['first-light', 'broken-shore', 'winged-tide', 'rescue-trial', 'abyss-warden', 'far-shore'];
+import { NIGHT_CATALOG, NIGHT_IDS } from '../content/nights';
+import { trapRechargeMultiplier, engineeringRepairMultiplier, DEVICE_KINDS, LEGACY_DEVICE_KINDS } from './devices';
+const nightIds: readonly string[] = NIGHT_IDS;
 const deviceKinds = DEVICE_KINDS;
-const stats: readonly UpgradeStat[] = ['damagePerSecond', 'halfAngle', 'range', ...deviceKinds, 'flash', 'typeSlots', 'pairedDamageBonus',
+const combatStats: readonly CombatUpgradeStat[] = ["beamArmorBonus","beamExecuteBonus","litDeviceDamageBonus","lighthouseDamageReduction","lighthouseHeavyReduction","lighthouseEmergencyReduction","lighthouseWaveRepair","shieldRestoreReduction"];
+const isCombatStat = (stat: UpgradeStat): stat is CombatUpgradeStat => (combatStats as readonly string[]).includes(stat);
+const stats: readonly UpgradeStat[] = [...combatStats, 'shieldDelayReduction', 'shieldRadius', 'flashReloadAssist', 'flashDamagedArmorBonus', 'deviceHealthBonus', 'rechargeCostReduction', 'flashRadius', 'flashStunDuration', 'maxObjects', 'repairCostReduction', 'damagePerSecond', 'halfAngle', 'range', ...deviceKinds, 'flash', 'typeSlots', 'pairedDamageBonus',
   'turnSpeed', 'lighthouseHealth', 'shieldCapacity', 'shieldRegeneration', 'flashDamage', 'flashCooldownReduction',
   'cannonDamage', 'cannonIntervalReduction', 'cannonRange', 'harpoonDamage', 'harpoonIntervalReduction', 'harpoonRange',
   'mortarDamage', 'mortarBlastRadius', 'mortarProjectileSpeed', 'mortarIntervalReduction', 'mortarArmorMultiplier',
@@ -72,7 +74,23 @@ export function calculateNightConfig(base: NightConfig, purchasedIds: readonly U
     if (!purchasedIds.includes(node.id)) continue;
     const {stat, amount} = node.effect;
     if (stat === 'range' || stat === 'halfAngle' || stat === 'damagePerSecond' || stat === 'turnSpeed') config.beam[stat] += amount;
+    else if (isCombatStat(stat)) {
+      config.progression ??= {};
+      config.progression[stat] = (config.progression[stat] ?? 0) + amount;
+    }
+    else if (stat === 'shieldDelayReduction') config.shield.regenerationDelay -= amount;
+    else if (stat === 'shieldRadius') config.shield.radius += amount;
     else if (stat === 'flash') config.flash.enabled = true;
+    else if (stat === 'flashRadius') config.flash.radius += amount;
+    else if (stat === 'flashStunDuration') config.flash.stunDuration += amount;
+    else if (stat === 'flashReloadAssist') config.flash.reloadAssist = (config.flash.reloadAssist ?? 0) + amount;
+    else if (stat === 'flashDamagedArmorBonus') config.flash.damagedArmorBonus = (config.flash.damagedArmorBonus ?? 0) + amount;
+    else if (stat === 'deviceHealthBonus') {
+      for (const kind of deviceKinds) config.devices.definitions[kind].health += base.devices.definitions[kind].health * amount;
+    }
+    else if (stat === 'maxObjects') config.devices.maxObjects += amount;
+    // Economy reads purchased identifiers directly; no combat effect.
+    else if (stat === 'repairCostReduction' || stat === 'rechargeCostReduction') continue;
     else if (stat === 'typeSlots') config.devices.typeSlots += amount;
     else if (stat === 'pairedDamageBonus') config.pairedDamageBonus = (config.pairedDamageBonus ?? 0) + amount;
     else if (stat === 'lighthouseHealth') config.lighthouseHealth += amount;
@@ -181,7 +199,18 @@ export function calculateNightConfig(base: NightConfig, purchasedIds: readonly U
     throw new Error('Неверные параметры гарпуна или ловушки.');
   return config;
 }
-function statValue(config: NightConfig, stat: UpgradeStat): number {
+function statValue(config: NightConfig, stat: UpgradeStat, purchasedIds: readonly UpgradeId[]): number {
+  if (isCombatStat(stat)) return config.progression?.[stat] ?? 0;
+  if (stat === 'shieldDelayReduction') return config.shield.regenerationDelay;
+  if (stat === 'shieldRadius') return config.shield.radius;
+  if (stat === 'flashReloadAssist') return config.flash.reloadAssist ?? 0;
+  if (stat === 'flashDamagedArmorBonus') return config.flash.damagedArmorBonus ?? 0;
+  if (stat === 'rechargeCostReduction') return trapRechargeMultiplier(purchasedIds);
+  if (stat === 'deviceHealthBonus') return UPGRADES.reduce((sum, node) => sum + (node.effect.stat === stat && purchasedIds.includes(node.id) ? node.effect.amount : 0), 0);
+  if (stat === 'flashRadius') return config.flash.radius;
+  if (stat === 'flashStunDuration') return config.flash.stunDuration;
+  if (stat === 'maxObjects') return config.devices.maxObjects;
+  if (stat === 'repairCostReduction') return engineeringRepairMultiplier(purchasedIds);
   if (stat === 'range' || stat === 'halfAngle' || stat === 'damagePerSecond' || stat === 'turnSpeed') return config.beam[stat];
   if (stat === 'typeSlots') return config.devices.typeSlots;
   if (stat === 'pairedDamageBonus') return config.pairedDamageBonus ?? 0;
@@ -236,12 +265,12 @@ export function createUpgradeViews(profile: Readonly<Profile>, base: NightConfig
   const config = calculateNightConfig(base, profile.purchasedUpgrades, profile.legacyEquipment);
   return UPGRADES.map(node => {
     const availability = getUpgradeAvailability(profile, node.id);
-    const currentValue = statValue(config, node.effect.stat);
+    const currentValue = statValue(config, node.effect.stat, profile.purchasedUpgrades);
 
     // Unmet prerequisite nodes still describe their local effect, without granting prerequisites.
     return { ...availability, definition: structuredClone(node), currentValue,
       nextValue: availability.status === 'purchased' ? currentValue : node.effect.stat === 'flash' || deviceKinds.includes(node.effect.stat as DeviceKind) ? 1
-        : currentValue + (node.effect.stat.endsWith('Reduction') ? -node.effect.amount : node.effect.amount) };
+        : currentValue + (node.effect.stat.endsWith('Reduction') && !isCombatStat(node.effect.stat) ? -node.effect.amount : node.effect.amount) };
   });
 }
 

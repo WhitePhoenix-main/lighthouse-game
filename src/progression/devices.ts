@@ -11,13 +11,19 @@ export function unlockedDeviceKinds(profile: Readonly<Profile>): DeviceKind[] {
     node.effect.stat === kind && profile.purchasedUpgrades.includes(node.id)));
 }
 
+/** Shared pre-rounding multiplier; ammunition and hull condition are unaffected. */
+export function engineeringRepairMultiplier(purchasedIds: readonly UpgradeId[]): number {
+  return 1 - UPGRADES.reduce((sum, node) => sum +
+    (node.effect.stat === 'repairCostReduction' && purchasedIds.includes(node.id) ? node.effect.amount : 0), 0);
+}
+
 /** Preliminary integer rounding, capped at 25% of the original purchase price. */
 export function repairCost(device: Readonly<OwnedDevice>, purchasedIds: readonly UpgradeId[] = []): number {
   const definition = DEVICE_RULES.definitions[device.kind];
   const missingFraction = Math.max(0, 1 - device.health / definition.health);
   const discount = device.kind === 'barrier' ? UPGRADES.reduce((sum, node) => sum +
     (node.effect.stat === 'barrierRepairReduction' && purchasedIds.includes(node.id) ? node.effect.amount : 0), 0) : 0;
-  const maximum = definition.cost * DEVICE_ECONOMY.repairFraction * (1 - discount);
+  const maximum = definition.cost * DEVICE_ECONOMY.repairFraction * (1 - discount) * engineeringRepairMultiplier(purchasedIds);
   return Math.min(Math.ceil(maximum * missingFraction), Math.floor(maximum));
 }
 
@@ -31,10 +37,15 @@ export function trapChargeCapacity(purchasedIds: readonly UpgradeId[] = []): num
     (node.effect.stat === 'trapCharges' && purchasedIds.includes(node.id) ? node.effect.amount : 0), 0);
 }
 
+export function trapRechargeMultiplier(purchasedIds: readonly UpgradeId[]): number {
+  return 1 - UPGRADES.reduce((sum, node) => sum +
+    (node.effect.stat === 'rechargeCostReduction' && purchasedIds.includes(node.id) ? node.effect.amount : 0), 0);
+}
+
 /** Each missing charge is paid separately; repairing the body never replenishes ammunition. */
 export function rechargeCost(device: Readonly<OwnedDevice>, purchasedIds: readonly UpgradeId[] = []): number {
-  return device.kind === 'light-trap' ? Math.max(0, trapChargeCapacity(purchasedIds) - remainingTrapCharges(device))
-    * Math.ceil(DEVICE_RULES.definitions[device.kind].cost * DEVICE_ECONOMY.rechargeFraction) : 0;
+  return device.kind === 'light-trap' ? Math.ceil(Math.max(0, trapChargeCapacity(purchasedIds) - remainingTrapCharges(device))
+    * Math.ceil(DEVICE_RULES.definitions[device.kind].cost * DEVICE_ECONOMY.rechargeFraction) * trapRechargeMultiplier(purchasedIds)) : 0;
 }
 
 export function deviceDeployments(profile: Readonly<Profile>): DeviceDeployment[] {

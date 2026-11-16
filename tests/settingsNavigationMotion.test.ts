@@ -79,7 +79,7 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
   let menu = makeMenu();
   let board = element();
   let scrim = element();
-  let page = { ...element(), dataset: { ready, entering: '', exiting: '', layout: mobile ? 'mobile' : 'desktop' }, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
+  let page = { ...element(), dataset: { ready, entering: '', exiting: '', layout: mobile ? 'mobile' : 'desktop' } as Record<string, string>, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
   const overlay = { clientWidth: 390,
     ownerDocument: { createElement: () => { const node = element(); node.classes.clear(); created.push(node); return node; } },
     parentElement: { clientLeft: 0, clientTop: 0, getBoundingClientRect: () => ({ left: 10, top: 15 }) },
@@ -111,7 +111,7 @@ describe('settings navigation motion', () => {
     expect(s.controller.isNavigating()).toBe(false);
     expect(s.page.dataset.entering).toBe('true');
     expect(s.animations).toHaveLength(3);
-    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateX(-360px)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }]);
+    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateX(calc(-100% - 1px))', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }]);
     expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[2]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
@@ -150,13 +150,13 @@ describe('settings navigation motion', () => {
   it('slides the mobile sheet up from its full height and closes down on the shared menu timeline', () => {
     const s = fixture('menu', 'true', true);
     s.controller.openSettings(() => s.show('settings'));
-    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateY(100%)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }]);
+    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateY(calc(100% + 1px))', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }]);
     expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     s.finish(0);
     const close = vi.fn(() => s.show('menu'));
     s.controller.closeSettings(close);
-    expect(s.animations[3]!.frames.at(-1)).toEqual({ transform: 'translateY(100%)', opacity: 0 });
+    expect(s.animations[3]!.frames.at(-1)).toEqual({ transform: 'translateY(calc(100% + 1px))', opacity: 0 });
     expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
@@ -173,16 +173,72 @@ describe('settings navigation motion', () => {
     s.controller.closeSettings(() => s.show('menu'));
     expect(s.animations[3]!.frames).toEqual([
       { transform: 'matrix(1, 0, 0, 1, 0, 123)', opacity: '0.45' },
-      { transform: 'translateY(100%)', opacity: 0 },
+      { transform: 'translateY(calc(100% + 1px))', opacity: 0 },
     ]);
     expect(s.animations[5]!.frames[0]).toEqual({ opacity: '0.4' });
     s.animations[3]!.currentTime = 123;
-    s.controller.setPaused(true); s.resize(844, 390); s.replace();
+    s.resize(844, 390); s.replace();
     expect(s.animations.slice(6).map(a => a.currentTime)).toEqual([123, 123, 123]);
-    expect(s.animations.slice(6).every(a => a.playState === 'paused')).toBe(true);
-    expect(s.animations[6]!.frames.at(-1)).toEqual({ transform: 'translateY(100%)', opacity: 0 });
-    s.controller.setPaused(false); s.finish(6);
+    expect(s.animations.slice(6).every(a => a.playState === 'running')).toBe(true);
+    expect(s.animations[6]!.frames.at(-1)).toEqual({ transform: 'translateY(calc(100% + 1px))', opacity: 0 });
+    s.finish(6);
     expect(s.controller.isNavigating()).toBe(false);
+    s.controller.destroy();
+  });
+
+  it.each([false, true])('hides retiring artwork before cancelling its final frame and throughout navigation (mobile=%s)', mobile => {
+    const s = fixture('menu', 'true', mobile);
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const departing = s.page;
+    const close = vi.fn(() => {
+      expect(departing.dataset.departed).toBe('true');
+      s.show('menu');
+      expect(departing.dataset.departed).toBe('true');
+    });
+    s.controller.closeSettings(close);
+    // A browser loses fill:both synchronously on cancel(). The old canvas is
+    // still connected here and must already be hidden, before release/back.
+    s.animations[3]!.cancel.mockImplementation(() => {
+      expect(departing.dataset.departed).toBe('true');
+    });
+    const stale = s.animations[3]!.onfinish!;
+    s.finish(3); stale();
+    expect(close).toHaveBeenCalledOnce();
+    expect(s.animations).toHaveLength(6);
+    expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
+    s.controller.destroy();
+  });
+
+  it('restores the current settings surface when navigation is rejected instead of leaving it hidden', () => {
+    const s = fixture('menu', 'true', true);
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const close = vi.fn(() => { expect(s.page.dataset.departed).toBe('true'); });
+    s.controller.closeSettings(close); s.finish(3);
+    expect(close).toHaveBeenCalledOnce();
+    expect(s.page.dataset.departed).toBeUndefined();
+    expect(s.page.inert).toBe(false);
+    expect(s.controller.isNavigating()).toBe(false);
+    s.controller.destroy();
+  });
+
+  it.each(['menu', 'other'] as const)('settles a translucent exit on focus loss with one Back callback to %s', destination => {
+    const s = fixture(destination);
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const close = vi.fn(() => s.show(destination));
+    s.controller.closeSettings(close);
+    const exitIndex = destination === 'menu' ? 3 : 2;
+    const exit = s.animations[exitIndex]!;
+    const stale = exit.onfinish!;
+    exit.currentTime = 133;
+    s.controller.setPaused(true); stale(); s.controller.setPaused(true);
+    expect(close).toHaveBeenCalledOnce();
+    expect(s.controller.isNavigating()).toBe(false);
+    expect(s.ghosts.every(g => g.remove.mock.calls.length === 1)).toBe(true);
+    const count = s.animations.length;
+    s.controller.setPaused(false); s.controller.sync();
+    expect(s.animations).toHaveLength(count);
+    expect(close).toHaveBeenCalledOnce();
+    if (destination === 'menu') expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
     s.controller.destroy();
   });
 
@@ -197,10 +253,11 @@ describe('settings navigation motion', () => {
     expect(s.ghosts).toHaveLength(1);
     expect(s.ghostBoard).toBe(copy);
     s.ready();
-    expect(s.animations.map(a => a.currentTime)).toEqual([0, 0, 0]);
-    expect(s.animations.every(a => a.playState === 'paused')).toBe(true);
+    expect(s.animations).toHaveLength(0);
+    expect(s.page.dataset.entering).toBe('false');
+    expect(s.ghosts[0]!.remove).toHaveBeenCalledOnce();
     s.controller.setPaused(false);
-    expect(s.animations.every(a => a.play.mock.calls.length === 1)).toBe(true);
+    expect(s.animations).toHaveLength(0);
     s.controller.destroy();
   });
 
@@ -340,26 +397,26 @@ describe('settings navigation motion', () => {
     s.controller.destroy();
   });
 
-  it('preserves entry artwork and rebuilds incoming artwork at frozen exit playheads across rerenders', () => {
+  it('preserves entry artwork and rebuilds incoming artwork at shared exit playheads across rerenders', () => {
     const s = fixture();
     const open = vi.fn(() => s.show('settings'));
     s.controller.openSettings(open);
     const ghost = s.ghostBoard;
     s.animations[0]!.currentTime = 83;
-    s.controller.setPaused(true); s.replace();
+    s.replace();
     expect(s.ghosts).toHaveLength(1); expect(s.ghostBoard).toBe(ghost);
     expect(s.animations.slice(3).map(a => a.currentTime)).toEqual([83, 83, 83]);
-    expect(s.animations.slice(3).every(a => a.playState === 'paused')).toBe(true);
-    s.controller.setPaused(false); s.finish(3);
+    expect(s.animations.slice(3).every(a => a.playState === 'running')).toBe(true);
+    s.finish(3);
     const close = vi.fn(() => s.show('menu'));
     s.controller.closeSettings(close);
     s.animations[6]!.currentTime = 91;
-    s.controller.setPaused(true); s.replace();
+    s.replace();
     expect(s.animations.slice(9).map(a => a.currentTime)).toEqual([91, 91, 91]);
-    expect(s.animations.slice(9).every(a => a.playState === 'paused')).toBe(true);
+    expect(s.animations.slice(9).every(a => a.playState === 'running')).toBe(true);
     expect(s.ghosts[1]!.remove).toHaveBeenCalledOnce();
     expect(s.staging.every(node => node.remove.mock.calls.length === 1 || node.classes.has('avalon-menu'))).toBe(true);
-    s.controller.setPaused(false); s.finish(9);
+    s.finish(9);
     expect(s.animations).toHaveLength(12);
     expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
     s.replace();

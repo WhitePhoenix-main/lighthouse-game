@@ -5,10 +5,16 @@ import { emitCombatEvent } from './events';
 import { applyRadialEffect } from './radialEffect';
 
 export function useFlash(state: BattleState, config: NightConfig): void {
-  if (config.flash.enabled === false || state.flash.cooldownRemaining > 1e-9) return;
+  if (config.ability || config.flash.enabled === false || state.flash.cooldownRemaining > 1e-9) return;
   state.flash.cooldownRemaining = Math.ceil(config.flash.cooldown / config.stepSeconds - 1e-9) * config.stepSeconds;
   state.flash.lastUsedTick = state.tick;
   emitCombatEvent(state, { type: 'flash-used', x: 0, y: 0 });
+  const assist = config.flash.reloadAssist ?? 0;
+  if (assist > 0) for (const device of state.devices) {
+    if (device.health > 0 && !device.consumed && ['cannon', 'harpoon', 'mortar'].includes(device.kind)
+      && Math.hypot(device.x, device.y) <= config.flash.radius + 1e-9)
+      device.attackCooldown = Math.max(0, device.attackCooldown - assist);
+  }
   if (bossIntersects(state, config, 0, 0, config.flash.radius)) {
     damageBoss(state, config.flash.damage, state.boss!.tentacles.find(zone => Math.hypot(zone.x, zone.y) <= config.flash.radius + config.boss!.radius + 1e-9)!);
     state.boss!.stunnedUntilTick = Math.max(state.boss!.stunnedUntilTick, state.tick + Math.ceil(config.flash.stunDuration / config.stepSeconds - 1e-9));
@@ -17,7 +23,8 @@ export function useFlash(state: BattleState, config: NightConfig): void {
   applyRadialEffect(state.enemies.filter(enemy => enemy.health > 0), 0, 0, config.flash.radius,
     enemy => ({ ...enemy, radius: config.enemies[enemy.kind].radius }), enemy => enemy.id,
     enemy => {
-      damageEnemy(enemy, config.flash.damage, state);
+      const damagedArmor = enemy.armor > 0 && enemy.armor < config.enemies[enemy.kind].armor;
+      damageEnemy(enemy, config.flash.damage, state, damagedArmor ? 1 + (config.flash.damagedArmorBonus ?? 0) : 1);
       enemy.stunnedUntilTick = Math.max(enemy.stunnedUntilTick ?? 0,
         state.tick + Math.ceil(config.flash.stunDuration / config.stepSeconds - 1e-9));
     });

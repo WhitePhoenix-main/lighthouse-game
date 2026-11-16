@@ -70,6 +70,7 @@ let ws;
   };
   const viewport = async (width, height, touch = width < 900) => {
     await cdp('Emulation.setTouchEmulationEnabled', { enabled: touch });
+    await evaluate(`Object.defineProperty(navigator,'maxTouchPoints',{configurable:true,get:()=>${touch?1:0}})`);
     await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: touch });
     await sleep(120);
   };
@@ -82,7 +83,7 @@ let ws;
     assert(result.time >= result.previous && result.phases, `${label}: ambient timeline reset`);
     await evaluate('motionMoonTime=motionMoon.currentTime;motionTimes=motionAnimations.map(a=>a.currentTime)');
   };
-  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,exit:p.dataset.exiting,layout:p.dataset.layout,x:new DOMMatrix(c.transform).m41,y:new DOMMatrix(c.transform).m42,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
+  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,exit:p.dataset.exiting,layout:p.dataset.layout,scrollTop:p.scrollTop,boardTop:b.getBoundingClientRect().top,viewportHeight:p.clientHeight,x:new DOMMatrix(c.transform).m41,y:new DOMMatrix(c.transform).m42,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
   const checkSceneryFrames = async label => {
     const frames=await evaluate('motionSceneryFrames');
     assert(frames.length>=3, `${label}: missing backdrop frames`);
@@ -113,6 +114,12 @@ let ws;
     await observeEntry(); await click('[data-action="settings"]'); await checkEntry(`${width} entry`);
     assert.deepEqual(await scenery(), original, `${width}: menu/settings scenery geometry or animation declarations differ`);
     await continuity('settings entry');
+    if(!touch&&width>=1000){
+      const ui=await evaluate(`(()=>{const on=document.querySelector('[data-setting="on"]').getBoundingClientRect(),back=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{onWidth:on.width,bottom:back.bottom,height:innerHeight}})()`);
+      const oldScale=Math.min(width/1280,Math.max(.8,height/720));
+      assert(ui.onWidth>128*oldScale*1.1,'standard desktop controls were not enlarged');
+      assert(ui.bottom<=ui.height+1,'enlarged desktop controls overflow viewport');
+    }
     await screenshot(`settings-${touch?'mobile':'desktop'}-${width}x${height}`);
     for (const selector of ['[data-setting="en"]','[data-setting="large"]','[data-setting="ru"]','[data-setting="normal"]']) {
       await observeEntry(); await click(selector); await ready(); await sleep(100);
@@ -134,6 +141,11 @@ let ws;
     timelines.push({label:`${width} exit`,frames:exitFrames});
     assert(exitFrames.some(f=>f.layout==='mobile'?f.y>40:f.x<-40),'exit did not move in its layout direction');
     assert(exitFrames.every(f=>f.layout==='mobile'?Math.abs(f.x)<.1&&f.y>=0:Math.abs(f.y)<.1&&f.x<=0),'exit used wrong axis/direction');
+    const mobileExit=exitFrames.filter(f=>f.layout==='mobile');
+    if(mobileExit.length){
+      assert(mobileExit.every(f=>Math.abs(f.scrollTop-mobileExit[0].scrollTop)<.5),'mobile exit changed scrollTop');
+      assert(mobileExit.at(-1).boardTop>=mobileExit.at(-1).viewportHeight-2,'mobile exit left bottom header tail');
+    }
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
     check(`${touch?'mobile':'desktop'} ${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }
@@ -141,25 +153,26 @@ let ws;
   const tallScenery=await scenery();await remember();await observeEntry();
   await click('[data-action="settings"]');await checkEntry('tall desktop');
   const tallBack=await evaluate(`(()=>{const r=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:innerHeight}})()`);
-  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom>tallBack.height*.9,'tall desktop Back must occupy lower viewport without clipping');
+  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom<=630*(1280/1120)+49,'tall desktop spacing exceeds density cap');
   assert.deepEqual(await scenery(),tallScenery);await continuity('tall desktop');
   await screenshot('settings-desktop-1280x1024');
   await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
-  check('1280×1024 desktop preserves width/left motion and fills available height');
+  check('1280×1024 desktop preserves left motion and bounded density');
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
   for(const [width,height] of [[844,390],[390,844]]) {
   await viewport(width,height,true);
   await evaluate(`window.freezeOnEntry=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){freezeOnEntry.disconnect();window.dispatchEvent(new Event('blur'))}});freezeOnEntry.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,attributeFilter:['data-entering']})`);
   await click('[data-action="settings"]');
-  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true' && !!document.querySelector('.menu-motion-paused')`);
+  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='false' && !!document.querySelector('.menu-motion-paused')`);
   await sleep(60);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.settings-board')).opacity`),'1','blur retained partial settings opacity');
   const paused=await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`);
   await sleep(200);
-  assert.deepEqual(await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`),paused,'blur did not freeze scene and entry');
+  assert.deepEqual(await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`),paused,'blur did not settle UI and freeze scene');
   await evaluate(`window.dispatchEvent(new Event('focus'))`); await ready();
   await continuity('resume');
   await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
-  check(`${width}×${height}: blur/focus freezes and resumes backdrop and vertical entrance without catch-up`);
+  check(`${width}×${height}: blur settles vertical entrance and freezes/resumes backdrop without catch-up`);
   }
   await click('[data-action="settings"]');await ready();
   await viewport(844,390); await ready();

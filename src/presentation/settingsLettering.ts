@@ -1,6 +1,7 @@
 // Project button letterforms from art/menu-buttons-v2/lettering.mjs, extended
 // for settings labels. The original button lettering and atlas remain separate.
 const settingsGlyphs: Record<string, readonly string[]> = {
+  'Ж':['11011011','01111110','00111100','00011000','00111100','01111110','11011011','11011011','11011011'],
   'А':['00111000','01111100','01101100','11000110','11000110','11111110','11000110','11000110','11101111'],
   'Б':['11111111','01100011','01100001','01100000','01111100','01100110','01100110','01100110','11111100'],
   'В':['11111100','01100110','01100110','01100110','01111100','01100110','01100110','01100110','11111100'],
@@ -71,21 +72,49 @@ export function drawSettingsPixelText(
   const advance = 9 * scale, width = settingsTextWidth(text, scale);
   const left = Math.round(x - (align === 'center' ? width / 2 : align === 'right' ? width : 0));
   const passes: readonly [number, number, string][] = [[1, 2, '#04101c'], [0, 0, color]];
-  for (const [dx, dy, ink] of passes) {
-    context.fillStyle = ink;
-    for (let n = 0; n < text.length; n++) {
-      const character = text.charAt(n);
-      if (character === ' ') continue;
-      const rows = settingsGlyphs[character];
-      if (!rows) throw new Error('Missing settings pixel glyph: ' + character);
-      for (let row = 0; row < 9; row++) for (let col = 0; col < 8; col++) {
-        if (rows[row]?.charAt(col) === '1') context.fillRect(left + n * advance + col * scale + dx, y + row * scale + dy, scale, scale);
-      }
-      if (character === 'Й') {
-        context.fillRect(left + n * advance + 2 * scale + dx, y - 3 * scale + dy, scale, scale);
-        context.fillRect(left + n * advance + 5 * scale + dx, y - 3 * scale + dy, scale, scale);
-        context.fillRect(left + n * advance + 3 * scale + dx, y - 2 * scale + dy, 2 * scale, scale);
-      }
+  const transform = context.getTransform();
+  const axisAligned = transform.b === 0 && transform.c === 0;
+  context.save();
+  // imageSmoothingEnabled does not affect fillRect. Snap shared cell edges in
+  // backing pixels (including UI scale and DPR), so neighbouring cells have no
+  // independently antialiased edges through which the shadow can show.
+  if (axisAligned) context.resetTransform();
+  const cell = (originX: number, originY: number, col: number, row: number, span = 1): void => {
+    const cellX = originX + col * scale, cellY = originY + row * scale;
+    if (axisAligned) {
+      const x0 = Math.round(transform.a * cellX + transform.e);
+      const y0 = Math.round(transform.d * cellY + transform.f);
+      const x1 = Math.round(transform.a * (originX + (col + span) * scale) + transform.e);
+      const y1 = Math.round(transform.d * (originY + (row + 1) * scale) + transform.f);
+      context.fillRect(x0, y0, x1 - x0, y1 - y0);
+    } else {
+      // Settings are axis-aligned; keep the API valid for rotated callers by
+      // filling one combined silhouette instead of separately blended cells.
+      context.rect(cellX, cellY, span * scale, scale);
     }
+  };
+  try {
+    for (const [dx, dy, ink] of passes) {
+      context.fillStyle = ink;
+      if (!axisAligned) context.beginPath();
+      for (let n = 0; n < text.length; n++) {
+        const character = text.charAt(n);
+        if (character === ' ') continue;
+        const rows = settingsGlyphs[character];
+        if (!rows) throw new Error('Missing settings pixel glyph: ' + character);
+        const originX = left + n * advance + dx, originY = y + dy;
+        for (let row = 0; row < 9; row++) for (let col = 0; col < 8; col++) {
+          if (rows[row]?.charAt(col) === '1') cell(originX, originY, col, row);
+        }
+        if (character === 'Й') {
+          cell(originX, originY, 2, -3);
+          cell(originX, originY, 5, -3);
+          cell(originX, originY, 3, -2, 2);
+        }
+      }
+      if (!axisAligned) context.fill();
+    }
+  } finally {
+    context.restore();
   }
 }

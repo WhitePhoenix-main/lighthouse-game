@@ -69,17 +69,27 @@ describe('one settings entrance per visit', () => {
     s.transition.destroy();
   });
 
-  it('freezes an entrance including a board replaced while paused', () => {
+  it('settles background artwork readiness without starting or replaying an entrance', () => {
     const s = fixture(); s.transition.setPaused(true); s.ready();
-    expect(s.animations[0]!.playState).toBe('paused');
-    s.animations[0]!.currentTime = 130; s.replace();
-    expect(s.animations[1]!.currentTime).toBe(130);
-    expect(s.animations[1]!.playState).toBe('paused');
-    expect(s.scrimAnimations[1]!.currentTime).toBe(130);
-    expect(s.scrimAnimations[1]!.playState).toBe('paused');
+    expect(s.animations).toHaveLength(0);
+    expect(s.page.dataset.entering).toBe('false');
+    s.replace();
+    expect(s.animations).toHaveLength(0);
     s.transition.setPaused(false);
-    expect(s.animations[1]!.play).toHaveBeenCalledOnce();
-    expect(s.scrimAnimations[1]!.play).toHaveBeenCalledOnce();
+    expect(s.animations).toHaveLength(0);
+    expect(s.scrimAnimations).toHaveLength(0);
+    s.transition.destroy();
+  });
+
+  it('settles an active entrance on focus loss and ignores stale completion', () => {
+    const s = fixture(); s.ready();
+    const stale = s.animations[0]!.onfinish!;
+    s.animations[0]!.currentTime = 133;
+    s.transition.setPaused(true); stale(); s.replace(); s.transition.setPaused(false);
+    expect(s.animations[0]!.cancel).toHaveBeenCalledOnce();
+    expect(s.scrimAnimations[0]!.cancel).toHaveBeenCalledOnce();
+    expect(s.page.dataset.entering).toBe('false');
+    expect(s.animations).toHaveLength(1);
     s.transition.destroy();
   });
 
