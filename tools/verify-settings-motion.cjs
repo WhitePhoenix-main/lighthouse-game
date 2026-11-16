@@ -8,7 +8,7 @@ const out = path.resolve('test-results', `settings-motion-${Date.now()}-${proces
 fs.mkdirSync(out, { recursive: true });
 const testBrowser = createTestBrowser(out);
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-const checks = [], runtimeErrors = [];
+const checks = [], runtimeErrors = [], timelines = [];
 const check = name => { checks.push(name); console.log(name); };
 let ws;
 (async () => {
@@ -82,7 +82,7 @@ let ws;
     assert(result.time >= result.previous && result.phases, `${label}: ambient timeline reset`);
     await evaluate('motionMoonTime=motionMoon.currentTime;motionTimes=motionAnimations.map(a=>a.currentTime)');
   };
-  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,x:new DOMMatrix(c.transform).m41,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
+  const observeEntry = () => evaluate(`(()=>{window.motionFrames=[];window.motionSceneryFrames=[];window.motionSceneryBaseline=JSON.stringify(motionScenerySnapshot());window.motionFrameTimes=motionAnimations.map(a=>a.currentTime);window.motionEntryChanges=[];window.motionObserver?.disconnect();window.motionObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p)motionEntryChanges.push(p.dataset.entering)});motionObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,childList:true,attributes:true,attributeFilter:['data-entering']});const token=window.motionFrameToken=(window.motionFrameToken||0)+1;const end=performance.now()+10000;function frame(){const scene=document.querySelector('.menu-scenery'),animations=scene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);motionSceneryFrames.push({layout:JSON.stringify(motionScenerySnapshot())===motionSceneryBaseline,same:scene===motionScene,animations:animations.length===motionAnimations.length&&motionAnimations.every(a=>animations.includes(a)),phases:motionAnimations.every((a,i)=>a.currentTime>=motionFrameTimes[i])});motionFrameTimes=motionAnimations.map(a=>a.currentTime);const p=document.querySelector('.reference-settings'),b=p?.querySelector('.settings-board');if(b){const c=getComputedStyle(b);motionFrames.push({state:p.dataset.entering,exit:p.dataset.exiting,layout:p.dataset.layout,x:new DOMMatrix(c.transform).m41,y:new DOMMatrix(c.transform).m42,opacity:+c.opacity,duration:b.getAnimations()[0]?.effect.getTiming().duration,controls:[...p.querySelectorAll('.settings-control')].every(e=>b.contains(e))})}if(performance.now()<end&&token===motionFrameToken)requestAnimationFrame(frame)}requestAnimationFrame(frame)})()`);
   const checkSceneryFrames = async label => {
     const frames=await evaluate('motionSceneryFrames');
     assert(frames.length>=3, `${label}: missing backdrop frames`);
@@ -93,11 +93,13 @@ let ws;
     await checkSceneryFrames(label);
     const frames = await evaluate('motionFrames');
     const moving = frames.filter(f=>f.state==='true');
-    assert(moving.some(f=>f.x < -20 && f.opacity < .99), `${label}: missing left slide/fade: ${JSON.stringify(frames)}`);
+    assert(moving.some(f=>(f.layout==='mobile'?f.y>20:f.x < -20) && f.opacity < .99), `${label}: missing layout-specific slide/fade: ${JSON.stringify(frames)}`);
+    assert(moving.every(f=>f.layout==='mobile'?Math.abs(f.x)<.1&&f.y>=0:Math.abs(f.y)<.1&&f.x<=0), `${label}: wrong entry axis/direction`);
+    timelines.push({label,frames});
     assert(moving.every(f=>f.duration===560), `${label}: entrance duration differs from 560ms`);
     assert(frames.filter(f=>f.state==='pending').every(f=>f.opacity===0), `${label}: pending board flashed before assets ready`);
     assert(moving.every(f=>f.controls), `${label}: controls escaped moving board`);
-    const last=frames.at(-1); assert(Math.abs(last.x)<.1 && last.opacity===1 && last.state==='false', `${label}: board did not settle: ${JSON.stringify(last)}`);
+    const last=frames.at(-1); assert(Math.abs(last.x)<.1 && Math.abs(last.y)<.1 && last.opacity===1 && last.state==='false', `${label}: board did not settle: ${JSON.stringify(last)}`);
   };
   await cdp('Page.enable'); await cdp('Runtime.enable');
   await cdp('Emulation.setEmulatedMedia', { features: [{name:'prefers-reduced-motion',value:'no-preference'}] });
@@ -115,7 +117,7 @@ let ws;
     for (const selector of ['[data-setting="en"]','[data-setting="large"]','[data-setting="ru"]','[data-setting="normal"]']) {
       await observeEntry(); await click(selector); await ready(); await sleep(100);
       assert(!(await evaluate('motionEntryChanges')).includes('true'),'setting change replayed entry');
-      assert(!(await evaluate('motionFrames')).some(f=>f.state==='true'||f.x<-.1||f.opacity<1),'setting change moved board');
+      assert(!(await evaluate('motionFrames')).some(f=>f.state==='true'||Math.abs(f.x)>.1||Math.abs(f.y)>.1||f.opacity<1),'setting change moved board');
       await continuity(selector);
     }
     const r=await evaluate(`(()=>{const r=document.querySelector('[data-action="music-volume"]').getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}})()`);
@@ -128,10 +130,25 @@ let ws;
     await observeEntry();
     await click('[data-setting="back"]'); await wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
     await checkSceneryFrames(`${width} exit`);
+    const exitFrames=(await evaluate('motionFrames')).filter(f=>f.exit==='true');
+    timelines.push({label:`${width} exit`,frames:exitFrames});
+    assert(exitFrames.some(f=>f.layout==='mobile'?f.y>40:f.x<-40),'exit did not move in its layout direction');
+    assert(exitFrames.every(f=>f.layout==='mobile'?Math.abs(f.x)<.1&&f.y>=0:Math.abs(f.y)<.1&&f.x<=0),'exit used wrong axis/direction');
     await continuity('return menu'); assert.deepEqual(await scenery(),original);
     check(`${touch?'mobile':'desktop'} ${width}×${height}: same full scenery/camera every entry and exit frame; DOM/CSSAnimation identity and all phases; 560ms slide/fade; native controls and drag`);
   }
+  await viewport(1280,1024,false);
+  const tallScenery=await scenery();await remember();await observeEntry();
+  await click('[data-action="settings"]');await checkEntry('tall desktop');
+  const tallBack=await evaluate(`(()=>{const r=document.querySelector('[data-setting="back"]').getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:innerHeight}})()`);
+  assert(tallBack.bottom<=tallBack.height+1&&tallBack.bottom>tallBack.height*.9,'tall desktop Back must occupy lower viewport without clipping');
+  assert.deepEqual(await scenery(),tallScenery);await continuity('tall desktop');
+  await screenshot('settings-desktop-1280x1024');
+  await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
+  check('1280×1024 desktop preserves width/left motion and fills available height');
   // Synthetic lifecycle events are deliberate: headless native focus events vary by build.
+  for(const [width,height] of [[844,390],[390,844]]) {
+  await viewport(width,height,true);
   await evaluate(`window.freezeOnEntry=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){freezeOnEntry.disconnect();window.dispatchEvent(new Event('blur'))}});freezeOnEntry.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,attributeFilter:['data-entering']})`);
   await click('[data-action="settings"]');
   await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true' && !!document.querySelector('.menu-motion-paused')`);
@@ -140,7 +157,11 @@ let ws;
   await sleep(200);
   assert.deepEqual(await evaluate(`({moon:motionMoon.currentTime,board:getComputedStyle(document.querySelector('.settings-board')).transform,opacity:getComputedStyle(document.querySelector('.settings-board')).opacity})`),paused,'blur did not freeze scene and entry');
   await evaluate(`window.dispatchEvent(new Event('focus'))`); await ready();
-  await continuity('resume'); check('blur/focus freezes and resumes background CSS and entrance without catch-up');
+  await continuity('resume');
+  await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
+  check(`${width}×${height}: blur/focus freezes and resumes backdrop and vertical entrance without catch-up`);
+  }
+  await click('[data-action="settings"]');await ready();
   await viewport(844,390); await ready();
   const beforeScroll=await scenery();
   await evaluate(`document.querySelector('.reference-settings').scrollTop=10000`); await sleep(100);
@@ -150,11 +171,17 @@ let ws;
   await continuity('portrait return');
   check('stationary backdrop on settings scroll; scene and CSS timelines survive orientation resize');
   await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+  for(const [width,height] of [[390,844],[844,390]]) {
+  await viewport(width,height,true);
   await observeEntry(); await click('[data-action="settings"]'); await ready(); await sleep(100);
   assert(!(await evaluate('motionEntryChanges')).includes('true'),'reduced motion entered animation');
-  assert((await evaluate('motionFrames')).every(f=>f.state!=='true'&&Math.abs(f.x)<.1&&f.opacity===1),'reduced motion moved board');
-  await screenshot('reduced-motion'); check('reduced motion immediately displays settled controls');
+  assert((await evaluate('motionFrames')).every(f=>f.state!=='true'&&Math.abs(f.x)<.1&&Math.abs(f.y)<.1&&f.opacity===1),'reduced motion moved board');
+  await screenshot(`reduced-motion-${width}x${height}`);
+  await click('[data-setting="back"]');await wait(`!!document.querySelector('[data-action="settings"]')`);
+  }
+  check('reduced motion immediately displays settled controls on both mobile orientations');
   assert.deepEqual(runtimeErrors,[],'browser runtime errors');
+  fs.writeFileSync(path.join(out,'timelines.json'),JSON.stringify(timelines,null,2));
   fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,runtimeErrors},null,2));
   await send('Browser.close'); ws.close();
 })().catch(error => { console.error(error); process.exitCode = 1; })

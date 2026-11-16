@@ -3,14 +3,14 @@ import { mountSettingsTransition } from '../src/presentation/settingsTransition'
 
 afterEach(() => vi.unstubAllGlobals());
 
-function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true') {
+function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true', mobile = false) {
   const media = Object.assign(new EventTarget(), { matches: false });
   vi.stubGlobal('window', {
     matchMedia: () => media,
     getComputedStyle: (element: unknown) => Object.assign(
       ['--menu-scale', '--menu-text-scale', 'font', 'background-position'], {
         getPropertyValue: (key: string) => ({ '--menu-scale': '1.5', '--menu-text-scale': textScale, font: '24px Avalon Menu', 'background-position': '50% 0%' })[key] ?? '',
-        transform: element === board ? 'matrix(1, 0, 0, 1, -123, 0)' : 'none',
+        transform: element === board ? mobile ? 'matrix(1, 0, 0, 1, 0, 123)' : 'matrix(1, 0, 0, 1, -123, 0)' : 'none',
         opacity: element === board ? '0.45' : '0.4',
       }),
   });
@@ -79,7 +79,7 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
   let menu = makeMenu();
   let board = element();
   let scrim = element();
-  let page = { ...element(), dataset: { ready, entering: '', exiting: '' }, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
+  let page = { ...element(), dataset: { ready, entering: '', exiting: '', layout: mobile ? 'mobile' : 'desktop' }, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
   const overlay = { clientWidth: 390,
     ownerDocument: { createElement: () => { const node = element(); node.classes.clear(); created.push(node); return node; } },
     parentElement: { clientLeft: 0, clientTop: 0, getBoundingClientRect: () => ({ left: 10, top: 15 }) },
@@ -111,6 +111,7 @@ describe('settings navigation motion', () => {
     expect(s.controller.isNavigating()).toBe(false);
     expect(s.page.dataset.entering).toBe('true');
     expect(s.animations).toHaveLength(3);
+    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateX(-360px)', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }]);
     expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
     expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[2]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
@@ -143,6 +144,45 @@ describe('settings navigation motion', () => {
     expect(s.controller.isNavigating()).toBe(false);
     expect(s.page.dataset.entering).toBe('false');
     expect(ghost.remove).toHaveBeenCalledOnce();
+    s.controller.destroy();
+  });
+
+  it('slides the mobile sheet up from its full height and closes down on the shared menu timeline', () => {
+    const s = fixture('menu', 'true', true);
+    s.controller.openSettings(() => s.show('settings'));
+    expect(s.animations[0]!.frames).toEqual([{ transform: 'translateY(100%)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }]);
+    expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
+    expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    s.finish(0);
+    const close = vi.fn(() => s.show('menu'));
+    s.controller.closeSettings(close);
+    expect(s.animations[3]!.frames.at(-1)).toEqual({ transform: 'translateY(100%)', opacity: 0 });
+    expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([560, 560, 560]);
+    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
+    expect(close).not.toHaveBeenCalled();
+    s.finish(3); expect(close).toHaveBeenCalledOnce();
+    expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
+    s.controller.destroy();
+  });
+
+  it('preserves the current mobile vertical pose and menu opacity when closing mid-entry and repainting', () => {
+    const s = fixture('menu', 'true', true);
+    s.controller.openSettings(() => s.show('settings'));
+    s.animations[0]!.currentTime = 140;
+    s.controller.closeSettings(() => s.show('menu'));
+    expect(s.animations[3]!.frames).toEqual([
+      { transform: 'matrix(1, 0, 0, 1, 0, 123)', opacity: '0.45' },
+      { transform: 'translateY(100%)', opacity: 0 },
+    ]);
+    expect(s.animations[5]!.frames[0]).toEqual({ opacity: '0.4' });
+    s.animations[3]!.currentTime = 123;
+    s.controller.setPaused(true); s.resize(844, 390); s.replace();
+    expect(s.animations.slice(6).map(a => a.currentTime)).toEqual([123, 123, 123]);
+    expect(s.animations.slice(6).every(a => a.playState === 'paused')).toBe(true);
+    expect(s.animations[6]!.frames.at(-1)).toEqual({ transform: 'translateY(100%)', opacity: 0 });
+    s.controller.setPaused(false); s.finish(6);
+    expect(s.controller.isNavigating()).toBe(false);
     s.controller.destroy();
   });
 

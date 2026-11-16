@@ -97,6 +97,34 @@ describe('shared settings artwork and native control geometry', () => {
     expect(ordinary.headings.effects.y - ordinary.headings.music.y).toBe(64);
   });
 
+  it.each(['normal', 'large'] as const)('fills a tall desktop panel with section spacing while retaining control sizes (%s)', size => {
+    for (const [width, height] of [[1280, 1024], [1000, 1000]] as const) {
+      const base = settingsLayout(width, 720, size, false);
+      const layout = settingsLayout(width, height, size, false);
+      expect(layout.scale).toBe(base.scale);
+      expect(layout.textScale).toBe(base.textScale);
+      expect(layout.title).toEqual(base.title);
+      expect(layout.height * layout.scale).toBeCloseTo(height, 5);
+      expect(layout.choices.back.y + layout.choices.back.height).toBeCloseTo(height / layout.scale - 40, 5);
+      for (const name of Object.keys(base.choices) as (keyof typeof base.choices)[]) {
+        expect(layout.choices[name].x).toBe(base.choices[name].x);
+        expect(layout.choices[name].width).toBe(base.choices[name].width);
+        expect(layout.choices[name].height).toBe(base.choices[name].height);
+      }
+      expect(layout.choices.on.y).toBeGreaterThan(base.choices.on.y);
+      expect(layout.choices.ru.y - layout.headings.effects.y).toBeGreaterThan(base.choices.ru.y - base.headings.effects.y);
+      expect(layout.choices.normal.y - layout.choices.ru.y).toBeGreaterThan(base.choices.normal.y - base.choices.ru.y);
+      const controls = Object.values(layout.choices);
+      for (const rail of Object.values(layout.sliders)) controls.push({ ...rail, y: rail.y + 5 - 22 / layout.scale, height: 44 / layout.scale });
+      for (let i = 0; i < controls.length; i++) for (let j = i + 1; j < controls.length; j++) {
+        const a = controls[i]!, b = controls[j]!;
+        const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+        const overlapY = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+        expect(overlapX <= .01 || overlapY <= .01).toBe(true);
+      }
+    }
+  });
+
   it.each(['normal', 'large'] as const)('leaves readable RU/EN lettering in compact phone controls (%s)', size => {
     const labels = { on: ['ВКЛ', 'ON'], off: ['ВЫКЛ', 'OFF'], auto: ['АВТО', 'AUTO'], ru: ['РУССКИЙ', 'RUSSIAN'], en: ['ENGLISH'], normal: ['ОБЫЧНЫЙ', 'NORMAL'], large: ['КРУПНЫЙ', 'LARGE'] } as const;
     for (const [width, height] of [[568, 320], [844, 390]] as const) {

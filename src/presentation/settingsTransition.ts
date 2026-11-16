@@ -206,6 +206,10 @@ export function mountSettingsTransition(overlay: HTMLElement): {
     };
   };
   const distance = (): number => Math.min(640, Math.max(360, overlay.clientWidth * 0.52));
+  // The full sheet height also clears the viewport when short-screen content is scrolled.
+  const offscreenTransform = (): string => page?.dataset.layout === 'mobile'
+    ? 'translateY(100%)' : `translateX(-${distance()}px)`;
+  const restingTransform = (): string => page?.dataset.layout === 'mobile' ? 'translateY(0)' : 'translateX(0)';
   const reveal = (): void => {
     if (destroyed || animation) return;
     if (phase === 'menu-in') {
@@ -222,7 +226,7 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       page.dataset.exiting = 'true';
       busy(page, true);
       if (reducedMotion.matches || typeof board.animate !== 'function') { finish(); return; }
-      run(board, [exitFrom, { transform: `translateX(-${distance()}px)`, opacity: 0 }], duration,
+      run(board, [exitFrom, { transform: offscreenTransform(), opacity: 0 }], duration,
         [{ opacity: scrimFrom }, { opacity: 0 }]);
       return;
     }
@@ -235,8 +239,8 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       return;
     }
     page.dataset.entering = 'true';
-    run(board, [{ transform: `translateX(-${distance()}px)`, opacity: 0 },
-      { transform: 'translateX(0)', opacity: 1 }], duration, [{ opacity: 0 }, { opacity: 1 }]);
+    run(board, [{ transform: offscreenTransform(), opacity: 0 },
+      { transform: restingTransform(), opacity: 1 }], duration, [{ opacity: 0 }, { opacity: 1 }]);
   };
   const observer = new MutationObserver(reveal);
 
@@ -300,7 +304,7 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       const pending = page.dataset.entering === 'pending';
       const style = board && typeof window.getComputedStyle === 'function' ? window.getComputedStyle(board) : null;
       const scrimStyle = scrim && typeof window.getComputedStyle === 'function' ? window.getComputedStyle(scrim) : null;
-      exitFrom = { transform: style?.transform ?? 'translateX(0)', opacity: style?.opacity ?? '1' };
+      exitFrom = { transform: style?.transform ?? restingTransform(), opacity: style?.opacity ?? '1' };
       scrimFrom = scrimStyle?.opacity ?? '1';
       // Reverse the visible menu from its current entry pose, before cancel()
       // discards the outgoing animation's computed opacity.

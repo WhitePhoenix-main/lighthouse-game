@@ -96,7 +96,7 @@ let ws;
       const style=b&&getComputedStyle(b), menu=m&&getComputedStyle(m);
       const timing=e=>{const a=e?.getAnimations()[0];return a?{start:a.startTime,time:a.currentTime,duration:a.effect.getTiming().duration,state:a.playState}:null};
       const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);
-      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
+      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,layout:p?.dataset.layout,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,y:style?new DOMMatrix(style.transform).m42:null,exitTarget:b?.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
       if(token===navToken)requestAnimationFrame(sample);
     } sample();requestAnimationFrame(sample);
   })()`);
@@ -106,6 +106,8 @@ let ws;
     assert(result.same&&result.animations&&result.phases,`${label}: backdrop DOM, CSSAnimation identity or playheads reset: ${JSON.stringify(result)}`);
     await evaluate('navTimes=navAnimations.map(a=>a.currentTime)');
   };
+  const displacement = frame => frame.layout==='mobile'?frame.y:-frame.x;
+  const checkAxis = (frames,label) => assert(frames.every(f=>f.layout==='mobile'?Math.abs(f.x)<.1&&f.y>=-.1:Math.abs(f.y)<.1&&f.x<=.1),`${label}: navigation used the wrong axis/direction`);
   const open = async (touch=false,keyboard=false,holdArtwork=false) => {
     await menuReady(); await record();
     // Capture the native click/keyboard activation itself, not the CDP roundtrip.
@@ -127,10 +129,12 @@ let ws;
     const firstSettings=frames.find(f=>f.settingsPages);
     assert(firstSettings&&firstSettings.t-activated<180,'Settings activation waited for button animation before mounting the page');
     assert(out.length>=3,'menu ghost has no rendered frames');
-    assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05&&f.enter==='true'&&f.x<0&&f.opacity>0&&f.opacity<1),'menu ghost fade and settings slide/fade did not share a frame');
+    assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05&&f.enter==='true'&&displacement(f)>0&&f.opacity>0&&f.opacity<1),'menu ghost fade and settings slide/fade did not share a frame');
     assert(out.every(f=>!f.screen||f.screen==='settings'),'settings route was delayed until after menu outro');
     const moving=frames.filter(f=>f.enter==='true');
     assert(moving.length>=3,'settings entry absent');
+    checkAxis(moving,'entry');
+    assert(displacement(moving.at(-1))<displacement(moving[0]),'entry did not approach its settled pose');
     assert(moving.every(f=>f.ghost&&f.menuDuration===560&&f.boardTiming?.duration===560&&f.scrimTiming?.duration===560),'all three entrance animations must run together for 560ms');
     for(const f of moving){
       const timings=[f.boardTiming,f.scrimTiming,f.menuTiming];
@@ -160,8 +164,10 @@ let ws;
     assert(exit.length>=3,'settings exit has no rendered frames');
     assert(exit.every(f=>f.exitDuration===560),'settings exit duration must be 560ms');
     assert(exit.every(f=>!f.screen||f.screen==='settings'),'route changed while exiting');
-    assert(exit.some(f=>f.x<-40&&f.opacity<.8),'settings board did not exit left and fade');
-    assert(exit.at(-1).x<exit[0].x&&exit.at(-1).opacity<exit[0].opacity,'settings exit did not progress');
+    checkAxis(exit,'exit');
+    assert(exit.some(f=>displacement(f)>40&&f.opacity<.8),'settings board did not exit in its layout direction and fade');
+    assert(exit.filter(f=>f.layout==='mobile').every(f=>f.exitTarget==='translateY(100%)'),'mobile exit must hide the full panel height, including scrolled compact layouts');
+    assert(displacement(exit.at(-1))>displacement(exit[0])&&exit.at(-1).opacity<exit[0].opacity,'settings exit did not progress');
     assert(exit.at(-1).scrim<exit[0].scrim,'scrim did not fade out');
     assert.equal(intro.length,0,'real menu must appear settled without a second intro');
     assert(exit.every(f=>f.ghost&&f.ghostSafe&&f.ghostSibling&&f.settingsPages===1&&f.settingsControls===10&&f.menuActions===0&&!f.duplicateIds),'exit ghost duplicated actions/IDs/pages or was unsafe');
@@ -197,7 +203,7 @@ let ws;
   await wait('!!window.settingsTest');await menuReady();
   await evaluate(`settingsTest.backCalls=0;settingsTest.originalBack=settingsTest.application.back.bind(settingsTest.application);settingsTest.application.back=()=>{settingsTest.backCalls++;return settingsTest.originalBack()}`);
   assert((await remember())>10,'ambient CSS animations absent');
-  for(const [w,h,touch] of [[1280,720,false],[844,390,false],[390,844,true],[844,390,true]]) {
+  for(const [w,h,touch] of [[1280,720,false],[844,390,false],[390,844,true],[844,390,true],[568,320,true]]) {
     await viewport(w,h,touch);await open(touch,w===1280,w===1280);await screenshot(`settings-${touch?'mobile':'desktop'}-${w}x${h}`);
     await evaluate(`document.querySelector('[data-action="music-volume"]').focus({preventScroll:true})`);
     await key('Home');await key('ArrowRight');
@@ -208,8 +214,9 @@ let ws;
     // No explicit .focus(): Enter must activate the button restored by navigation.
     await open(false,'restored');await close(true);
     await screenshot(`roundtrip-${touch?'mobile':'desktop'}-${w}x${h}`);
-    check(`${touch?'mobile':'desktop'} ${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
+    check(`${touch?'mobile':'desktop'} ${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit on the layout axis; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
   }
+  await viewport(844,390,true);
   // Force a real locale rerender while all three entrance animations are live.
   await evaluate(`(()=>{window.navRerendered=false;window.navRerenderObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p?.dataset.entering==='true'){navRerenderObserver.disconnect();window.navOldBoard=p.querySelector('.settings-board');window.navOldGhost=document.querySelector('[data-settings-menu-ghost]');requestAnimationFrame(()=>requestAnimationFrame(()=>{settingsTest.application.setLanguage('en');window.navRerendered=true}))}});navRerenderObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,childList:true})})()`);
   const rerenderFrames=await open(true);
@@ -253,7 +260,9 @@ let ws;
   const mid=await evaluate('navFrames'),firstExit=mid.findIndex(f=>f.exit==='true'),prior=mid.slice(0,firstExit).findLast(f=>f.enter==='true');
   timeline({phase:'close-mid-entry',frames:mid});
   assert(prior&&firstExit>0,'close during entry was not exercised');
-  assert(Math.abs(mid[firstExit].x-prior.x)<90&&Math.abs(mid[firstExit].opacity-prior.opacity)<.2,'entry-to-exit pose jumped');
+  assert(Math.abs(mid[firstExit].x-prior.x)<90&&Math.abs(mid[firstExit].y-prior.y)<90&&Math.abs(mid[firstExit].opacity-prior.opacity)<.2,'entry-to-exit pose jumped');
+  checkAxis([prior,mid[firstExit]],'mid-entry close');
+  assert(prior.layout==='mobile'&&prior.y>0,'mid-entry close did not exercise mobile upward entry');
   assert(prior.menuOpacity>.2,'mid-entry close did not exercise a visible outgoing menu');
   assert(Math.abs(mid[firstExit].menuOpacity-prior.menuOpacity)<.2,'entry-to-exit menu opacity jumped instead of continuing the visible ghost');
   assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),false,'mid-entry close retained ghost');
