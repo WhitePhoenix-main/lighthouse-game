@@ -49,7 +49,7 @@ export function mountMenuAudio(root: HTMLElement, application: GameApplication,
         if (destroyed) return;
         const { screen, settings } = application.view;
         if (screen !== previousScreen) {
-            if (screen === 'settings') menuSettings = previousScreen === 'menu';
+            if (screen === 'settings') menuSettings = previousScreen === 'menu' || previousScreen === 'game-menu';
             previousScreen = screen;
         }
         audio.volume = settings.musicVolume / 100;
@@ -58,7 +58,7 @@ export function mountMenuAudio(root: HTMLElement, application: GameApplication,
         if (choice !== previousChoice) { blocked = false; previousChoice = choice; }
         const allowed = focused && pageVisible && env.visible()
             && settings.soundEnabled && settings.musicVolume > 0
-            && (screen === 'menu' || (screen === 'settings' && menuSettings));
+            && (screen === 'menu' || screen === 'game-menu' || (screen === 'settings' && menuSettings));
         if (!allowed) {
             if (playing) { playing = false; generation++; audio.pause(); }
             return;

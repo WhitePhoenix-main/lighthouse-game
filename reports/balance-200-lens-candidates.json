@@ -1,0 +1,305 @@
+{
+  "note": "Copies only. No production tuning applied. Same complete general tree; synthetic stationary targets.",
+  "rows": [
+    {
+      "lens": "basic",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.5333333333333333
+    },
+    {
+      "lens": "basic",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.4
+    },
+    {
+      "lens": "basic",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 0.8
+    },
+    {
+      "lens": "basic",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 6.533333333333333
+    },
+    {
+      "lens": "basic",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 14.866666666666667
+    },
+    {
+      "lens": "expanded",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.6333333333333333
+    },
+    {
+      "lens": "expanded",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.6666666666666667
+    },
+    {
+      "lens": "expanded",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 0.5
+    },
+    {
+      "lens": "expanded",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 7.833333333333333
+    },
+    {
+      "lens": "expanded",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 9.6
+    },
+    {
+      "lens": "slowing",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.6333333333333333
+    },
+    {
+      "lens": "slowing",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.6
+    },
+    {
+      "lens": "slowing",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 0.9333333333333333
+    },
+    {
+      "lens": "slowing",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 7.533333333333333
+    },
+    {
+      "lens": "slowing",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 18.466666666666665
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.8,
+      "scenario": "single-ghost",
+      "seconds": 0.5666666666666667
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.8,
+      "scenario": "single-turtle",
+      "seconds": 1.0666666666666667
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.8,
+      "scenario": "four-ghosts",
+      "seconds": 2.2666666666666666
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.8,
+      "scenario": "armored-elite",
+      "seconds": 3.7666666666666666
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.8,
+      "scenario": "prolonged-group",
+      "seconds": 44.13333333333333
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.9,
+      "scenario": "single-ghost",
+      "seconds": 0.5333333333333333
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.9,
+      "scenario": "single-turtle",
+      "seconds": 1
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.9,
+      "scenario": "four-ghosts",
+      "seconds": 2.1333333333333333
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.9,
+      "scenario": "armored-elite",
+      "seconds": 3.433333333333333
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 0.9,
+      "scenario": "prolonged-group",
+      "seconds": 40.266666666666666
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 1,
+      "scenario": "single-ghost",
+      "seconds": 0.4666666666666667
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 1,
+      "scenario": "single-turtle",
+      "seconds": 0.9
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 1,
+      "scenario": "four-ghosts",
+      "seconds": 1.8666666666666667
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 1,
+      "scenario": "armored-elite",
+      "seconds": 3.1333333333333333
+    },
+    {
+      "lens": "armor-breaker",
+      "multiplier": 1,
+      "scenario": "prolonged-group",
+      "seconds": 36.93333333333333
+    },
+    {
+      "lens": "focused",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.4
+    },
+    {
+      "lens": "focused",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1
+    },
+    {
+      "lens": "focused",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 1.6
+    },
+    {
+      "lens": "focused",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 4.066666666666666
+    },
+    {
+      "lens": "focused",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 25.466666666666665
+    },
+    {
+      "lens": "smoldering",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.6333333333333333
+    },
+    {
+      "lens": "smoldering",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.7
+    },
+    {
+      "lens": "smoldering",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 1.0666666666666667
+    },
+    {
+      "lens": "smoldering",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 8.2
+    },
+    {
+      "lens": "smoldering",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 20
+    },
+    {
+      "lens": "resonant",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.6
+    },
+    {
+      "lens": "resonant",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.5666666666666667
+    },
+    {
+      "lens": "resonant",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 0.9333333333333333
+    },
+    {
+      "lens": "resonant",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 7.433333333333334
+    },
+    {
+      "lens": "resonant",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 14.066666666666666
+    },
+    {
+      "lens": "long-range",
+      "multiplier": null,
+      "scenario": "single-ghost",
+      "seconds": 0.6333333333333333
+    },
+    {
+      "lens": "long-range",
+      "multiplier": null,
+      "scenario": "single-turtle",
+      "seconds": 1.6333333333333333
+    },
+    {
+      "lens": "long-range",
+      "multiplier": null,
+      "scenario": "four-ghosts",
+      "seconds": 1
+    },
+    {
+      "lens": "long-range",
+      "multiplier": null,
+      "scenario": "armored-elite",
+      "seconds": 7.666666666666667
+    },
+    {
+      "lens": "long-range",
+      "multiplier": null,
+      "scenario": "prolonged-group",
+      "seconds": 18.8
+    }
+  ]
+}

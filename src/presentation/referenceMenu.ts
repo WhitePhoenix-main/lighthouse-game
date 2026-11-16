@@ -37,7 +37,7 @@ function buttonArt(name: 'play' | 'settings'): string {
 export function referenceMenu(view: ApplicationView): string {
   return `<section class="avalon-menu" aria-labelledby="menu-title">${menuScenery()}<div class="menu-artboard">
     <h1 id="menu-title" class="menu-title" data-menu-rect="title" tabindex="-1" aria-label="Свет Авалона"><span class="menu-title-sprite menu-sprite menu-decoration" aria-hidden="true" style="background-image:url('${import.meta.env.BASE_URL}images/menu-sprites/title.png')"></span></h1>
-    <button class="menu-hotspot play-hotspot" data-menu-rect="play" data-action="preparation" ${view.error ? 'disabled' : ''}>${buttonArt('play')}<span class="menu-button-label">Играть</span></button>
+    <button class="menu-hotspot play-hotspot" data-menu-rect="play" data-action="game-menu" ${view.error ? 'disabled' : ''}>${buttonArt('play')}<span class="menu-button-label">Играть</span></button>
     <button class="menu-hotspot settings-hotspot" data-menu-rect="settings" data-action="settings">${buttonArt('settings')}<span class="menu-button-label">Настройки</span></button>
     </div>${view.interrupted ? '<p class="menu-notice" role="status">Ночь была прервана. Временные награды отброшены, стоимость устройств возвращена.</p>' : ''}</section>`;
 }
