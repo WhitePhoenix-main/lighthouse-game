@@ -3,7 +3,7 @@ const LABEL_OFFSETS = [0, 0, 1, 2, 2, 1, 0, 0] as const;
 
 /** Native clicks confirm an action; presentation time determines when it may run. */
 export function mountMenuButtons(root: HTMLElement): {
-  activate(button: HTMLButtonElement, onComplete: () => void): void;
+  activate(button: HTMLButtonElement, onComplete: () => void, immediate?: boolean): void;
   setPaused(paused: boolean): void;
   destroy(): void;
 } {
@@ -140,11 +140,14 @@ export function mountMenuButtons(root: HTMLElement): {
   window.addEventListener('keyup', keyUp);
   reducedMotion.addEventListener('change', preferenceChanged);
   return {
-    activate(button, callback) {
+    activate(button, callback, immediate = false) {
       if (!valid(button) || paused || canceled.has(button)) return;
       if (press && (press.button !== button || press.callback)) return;
       const current = press ?? begin(button, false);
       current.callback = callback;
+      // Screen crossfades already provide click feedback; they must not wait for
+      // the remaining press frames. Other menu actions keep the full sequence.
+      if (immediate) current.finished = true;
       complete();
     },
     setPaused(value) {

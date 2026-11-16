@@ -9,7 +9,7 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
     matchMedia: () => media,
     getComputedStyle: (element: unknown) => Object.assign(
       ['--menu-scale', '--menu-text-scale', 'font', 'background-position'], {
-        getPropertyValue: (key: string) => ({ '--menu-scale': '1.5', '--menu-text-scale': '1.12', font: '24px Avalon Menu', 'background-position': '50% 0%' })[key] ?? '',
+        getPropertyValue: (key: string) => ({ '--menu-scale': '1.5', '--menu-text-scale': textScale, font: '24px Avalon Menu', 'background-position': '50% 0%' })[key] ?? '',
         transform: element === board ? 'matrix(1, 0, 0, 1, -123, 0)' : 'none',
         opacity: element === board ? '0.45' : '0.4',
       }),
@@ -33,42 +33,65 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
     };
     animations.push(result); return result;
   }
-  function element() {
+  interface FakeNode {
+    dataset: Record<string, string>; inert: boolean; attributes: Map<string, string>;
+    properties: Record<string, string>; classes: Set<string>; children: FakeNode[];
+    style: CSSStyleDeclaration; classList: { remove(key: string): boolean; add(key: string): Set<string> };
+    setAttribute: ReturnType<typeof vi.fn>; removeAttribute: ReturnType<typeof vi.fn>;
+    animate: ReturnType<typeof vi.fn>; append: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn>;
+    getBoundingClientRect(): { left: number; top: number; width: number; height: number };
+    querySelectorAll(selector: string): FakeNode[]; querySelector(selector: string): FakeNode | null;
+    cloneNode(): FakeNode;
+  }
+  let viewport = { width: 540, height: 960 };
+  let textScale = '1.12';
+  function element(): FakeNode {
     const attributes = new Map<string, string>([['id', 'menu-title'], ['data-action', 'settings'], ['data-focus-key', 'settings']]);
     const properties: Record<string, string> = {};
     const classes = new Set(['menu-artboard', 'menu-title-ready']);
-    return { dataset: {} as Record<string, string>, inert: false, attributes, properties, classes,
+    const node: FakeNode = { dataset: {}, inert: false, attributes, properties, classes, children: [],
       style: { setProperty: (key: string, value: string) => { properties[key] = value; } } as unknown as CSSStyleDeclaration,
       classList: { remove: (key: string) => classes.delete(key), add: (key: string) => classes.add(key) },
       setAttribute: vi.fn((key: string, value: string) => attributes.set(key, value)),
       removeAttribute: vi.fn((key: string) => attributes.delete(key)), animate: vi.fn(makeAnimation),
-      getBoundingClientRect: () => ({ left: 30, top: 40, width: 540, height: 960 }),
-      append: vi.fn<(node: unknown) => void>(), remove: vi.fn(), querySelectorAll: () => [] as ReturnType<typeof element>[],
+      getBoundingClientRect: () => ({ left: 30, top: 40, ...viewport }),
+      append: vi.fn((child: FakeNode) => node.children.push(child)), remove: vi.fn(),
+      querySelectorAll: (selector: string) => selector === '*' ? node.children.flatMap(child => [child, ...child.querySelectorAll('*')]) : [],
+      querySelector: (selector: string) => node.querySelectorAll('*').find(child => child.classes.has(selector.slice(1))) ?? null,
+      cloneNode: () => {
+        const copy = element();
+        copy.children = node.children.map(child => child.cloneNode());
+        copy.dataset = { ...node.dataset };
+        copy.style = { ...node.style, setProperty: copy.style.setProperty } as CSSStyleDeclaration;
+        copy.classes.clear(); for (const name of classes) copy.classes.add(name);
+        return copy;
+      },
     };
+    return node;
   }
   function makeMenu() {
     const button = { ...element(), isConnected: true, focus: vi.fn() };
-    const copy = { ...element(), children: [element()] };
-    copy.querySelectorAll = () => copy.children;
-    return { ...element(), button, cloneNode: () => copy, querySelectorAll: () => [button],
-      querySelector: (selector: string) => selector === '[data-action="settings"]' ? button : null };
+    const node = element(); node.children = [button];
+    return { ...node, button, querySelector: (selector: string) => selector === '[data-action="settings"]' ? button : null };
   }
-  const ghosts: ReturnType<typeof element>[] = [];
+  const created: FakeNode[] = [];
   let screen = initial;
   let menu = makeMenu();
   let board = element();
   let scrim = element();
   let page = { ...element(), dataset: { ready, entering: '', exiting: '' }, querySelector: (selector: string) => selector === '.settings-board' ? board : scrim };
   const overlay = { clientWidth: 390,
-    ownerDocument: { createElement: () => { const node = element(); ghosts.push(node); return node; } },
+    ownerDocument: { createElement: () => { const node = element(); node.classes.clear(); created.push(node); return node; } },
     parentElement: { clientLeft: 0, clientTop: 0, getBoundingClientRect: () => ({ left: 10, top: 15 }) },
     before: vi.fn(), querySelector: (selector: string) => selector === '.reference-settings'
     ? (screen === 'settings' ? page : null) : screen === 'menu' ? menu : null } as unknown as HTMLElement;
   const controller = mountSettingsTransition(overlay);
   return {
-    controller, animations, media, ghosts, get page() { return page; }, get menu() { return menu; },
+    controller, animations, media, get ghosts() { return created.filter(node => 'settingsMenuGhost' in node.dataset); }, get staging() { return created.filter(node => !('settingsMenuGhost' in node.dataset)); }, get page() { return page; }, get menu() { return menu; },
     ready() { page.dataset.ready = 'true'; readinessChanged(); },
-    get ghostBoard() { return ghosts.at(-1)?.append.mock.calls[0]?.[0] as ReturnType<ReturnType<typeof makeMenu>['cloneNode']>; },
+    get ghostBoard() { return created.filter(node => 'settingsMenuGhost' in node.dataset).at(-1)?.children[0] as FakeNode; },
+    resize(width: number, height: number) { viewport = { width, height }; },
+    textScale(value: string) { textScale = value; },
     show(next: typeof initial) { screen = next; controller.sync(); },
     replace() {
       if (screen === 'menu') { menu.button.isConnected = false; menu = makeMenu(); }
@@ -156,6 +179,106 @@ describe('settings navigation motion', () => {
     s.controller.destroy();
   });
 
+  it('crossfades incoming menu and real settings concurrently, then restores focus without another intro', () => {
+    const s = fixture();
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const close = vi.fn(() => s.show('menu'));
+    s.controller.closeSettings(close); s.controller.closeSettings(close);
+    const incoming = s.ghosts[1]!;
+    expect(incoming.dataset.settingsMenuDirection).toBe('in');
+    expect(s.ghosts[0]!.dataset.settingsMenuDirection).toBe('out');
+    expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([420, 420, 420]);
+    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
+    expect(s.page.inert).toBe(true); expect(close).not.toHaveBeenCalled();
+    const copy = s.ghostBoard;
+    for (const node of [copy, ...copy.children]) {
+      expect(node.inert).toBe(true);
+      expect(node.attributes.has('id')).toBe(false);
+      expect(node.attributes.has('data-action')).toBe(false);
+      expect(node.attributes.has('data-focus-key')).toBe(false);
+    }
+    expect(copy.classes.has('menu-artboard')).toBe(false);
+    const stale = s.animations[3]!.onfinish!;
+    s.finish(3); stale();
+    expect(close).toHaveBeenCalledOnce();
+    expect(incoming.remove).toHaveBeenCalledOnce();
+    expect(s.animations).toHaveLength(6);
+    expect(s.controller.isNavigating()).toBe(false);
+    expect(s.menu.inert).toBe(false);
+    expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
+    s.controller.destroy();
+  });
+
+  it('measures fresh incoming layout and text size, including resize with the same settings DOM', () => {
+    const s = fixture();
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    s.resize(960, 540); s.textScale('1');
+    s.controller.closeSettings(() => s.show('menu'));
+    expect(s.ghostBoard.style.width).toBe('960px');
+    expect(s.ghostBoard.properties['--menu-text-scale']).toBe('1');
+    expect(s.staging.find(node => node.classes.has('avalon-menu'))!.dataset.orientation).toBe('landscape');
+    s.animations[3]!.currentTime = 175;
+    const firstIncoming = s.ghosts[1]!;
+    s.resize(390, 844); s.textScale('1.12'); s.controller.sync();
+    expect(firstIncoming.remove).toHaveBeenCalledOnce();
+    expect(s.ghostBoard.style.width).toBe('390px');
+    expect(s.ghostBoard.properties['--menu-text-scale']).toBe('1.12');
+    expect(s.animations.slice(6).map(a => a.currentTime)).toEqual([175, 175, 175]);
+    expect(s.staging.filter(node => node.classes.has('avalon-menu')).at(-1)!.dataset.orientation).toBe('portrait');
+    s.controller.destroy();
+  });
+
+  it('closes mid-entry from the current real pose while reversing the incoming artwork', () => {
+    const s = fixture();
+    s.controller.openSettings(() => s.show('settings'));
+    const stale = s.animations[0]!.onfinish!;
+    s.animations[0]!.currentTime = 140;
+    s.controller.closeSettings(() => s.show('menu'));
+    expect(s.animations[3]!.frames[0]).toEqual({ transform: 'matrix(1, 0, 0, 1, -123, 0)', opacity: '0.45' });
+    expect(s.ghostBoard.style.opacity).toBe('0.4');
+    expect(s.animations[5]!.frames).toEqual([{ opacity: '0.4' }, { opacity: 1 }]);
+    stale(); expect(s.controller.isNavigating()).toBe(true);
+    s.animations[3]!.currentTime = 123;
+    s.resize(960, 540); s.controller.sync();
+    expect(s.ghostBoard.style.opacity).toBe('0.4');
+    expect(s.animations[8]!.frames).toEqual([{ opacity: '0.4' }, { opacity: 1 }]);
+    expect(s.animations.slice(6).map(a => a.currentTime)).toEqual([123, 123, 123]);
+    s.finish(6); expect(s.animations).toHaveLength(9);
+    s.controller.destroy();
+  });
+
+  it.each(['destroy', 'external'] as const)('cleans incoming artwork, staging and deferred callbacks on %s', reason => {
+    const s = fixture();
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const close = vi.fn(() => s.show('menu'));
+    s.controller.closeSettings(close);
+    const incoming = s.ghosts[1]!;
+    const stale = s.animations[3]!.onfinish!;
+    if (reason === 'destroy') s.controller.destroy(); else s.show('other');
+    stale();
+    expect(close).not.toHaveBeenCalled();
+    expect(incoming.remove).toHaveBeenCalledOnce();
+    expect(s.staging.filter(node => !node.classes.has('avalon-menu')).every(node => node.remove.mock.calls.length === 1)).toBe(true);
+    expect(s.controller.isNavigating()).toBe(false);
+    s.controller.destroy();
+  });
+
+  it('defers a settings return to paused battle without a menu snapshot or second introduction', () => {
+    const s = fixture('other');
+    s.controller.openSettings(() => s.show('settings')); s.finish(0);
+    const close = vi.fn(() => s.show('other'));
+    s.controller.closeSettings(close);
+    expect(s.animations).toHaveLength(4);
+    expect(s.ghosts).toHaveLength(0);
+    expect(close).not.toHaveBeenCalled();
+    s.finish(2);
+    expect(close).toHaveBeenCalledOnce();
+    expect(s.animations).toHaveLength(4);
+    expect(s.controller.isNavigating()).toBe(false);
+    s.controller.destroy();
+  });
+
   it('closes from computed entry styles and retains the real page until exit completes', () => {
     const s = fixture('settings');
     const navigate = vi.fn(() => s.show('menu'));
@@ -177,7 +300,7 @@ describe('settings navigation motion', () => {
     s.controller.destroy();
   });
 
-  it('preserves the single ghost and frozen playheads across entry, exit and menu rerenders', () => {
+  it('preserves entry artwork and rebuilds incoming artwork at frozen exit playheads across rerenders', () => {
     const s = fixture();
     const open = vi.fn(() => s.show('settings'));
     s.controller.openSettings(open);
@@ -192,19 +315,20 @@ describe('settings navigation motion', () => {
     s.controller.closeSettings(close);
     s.animations[6]!.currentTime = 91;
     s.controller.setPaused(true); s.replace();
-    expect(s.animations[8]!.currentTime).toBe(91);
-    expect(s.animations[9]!.playState).toBe('paused');
-    s.controller.setPaused(false); s.finish(8);
-    s.animations[10]!.currentTime = 54;
-    s.controller.setPaused(true); s.replace();
-    expect(s.animations[11]!.currentTime).toBe(54);
-    expect(s.animations[11]!.playState).toBe('paused');
-    s.controller.setPaused(false); s.finish(11);
+    expect(s.animations.slice(9).map(a => a.currentTime)).toEqual([91, 91, 91]);
+    expect(s.animations.slice(9).every(a => a.playState === 'paused')).toBe(true);
+    expect(s.ghosts[1]!.remove).toHaveBeenCalledOnce();
+    expect(s.staging.every(node => node.remove.mock.calls.length === 1 || node.classes.has('avalon-menu'))).toBe(true);
+    s.controller.setPaused(false); s.finish(9);
+    expect(s.animations).toHaveLength(12);
+    expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
+    s.replace();
+    expect(s.animations).toHaveLength(12);
     expect(open).toHaveBeenCalledOnce(); expect(close).toHaveBeenCalledOnce();
     s.controller.destroy();
   });
 
-  it('settles reduced motion changes once, including exit followed by menu introduction', () => {
+  it('settles reduced motion changes once without a second menu introduction', () => {
     const s = fixture();
     const open = vi.fn(() => s.show('settings'));
     s.controller.openSettings(open);
@@ -259,7 +383,8 @@ describe('settings navigation motion', () => {
     expect(s.ghosts[0]!.remove).toHaveBeenCalledOnce();
     if (reason === 'close') {
       expect(close).toHaveBeenCalledOnce();
-      expect(s.animations[0]!.options.duration).toBe(220);
+      expect(s.animations).toHaveLength(0);
+      expect(s.menu.button.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true });
     } else expect(s.animations).toHaveLength(0);
     s.controller.destroy();
   });

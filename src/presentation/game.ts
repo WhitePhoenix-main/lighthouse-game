@@ -782,7 +782,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   // Explicit host sizing avoids RESIZE mode overwriting resize() with its
   // cached parent size when a screen transition changes layout within a frame.
   const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: false, antialias: true, scale: { mode: Phaser.Scale.NONE, width: canvasHost.clientWidth, height: canvasHost.clientHeight }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
-  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutSharedScenery(application.view); });
+  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutSharedScenery(application.view); settingsTransition.sync(); });
   resize.observe(canvasHost);
   resize.observe(shell);
   const placementPoint = (map: SVGSVGElement, x: number, y: number): DOMPoint | null => {
@@ -837,7 +837,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         if (action === 'settings') { openSettingsWithMotion(); return; }
         application.openPreparation();
         renderHud(application.view);
-      });
+      }, action === 'settings');
       return;
     }
     switch (button.dataset.action) {

@@ -84,6 +84,7 @@ let ws;
     await sleep(120);
   };
   const menuReady = () => wait(`!!document.querySelector('[data-action="settings"]') && document.querySelector('.menu-artboard')?.dataset.menuTransition !== 'in'`);
+  const menuVisual = `(root)=>[...root.querySelectorAll('[data-menu-rect],.menu-button-label-art,.menu-button-label')].map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return{class:e.className,image:s.backgroundImage,font:s.fontSize,rect:[r.x,r.y,r.width,r.height].map(n=>Math.round(n*10)/10)}})`;
   const key = async name => {
     const code = {Escape:27, Enter:13, Home:36, ArrowRight:39}[name];
     for (const type of ['keyDown','keyUp']) await cdp('Input.dispatchKeyEvent', {type,key:name,code:name,windowsVirtualKeyCode:code,...(name==='Enter'&&type==='keyDown'?{text:'\r',unmodifiedText:'\r'}:{})});
@@ -95,7 +96,7 @@ let ws;
       const style=b&&getComputedStyle(b), menu=m&&getComputedStyle(m);
       const timing=e=>{const a=e?.getAnimations()[0];return a?{start:a.startTime,time:a.currentTime,duration:a.effect.getTiming().duration,state:a.playState}:null};
       const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);
-      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?'out':m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
+      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
       if(token===navToken)requestAnimationFrame(sample);
     } sample();requestAnimationFrame(sample);
   })()`);
@@ -107,6 +108,8 @@ let ws;
   };
   const open = async (touch=false,keyboard=false,holdArtwork=false) => {
     await menuReady(); await record();
+    // Capture the native click/keyboard activation itself, not the CDP roundtrip.
+    await evaluate(`document.querySelector('[data-action="settings"]').addEventListener('click',()=>window.navActivation=performance.now(),{capture:true,once:true})`);
     if(holdArtwork)await evaluate(`(()=>{window.navImageSource=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');window.navHeldImages=[];Object.defineProperty(HTMLImageElement.prototype,'src',{...navImageSource,set(value){if(String(value).includes('menu-buttons-v2/'))navHeldImages.push([this,value]);else navImageSource.set.call(this,value)}})})()`);
     if(keyboard){if(keyboard!=='restored')await evaluate(`document.querySelector('[data-action="settings"]').focus()`);await key('Enter');}
     else await click('[data-action="settings"]',touch);
@@ -120,6 +123,9 @@ let ws;
     await ready(); await sleep(40);
     const frames=await evaluate('navFrames'),out=frames.filter(f=>f.menu==='out');
     timeline({phase:'open',frames});
+    const activated=await evaluate('navActivation');
+    const firstSettings=frames.find(f=>f.settingsPages);
+    assert(firstSettings&&firstSettings.t-activated<180,'Settings activation waited for button animation before mounting the page');
     assert(out.length>=3,'menu ghost has no rendered frames');
     assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05&&f.enter==='true'&&f.x<0&&f.opacity>0&&f.opacity<1),'menu ghost fade and settings slide/fade did not share a frame');
     assert(out.every(f=>!f.screen||f.screen==='settings'),'settings route was delayed until after menu outro');
@@ -157,11 +163,21 @@ let ws;
     assert(exit.some(f=>f.x<-40&&f.opacity<.8),'settings board did not exit left and fade');
     assert(exit.at(-1).x<exit[0].x&&exit.at(-1).opacity<exit[0].opacity,'settings exit did not progress');
     assert(exit.at(-1).scrim<exit[0].scrim,'scrim did not fade out');
-    assert(intro.length>=3&&intro[0].menuOpacity<.2,'menu intro must start near zero');
-    assert(intro.every(f=>f.menuDuration===220),'menu intro duration must be 220ms');
+    assert.equal(intro.length,0,'real menu must appear settled without a second intro');
+    assert(exit.every(f=>f.ghost&&f.ghostSafe&&f.ghostSibling&&f.settingsPages===1&&f.settingsControls===10&&f.menuActions===0&&!f.duplicateIds),'exit ghost duplicated actions/IDs/pages or was unsafe');
+    assert(exit.every(f=>f.menuDuration===420&&f.boardTiming?.duration===420&&f.scrimTiming?.duration===420),'exit board/scrim/menu must share 420ms');
+    assert(exit.some(f=>f.menuOpacity>.05&&f.menuOpacity<.95&&f.opacity>0&&f.opacity<1),'incoming ghost and outgoing board did not share rendered frames');
+    for(const f of exit){
+      const timings=[f.boardTiming,f.scrimTiming,f.menuTiming];
+      const starts=timings.map(a=>a.start),times=timings.map(a=>a.time);
+      if(starts.every(t=>typeof t==='number'))assert(Math.max(...starts)-Math.min(...starts)<1,'exit animation start times differ');
+      if(times.every(t=>typeof t==='number'))assert(Math.max(...times)-Math.min(...times)<1,'exit animation playheads differ');
+      assert(Math.abs(f.menuOpacity+f.opacity-1)<.015&&Math.abs(f.scrim-f.opacity)<.015,'exit menu/board/scrim opacity diverged');
+    }
     assert(frames.at(-1).menuOpacity===1,'menu did not settle at opacity one');
-    const firstMenu=frames.findIndex(f=>f.menu==='in');
-    assert(firstMenu>frames.findLastIndex(f=>f.exit==='true'),'menu route occurred before settings exit');
+    const firstMenu=frames.findIndex(f=>!f.settingsPages&&f.menuOpacity!==null);
+    assert(firstMenu>frames.findLastIndex(f=>f.exit==='true'),'real menu route occurred before settings exit');
+    assert(frames.slice(firstMenu).every(f=>f.menuOpacity===1&&!f.ghost),'real menu flashed or faded after exit');
     if(await evaluate('!!window.settingsTest'))assert.equal(await evaluate('settingsTest.backCalls'),before+1,'Back callback count');
     await continuity('close');
   };
@@ -192,7 +208,7 @@ let ws;
     // No explicit .focus(): Enter must activate the button restored by navigation.
     await open(false,'restored');await close(true);
     await screenshot(`roundtrip-${w}x${h}`);
-    check(`${w}×${h}: synchronous menu fade/settings entry → Back/Escape exit → menu intro; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
+    check(`${w}×${h}: immediate activation; synchronous menu/settings entry and mirrored exit; native controls, double Back, restored focus/Enter reopen and backdrop continuity`);
   }
   // Force a real locale rerender while all three entrance animations are live.
   await evaluate(`(()=>{window.navRerendered=false;window.navRerenderObserver=new MutationObserver(()=>{const p=document.querySelector('.reference-settings');if(p?.dataset.entering==='true'){navRerenderObserver.disconnect();window.navOldBoard=p.querySelector('.settings-board');window.navOldGhost=document.querySelector('[data-settings-menu-ghost]');requestAnimationFrame(()=>requestAnimationFrame(()=>{settingsTest.application.setLanguage('en');window.navRerendered=true}))}});navRerenderObserver.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,childList:true})})()`);
@@ -201,24 +217,45 @@ let ws;
   const rerenderMoving=rerenderFrames.filter(f=>f.enter==='true');
   assert(rerenderMoving.every((f,i)=>!i||f.boardTiming.time>=rerenderMoving[i-1].boardTiming.time),'rerender reset the shared entrance playhead');
   await close(true);check('locale rerender retains synchronous entrance playheads and cleans up ghost');
-  await open(true);await viewport(390,844);await ready();await viewport(844,390);await ready();await close(false,true);
+  await open(true);await viewport(390,844);await ready();
+  await click('[data-setting="ru"]',true);await ready();await click('[data-setting="large"]',true);await ready();
+  await viewport(844,390);await ready();
+  await evaluate(`(()=>{window.navSnapshotObserver=new MutationObserver(()=>{const g=document.querySelector('[data-settings-menu-direction="in"] .settings-menu-outgoing');if(g){navSnapshotObserver.disconnect();window.navIncomingVisual=(${menuVisual})(g)}});navSnapshotObserver.observe(document.querySelector('[data-overlay]').parentElement,{subtree:true,childList:true,attributes:true})})()`);
+  await close(false,true);
+  const incomingVisual=await evaluate('navIncomingVisual');
+  const settledVisual=await evaluate(`(${menuVisual})(document.querySelector('.menu-artboard'))`);
+  assert(incomingVisual?.length>0,'fresh incoming ghost was not sampled');
+  assert.equal(incomingVisual.length,settledVisual.length,'incoming menu artwork count');
+  for(let i=0;i<incomingVisual.length;i++){
+    const {rect,...visual}=incomingVisual[i],{rect:expected,...expectedVisual}=settledVisual[i];
+    assert.deepEqual(visual,expectedVisual,'incoming menu snapshot used stale locale/text-size after rotation');
+    assert(rect.every((n,j)=>Math.abs(n-expected[j])<=.5),`incoming menu geometry mismatch: ${JSON.stringify({rect,expected})}`);
+  }
+  check('incoming ghost matches current language, large text and rotated layout before real menu replaces it');
   await pausePhase('.reference-settings','entering','true',()=>click('[data-action="settings"]'));
   assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),true,'paused entry lost ghost');
   await ready();await continuity('paused menu outro resumed');
   await pausePhase('.reference-settings','exiting','true',()=>key('Escape'));
   await menuReady();await continuity('paused exit resumed');
   await open(true);
-  await pausePhase('.menu-artboard','menuTransition','in',()=>key('Escape'));
-  await menuReady();await continuity('paused menu intro resumed');
+  await pausePhase('.reference-settings','exiting','true',()=>key('Escape'));
+  await menuReady();await continuity('paused incoming ghost resumed');
   check('rotation and blur/focus preserve synchronous entry, exit and incoming fades without route catch-up');
   // Close while the entrance is still in flight: the first exit frame must continue its current pose.
+  // Freeze an actual early RAF pose before sending native Escape. CDP roundtrip
+  // latency otherwise lets this fast easing pass the useful visible-menu range.
+  await evaluate(`(()=>{window.navMidFreeze=new MutationObserver(()=>{if(document.querySelector('.reference-settings')?.dataset.entering==='true'){navMidFreeze.disconnect();requestAnimationFrame(()=>window.dispatchEvent(new Event('blur')))}});navMidFreeze.observe(document.querySelector('[data-overlay]'),{subtree:true,attributes:true,childList:true})})()`);
   await record();await click('[data-action="settings"]',true);
-  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true'`);
-  await key('Escape');await menuReady();
+  await wait(`document.querySelector('.reference-settings')?.dataset.entering==='true'&&!!document.querySelector('.menu-motion-paused')`);
+  await key('Escape');
+  await evaluate(`new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))`);
+  await evaluate(`window.dispatchEvent(new Event('focus'))`);await menuReady();
   const mid=await evaluate('navFrames'),firstExit=mid.findIndex(f=>f.exit==='true'),prior=mid.slice(0,firstExit).findLast(f=>f.enter==='true');
   timeline({phase:'close-mid-entry',frames:mid});
   assert(prior&&firstExit>0,'close during entry was not exercised');
   assert(Math.abs(mid[firstExit].x-prior.x)<90&&Math.abs(mid[firstExit].opacity-prior.opacity)<.2,'entry-to-exit pose jumped');
+  assert(prior.menuOpacity>.2,'mid-entry close did not exercise a visible outgoing menu');
+  assert(Math.abs(mid[firstExit].menuOpacity-prior.menuOpacity)<.2,'entry-to-exit menu opacity jumped instead of continuing the visible ghost');
   assert.equal(await evaluate("!!document.querySelector('[data-settings-menu-ghost]')"),false,'mid-entry close retained ghost');
   await continuity('mid-entry close');check('closing during entry preserves the current board pose and removes ghost');
   await click('[data-action="settings"]',true);
