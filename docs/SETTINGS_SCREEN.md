@@ -52,3 +52,7 @@ node tools/verify-settings-screen.cjs
 
 Этот файл объединяет описание и проверку экрана, чтобы его ветка не пересекалась
 с параллельными изменениями общих `README.md` и `VERIFICATION.md`.
+Тесты экрана имеют отдельные имена: `tests/settingsScreenLayout.test.ts`,
+`tests/settingsScreenPersistence.test.ts` и стенд
+`tests/browser/settings-screen-frame.html`, чтобы сохранить существующие
+незакоммиченные тестовые файлы при слиянии.
