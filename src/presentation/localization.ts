@@ -10,6 +10,151 @@ export function resolveLanguage(preference: LanguagePreference, platformLanguage
 
 // Presentation-only dictionary. Content identifiers and simulation data remain language independent.
 const entries = `
+Выбор игры|Choose game
+Не удалось начать игру|Could not start the game
+Испытания|Trials
+Новая игра|New game
+Сохранения нет|No saved game
+Продолжить — сохранения нет|Continue — no saved game
+Сохранения пока нет. Начните новую игру.|No saved game yet. Start a new game.
+Начать новую игру?|Start a new game?
+Текущее прохождение, ресурсы и улучшения будут удалены. Настройки сохранятся.|Your campaign, resources and upgrades will be deleted. Settings will be kept.
+Начать заново|Start over
+Не удалось загрузить оформление меню. Обновите страницу.|Menu artwork could not load. Refresh the page.
+ОТДЕЛЬНЫЕ НОЧИ|OPTIONAL NIGHTS
+Необязательные ночи. Условия открытия сохраняются.|Optional nights. Unlock requirements still apply.
+Награда включает существ и победу; досрочные бонусы отдельно.|Rewards include enemies and victory; early-wave bonuses are extra.
+Переходный|Transition
+Штурм|Assault
+Режим позднего испытания|Late trial mode
+Прохождение ночи общее для обоих режимов.|Night completion is shared across both modes.
+Полная зачистка|Full clear
+Более слабые враги для частично прокачанного маяка. Ремонт и перезарядка остаются платными.|Weaker enemies for a partly upgraded lighthouse. Repairs and recharging still cost resources.
+Усиленные враги для развитого маяка. Требуются сильная защита и своевременная реакция.|Stronger enemies for an upgraded lighthouse. Requires strong defenses and timely reactions.
+Штурмовой призрак|Assault Ghost
+Стойкий и быстрый призрак. Группа способна удержать общее поле истощённым.|A tough, fast ghost. A group can keep the shared shield depleted.
+Броневой фронт|Armored Front
+Воздушный налёт|Air Raid
+Смешанный штурм|Combined Assault
+Поздние испытания|Late Trials
+Панцирная черепаха|Plated Turtle
+Налётчик|Raider
+Усиленный панцирь задерживает луч. Бронебойность помогает освободить свет для других угроз.|A reinforced shell holds the beam. Armor piercing frees the light for other threats.
+Более стойкая летучая мышь. Обходит барьеры и атакует устройства.|A tougher bat. Bypasses barriers and attacks devices.
+Испытание развитого маяка: черепахи с 840 брони. Темп растёт по волнам; используйте бронебойность и готовьте защиту от рывков.|Endgame trial: turtles with 840 armor. Waves grow denser; use armor piercing and prepare for charges.
+Испытание развитого маяка: стойкие налётчики и штурмовые призраки. Темп растёт по волнам; защищайте устройства и общее поле.|Endgame trial: tough raiders and assault ghosts. Waves grow denser; protect devices and the shared shield.
+Испытание развитого маяка: броня, налётчики и рывки с предупреждением 5,5 с. Темп растёт по волнам; вовремя переключайте цели.|Endgame trial: armor, raiders and charges with a 5.5 s warning. Waves grow denser; switch targets in time.
+урона луча при HP ниже 25%|beam damage below 25% HP
+урона орудий по освещённой цели|gun damage to illuminated targets
+снижения урона маяку|lighthouse damage reduction
+защиты от рывка и босса|charge and boss damage reduction
+аварийного снижения урона|emergency damage reduction
+защиты поля после включения|shield restart protection
+Бонус складывается с множителем брони выбранной линзы. Остаток урона здоровью не усиливается.|Adds to the selected lens armor multiplier. Overflow health damage is unchanged.
+Усиливает прямой урон луча при здоровье цели строго ниже 25%. Не убивает мгновенно; броня и лимит целей сохраняются.|Boosts direct beam damage strictly below 25% target health. No instant kill; armor and target limits remain.
+Пушки и гарпуны получают бонус по выбранной светом цели. Для мортиры освещение проверяется при взрыве; ловушки, горение и вспышка бонус не получают.|Cannons and harpoons gain damage against beam-selected targets. Mortars check illumination at impact; traps, burn and flash gain no bonus.
+Снижает входящий урон только маяку. Применяется вместе с защитой от тяжёлых ударов и аварийной защитой.|Reduces damage only to the lighthouse. Combines with heavy impact and emergency protection.
+Дополнительно снижает урон маяку от рывка и щупалец босса. Не усиливает защиту устройств или поля.|Additionally reduces lighthouse damage from charges and boss tentacles. Does not protect devices or the shield.
+Один раз за ночь при ударе, опускающем здоровье до 25%, включает защиту на 2 с, включая этот удар. Не лечит и не гарантирует спасение от смертельного урона.|Once per night, an attack that would bring health to 25% triggers protection for 2 s, including that hit. Does not heal or guarantee survival.
+Восстанавливает живому маяку здоровье за каждую впервые завершённую волну, не выше максимума. Не воскрешает и не ремонтирует устройства.|Heals the living lighthouse once per completed wave, up to maximum health. Does not revive or repair devices.
+Сокращает задержку восстановления. Удары по защищаемым целям при истощённом щите по-прежнему откладывают восстановление.|Shortens recovery delay. Hits on protected targets while the shield is exhausted still postpone recovery.
+Устройство защищено только когда весь его корпус находится внутри поля. Дополнительный генератор не ускоряет восстановление.|A device is protected only when its entire hull is inside the field. Additional generators do not speed up recovery.
+Снижает входящий урон полю на 1 с после настоящего восстановления из нуля. Не даёт мгновенного заряда и не действует при старте ночи.|Reduces shield damage for 1 s after real recovery from zero. Grants no instant charge and is inactive at night start.
+к множителю урона броне|to armor damage multiplier
+радиуса поля|field radius
+HP за завершённую волну|HP per completed wave
+Разрушение брони I|Armor Erosion I
+Разрушение брони II|Armor Erosion II
+Разрушение брони III|Armor Erosion III
+Добивающий свет I|Finishing Light I
+Добивающий свет II|Finishing Light II
+Наведение светом I|Light Guidance I
+Наведение светом II|Light Guidance II
+Защита маяка I|Lighthouse Guard I
+Защита маяка II|Lighthouse Guard II
+Защита маяка III|Lighthouse Guard III
+Аварийная защита I|Emergency Guard I
+Аварийная защита II|Emergency Guard II
+Аварийная защита III|Emergency Guard III
+Восстановление между волнами I|Wave Recovery I
+Восстановление между волнами II|Wave Recovery II
+Упор против тяжёлых ударов I|Heavy Impact Guard I
+Упор против тяжёлых ударов II|Heavy Impact Guard II
+Быстрый возврат поля I|Field Recovery Delay I
+Быстрый возврат поля II|Field Recovery Delay II
+Быстрый возврат поля III|Field Recovery Delay III
+Радиус поля I|Field Radius I
+Радиус поля II|Field Radius II
+Радиус поля III|Field Radius III
+Защита при включении I|Restart Protection I
+Защита при включении II|Restart Protection II
+Сокращает текущую перезарядку живых пушек, гарпунов и мортир, центры которых находятся в радиусе вспышки. Не ремонтирует и не пополняет заряды.|Reduces the current reload timer of living cannons, harpoons and mortars whose centers are within flash range. Does not repair or replenish charges.
+Бонус действует только на оставшуюся броню, повреждённую до вспышки. Урон здоровью и боссу не усиливается.|Only affects remaining armor damaged before the flash. Health and boss damage are unchanged.
+Добавляет долю исходной прочности каждого корпуса. Доля повреждений, разрушенные корпуса и цена ремонта сохраняются.|Adds a fraction of each original hull capacity. Damage ratio, destroyed hulls and repair prices are preserved.
+Скидка применяется к общему счёту за недостающие заряды, затем цена округляется вверх. Заряды покупаются отдельно от ремонта.|Discount applies to the total missing-charge bill, then rounds up. Charges are purchased separately from repairs.
+Усиляет первый выстрел пушки по назначенной цели за ночь. Смена цели не обновляет использованный бонус; щупальца считаются одной целью.|Boosts the first cannon shot at a manually assigned target each night. Switching targets does not reset the bonus; all tentacles count as one target.
+п.п. коэффициента стоимости|percentage points of cost multiplier
+Радиус вспышки III|Flash Radius III
+Оглушение вспышки III|Flash Stun III
+Импульс готовности|Readiness Pulse
+Надломленная броня|Fractured Armor
+Седьмое место устройств|Seventh Device Space
+Восьмое место устройств|Eighth Device Space
+Усиление корпусов I|Hull Reinforcement I
+Усиление корпусов II|Hull Reinforcement II
+Усиление корпусов III|Hull Reinforcement III
+Координация пушек I|Cannon Coordination I
+Координация пушек II|Cannon Coordination II
+Экономная перезарядка I|Efficient Reload I
+Экономная перезарядка II|Efficient Reload II
+стоимости перезарядки до округления|reload cost before rounding
+урона повреждённой броне|damage to damaged armor
+исходной прочности корпусов|base hull health
+с ускорения готовности|s readiness boost
+Сила вспышки III|Flash Power III
+Сила вспышки IV|Flash Power IV
+Радиус вспышки I|Flash Radius I
+Радиус вспышки II|Flash Radius II
+Оглушение вспышки I|Flash Stun I
+Оглушение вспышки II|Flash Stun II
+Восстановление вспышки III|Flash Recovery III
+Пятое место устройств|Fifth Device Space
+Шестое место устройств|Sixth Device Space
+Бережный ремонт I|Efficient Repairs I
+Бережный ремонт II|Efficient Repairs II
+Бережный ремонт III|Efficient Repairs III
+стоимости ремонта до округления|repair cost before rounding
+радиуса вспышки|flash radius
+с оглушения|s stun
+мест устройств|device spaces
+Мощность V|Power V
+Мощность VI|Power VI
+Ширина IV|Width IV
+Ширина V|Width V
+Дальность IV|Range IV
+Дальность V|Range V
+Привод IV|Drive IV
+Привод V|Drive V
+Привод VI|Drive VI
+Корпус маяка V|Lighthouse Hull V
+Корпус маяка VI|Lighthouse Hull VI
+Ёмкость поля III|Field Capacity III
+Ёмкость поля IV|Field Capacity IV
+Восстановление поля III|Field Recovery III
+Восстановление поля IV|Field Recovery IV
+Связанный свет III|Linked Light III
+Мощность III|Power III
+Мощность IV|Power IV
+Ширина III|Width III
+Дальность III|Range III
+Привод III|Drive III
+Корпус маяка III|Lighthouse Hull III
+Корпус маяка IV|Lighthouse Hull IV
+Ёмкость поля II|Field Capacity II
+Восстановление поля II|Field Recovery II
+Сила вспышки II|Flash Power II
+Восстановление вспышки II|Flash Recovery II
+Связанный свет II|Linked Light II
 Сила широкого света I|Wide Light Power I
 Сила широкого света II|Wide Light Power II
 Дальность контроля|Control Range

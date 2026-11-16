@@ -7,6 +7,9 @@ import './menu.css';
 import './menuFog.css';
 import './menuTitle.css';
 import './settings.css';
+import './gameMenu.css';
+import { layoutGameMenu } from './gameMenu';
+import { mountGameMenuTransition } from './gameMenuTransition';
 import { mountMenuAudio } from './menuAudio';
 import { mountEffectsAudio } from './effectsAudio';
 import { localizeRoot, resolveLanguage, translate } from './localization';
@@ -15,8 +18,10 @@ import { layoutReferenceMenu, mountMenuMotion } from './referenceMenu';
 import { mountMenuWindows } from './menuWindows';
 import { mountMenuTitle } from './menuTitle';
 import { mountMenuButtons } from './menuButtons';
+import { menuScenery, layoutMenuScenery } from './menuScenery';
+import { mountSettingsTransition } from './settingsTransition';
 import { renderPlacementPreview } from './preparation';
-import { screenContent } from './screens';
+import { screenContent, nightLabel } from './screens';
 import { drawCombatFeedback } from './feedback';
 import { battleDevicePanel } from './devices';
 import { drawCoast } from './coast';
@@ -49,10 +54,26 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   const menuAudio = mountMenuAudio(root, application);
   const effectsAudio = mountEffectsAudio(root, application);
   const overlay = find('[data-overlay]');
-  const menuWindows = mountMenuWindows(overlay);
-  const menuTitle = mountMenuTitle(overlay);
+  // One connected scene survives menu/settings replacement and retains its timelines.
+  const sceneryLayer = document.createElement('div');
+  sceneryLayer.className = 'menu-scene-layer';
+  sceneryLayer.setAttribute('aria-hidden', 'true');
+  sceneryLayer.innerHTML = menuScenery();
+  overlay.before(sceneryLayer);
+  let sceneryActive = false;
+  let lifecyclePaused = false;
+  const menuWindows = mountMenuWindows(sceneryLayer);
+  const menuTitle = mountMenuTitle(overlay, sceneryLayer);
   const menuButtons = mountMenuButtons(overlay);
-  const menuMotion = mountMenuMotion(root, (paused) => { menuWindows.setPaused(paused); menuButtons.setPaused(paused); });
+  const settingsTransition = mountSettingsTransition(overlay);
+  const gameMenuTransition = mountGameMenuTransition(overlay);
+  const menuMotion = mountMenuMotion(root, (paused) => {
+    lifecyclePaused = paused;
+    menuWindows.setPaused(paused || !sceneryActive);
+    menuButtons.setPaused(paused);
+    settingsTransition.setPaused(paused);
+    gameMenuTransition.setPaused(paused);
+  });
   const devicePanel = find('[data-battle-devices]');
   const flashButton = find<HTMLButtonElement>('[data-action="flash"]');
   const flashStatus = find('[data-flash-status]');
@@ -82,6 +103,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   let overlayKey = '';
   let selectedUpgrade = application.view.upgrades[0]?.definition.id;
   let confirmAbandon = false;
+  let confirmNewGame = false;
   let previousScreen = '';
   let settingsPointerHeld = false;
   const returnFocus = new Map<string, string>();
@@ -93,10 +115,39 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     if (width > 0 && height > 0 && (scale.width !== width || scale.height !== height)) scale.resize(width, height);
   }
 
+  function layoutSharedScenery(): void {
+    const width = sceneryLayer.clientWidth, height = sceneryLayer.clientHeight;
+    layoutMenuScenery(sceneryLayer, width, height);
+  }
+
+  function openSettingsWithMotion(): void {
+    const origin = application.view.screen;
+    settingsTransition.openSettings(() => {
+      if (application.view.screen !== origin) return;
+      application.openSettings();
+      renderHud(application.view);
+    });
+  }
+
+  function closeSettingsWithMotion(): void {
+    settingsPointerHeld = false;
+    settingsTransition.closeSettings(() => {
+      if (application.view.screen !== 'settings') return;
+      application.back();
+      renderHud(application.view);
+    });
+  }
+
   function renderHud(view: ApplicationView): void {
     const { config, battle } = view;
     shell.classList.toggle('is-main-menu', view.screen === 'menu');
     shell.classList.toggle('is-settings', view.screen === 'settings');
+    shell.classList.toggle('is-game-menu', view.screen === 'game-menu');
+    sceneryActive = view.screen === 'menu' || view.screen === 'settings' || view.screen === 'game-menu';
+    shell.classList.toggle('has-menu-scenery', sceneryActive);
+    sceneryLayer.classList.toggle('is-inactive', !sceneryActive);
+    sceneryLayer.classList.toggle('menu-motion-paused', !sceneryActive);
+    menuWindows.setPaused(lifecyclePaused || !sceneryActive);
     menuAudio.sync();
     effectsAudio.sync();
     if (view.screen !== 'battle') { selectedDevice = null; choosingTarget = false; rememberedTarget = null; targetNotice = ''; pendingTarget = null; }
@@ -125,7 +176,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     flashStatus.textContent = config.flash.enabled === false ? 'Закрыта · открой в развитии' : battle && battle.flash.cooldownRemaining > 0 ? 'Готова через ' + Math.ceil(battle.flash.cooldownRemaining) + ' с' : 'Готова · урон + оглушение';
     flashButton.title = config.flash.enabled === false ? 'Открой вспышку на экране развития маяка' : 'Радиус ' + config.flash.radius + ' · урон ' + config.flash.damage + ' · оглушение ' + config.flash.stunDuration + ' с';
     shieldStatus.textContent = shieldStatusText(battle, config);
-    find('[data-night-label]').textContent = view.nights.find((night) => night.id === view.selectedNightId)?.name ?? '';
+    find('[data-night-label]').textContent = nightLabel(view);
     const rescue = find('[data-ship-status]');
     rescue.textContent = battle?.ship ? shipStatus(battle.ship, config) : '';
     rescue.hidden = view.screen !== 'battle' || !battle?.ship;
@@ -175,8 +226,9 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     root.querySelector('.lighthouse-app')?.classList.toggle('screen-page', !isBattle);
     for (const selector of ['.statusbar', '.battle-controls', '.legend', '.map-label', '.range-label', '.battle-devices', '.shield-status']) find(selector).hidden = !isBattle;
     devicePanel.hidden = !isBattle || view.paused;
-    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon]);
-    if (key === overlayKey || (view.screen === 'settings' && settingsPointerHeld && !view.settingsError)) { renderPlacementPreview(overlay, view); localize(); return; }
+    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.lateNightModes, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon]);
+    const keyed = key + '/' + confirmNewGame;
+    if (keyed === overlayKey || (view.screen === 'settings' && settingsPointerHeld && !view.settingsError)) { renderPlacementPreview(overlay, view); localize(); return; }
     const scrollSurface = overlay.querySelector<HTMLElement>('.reference-settings') ?? overlay;
     const scrollTop = scrollSurface.scrollTop;
     const focused = (document.activeElement instanceof HTMLElement || document.activeElement instanceof SVGElement) && root.contains(document.activeElement) ? document.activeElement : null;
@@ -185,15 +237,21 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     const oldScreen = previousScreen;
     if (screenChanged && oldScreen) screenScroll.set(oldScreen, scrollTop);
     previousScreen = view.screen;
-    if (screenChanged) confirmAbandon = false;
-    overlayKey = key;
+    if (screenChanged) { confirmAbandon = false; confirmNewGame = false; }
+    overlayKey = keyed;
     const wasHidden = overlay.hidden;
     overlay.hidden = isBattle && !view.paused;
     canvasHost.setAttribute('aria-hidden', String(!isBattle));
     overlay.className = 'overlay screen-' + view.screen + (view.screen === 'preparation' ? ' preparation' : '');
-    overlay.innerHTML = screenContent(view, selectedUpgrade, confirmAbandon);
+    overlay.innerHTML = screenContent(view, selectedUpgrade, confirmAbandon, confirmNewGame);
+    // Standalone menu markup includes a scene; the game uses its persistent sibling.
+    overlay.querySelector('.avalon-menu > .menu-scenery')?.remove();
     layoutReferenceMenu(overlay);
     layoutReferenceSettings(overlay, view);
+    layoutGameMenu(overlay, view);
+    layoutSharedScenery();
+    settingsTransition.sync();
+    gameMenuTransition.sync();
     for (const element of root.querySelectorAll<HTMLElement>('[data-action]')) {
       element.dataset.focusKey = [element.dataset.action, element.dataset.upgrade ?? element.dataset.lensUpgrade ?? element.dataset.lens ?? element.dataset.night ?? element.dataset.kind ?? element.dataset.deviceId ?? element.dataset.size ?? element.dataset.enabled ?? element.dataset.language ?? ''].join(':');
     }
@@ -209,6 +267,11 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       (overlay.querySelector<HTMLElement>('.reference-settings') ?? overlay).scrollTop = screenChanged ? screenScroll.get(view.screen) ?? 0 : scrollTop;
     } else if (focused && !focused.isConnected) pause.focus({ preventScroll: true });
     if (confirmAbandon && !overlay.querySelector('.abandon-confirm')?.contains(document.activeElement)) overlay.querySelector<HTMLElement>('[data-action="cancel-abandon"]')?.focus({ preventScroll: true });
+    if (confirmNewGame) {
+      const board = overlay.querySelector<HTMLElement>('.game-menu-board'); if (board) board.inert = true;
+      const back = overlay.querySelector<HTMLElement>('.game-menu-back'); if (back) back.inert = true;
+      if (!overlay.querySelector('.game-menu-confirm')?.contains(document.activeElement)) overlay.querySelector<HTMLElement>('[data-action="cancel-new-game"]')?.focus({ preventScroll: true });
+    }
     renderPlacementPreview(overlay, view);
     localize();
   }
@@ -723,7 +786,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   // Explicit host sizing avoids RESIZE mode overwriting resize() with its
   // cached parent size when a screen transition changes layout within a frame.
   const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: false, antialias: true, scale: { mode: Phaser.Scale.NONE, width: canvasHost.clientWidth, height: canvasHost.clientHeight }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
-  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); });
+  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutGameMenu(overlay, application.view); layoutSharedScenery(); settingsTransition.sync(); gameMenuTransition.sync(); });
   resize.observe(canvasHost);
   resize.observe(shell);
   const placementPoint = (map: SVGSVGElement, x: number, y: number): DOMPoint | null => {
@@ -757,6 +820,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     renderHud(application.view);
   }
   const click = (event: MouseEvent): void => {
+    if (settingsTransition.isNavigating() || gameMenuTransition.isNavigating()) return;
     panelPointerHeld = false;
     clearTimeout(panelReleaseTimer);
     const target = event.target as Element;
@@ -770,17 +834,36 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     if (!button || (button instanceof HTMLButtonElement && button.disabled)) return;
     if (button.dataset.focusKey) returnFocus.set(application.view.screen, button.dataset.focusKey);
     if (application.view.screen === 'menu' && button instanceof HTMLButtonElement && button.matches('.menu-hotspot') &&
-      (button.dataset.action === 'preparation' || button.dataset.action === 'settings')) {
+      (button.dataset.action === 'game-menu' || button.dataset.action === 'settings')) {
       const action = button.dataset.action;
       menuButtons.activate(button, () => {
         if (application.view.screen !== 'menu' || !overlay.contains(button) || button.disabled) return;
-        if (action === 'preparation') application.openPreparation();
-        else application.openSettings();
+        if (action === 'settings') { openSettingsWithMotion(); return; }
+        gameMenuTransition.open(() => { application.openGameMenu(); renderHud(application.view); });
+      }, action === 'settings');
+      return;
+    }
+    if (application.view.screen === 'game-menu' && button instanceof HTMLButtonElement && button.matches('.game-menu-control')) {
+      const action = button.dataset.action;
+      gameMenuTransition.press(button, () => {
+        if (application.view.screen !== 'game-menu' || !overlay.contains(button)) return;
+        if (action === 'game-menu-back') { gameMenuTransition.close(() => { application.back(); renderHud(application.view); }); return; }
+        if (action === 'continue-game') application.continueGame();
+        else if (action === 'trials') application.openTrials();
+        else if (action === 'new-game') {
+          if (application.view.hasProgress) confirmNewGame = true;
+          else { application.startNewGame(); if (application.view.error) confirmNewGame = true; }
+        }
         renderHud(application.view);
       });
       return;
     }
     switch (button.dataset.action) {
+      case 'confirm-new-game': application.startNewGame(true); break;
+      case 'cancel-new-game':
+        application.cancelNewGame();
+        if (!application.view.error) confirmNewGame = false;
+        break;
       case 'select-lens': {
         const lens = application.view.lenses.find(entry => entry.definition.id === button.dataset.lens);
         if (application.view.screen === 'preparation' && lens?.unlocked) application.selectLens(lens.definition.id);
@@ -796,6 +879,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         if (application.view.screen === 'development' && node?.status === 'available') application.purchaseLensUpgrade(node.definition.id);
         break;
       }
+      case 'select-late-mode': {
+        const mode = application.view.lateNightModes?.find(entry => entry.id === button.dataset.mode);
+        if (mode && ['preparation', 'result'].includes(application.view.screen) && !application.view.error
+          && (application.view.screen !== 'result' || application.view.result?.saved)) application.selectLateMode(mode.id);
+        break;
+      }
       case 'select-night': {
         const night = application.view.nights.find((entry) => entry.id === button.dataset.night);
         if (night && night.available && application.view.screen !== 'battle') application.selectNight(night.id);
@@ -804,8 +893,10 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       case 'preparation': application.openPreparation(); break;
       case 'menu': application.openMainMenu(); break;
       case 'development': application.openDevelopment(); break;
-      case 'settings': application.openSettings(); break;
-      case 'back': application.back(); break;
+      case 'settings': openSettingsWithMotion(); return;
+      case 'back':
+        if (application.view.screen === 'settings') { closeSettingsWithMotion(); return; }
+        application.back(); break;
       case 'text-size': if (button.dataset.size === 'normal' || button.dataset.size === 'large') application.setTextSize(button.dataset.size); break;
       case 'sound-toggle': application.setAudioSettings({ soundEnabled: button.dataset.enabled === 'true' }); break;
       case 'language': if (button.dataset.language === 'auto' || button.dataset.language === 'ru' || button.dataset.language === 'en') application.setLanguage(button.dataset.language); break;
@@ -863,6 +954,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     renderHud(application.view);
   };
   const keydown = (event: KeyboardEvent): void => {
+    // A held Escape must not close settings and then resume the paused battle.
+    if (event.key === 'Escape' && event.repeat) { event.preventDefault(); return; }
+    if (settingsTransition.isNavigating() || gameMenuTransition.isNavigating()) {
+      if (event.key === 'Escape') event.preventDefault();
+      return;
+    }
     const map = event.target instanceof Element ? event.target.closest('[data-placement-map]') : null;
     if (map && application.view.screen === 'preparation' && !application.view.error) {
       const point = application.view.preparation.preview ?? { x: application.view.config.terrain?.landOnlyPlacement ? -80 : 80, y: 0 };
@@ -875,8 +972,8 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         renderHud(application.view); return;
       }
     }
-    if (event.key === 'Tab' && confirmAbandon) {
-      const buttons = [...overlay.querySelectorAll<HTMLButtonElement>('.abandon-confirm button:not(:disabled)')];
+    if (event.key === 'Tab' && (confirmAbandon || confirmNewGame)) {
+      const buttons = [...overlay.querySelectorAll<HTMLButtonElement>(confirmNewGame ? '.game-menu-confirm button:not(:disabled)' : '.abandon-confirm button:not(:disabled)')];
       const first = buttons[0], last = buttons[buttons.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
@@ -884,8 +981,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     if (event.key !== 'Escape') return;
     event.preventDefault();
     if (selectedDevice !== null) closeDevice();
+    else if (confirmNewGame) { application.cancelNewGame(); if (!application.view.error) confirmNewGame = false; }
     else if (confirmAbandon) confirmAbandon = false;
-    else if (application.view.screen === 'settings' || application.view.screen === 'development') application.back();
+    else if (application.view.screen === 'settings') { closeSettingsWithMotion(); return; }
+    else if (application.view.screen === 'development') application.back();
+    else if (application.view.screen === 'trials') application.back();
+    else if (application.view.screen === 'game-menu') { gameMenuTransition.close(() => { application.back(); renderHud(application.view); }); return; }
     else if (application.view.screen === 'battle') {
       if (application.view.paused) application.resume(); else application.pause();
     } else if (application.view.screen === 'preparation') application.openMainMenu();
@@ -894,6 +995,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   // Preserve the pressed DOM node until its click fires. Live health updates
   // must not remove a touch/mouse target between pointerdown and pointerup.
   const changeVolume = (event: Event): void => {
+    if (settingsTransition.isNavigating()) return;
     if (!(event.target instanceof HTMLInputElement)) return;
     const action = event.target.dataset.action;
     if (action !== 'music-volume' && action !== 'effects-volume') return;
@@ -928,5 +1030,5 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   root.addEventListener('pointermove', placementMove);
   window.addEventListener('keydown', keydown);
   renderHud(application.view);
-  return { destroy() { menuAudio.destroy(); effectsAudio.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
+  return { destroy() { menuAudio.destroy(); effectsAudio.destroy(); settingsTransition.destroy(); gameMenuTransition.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
 }
