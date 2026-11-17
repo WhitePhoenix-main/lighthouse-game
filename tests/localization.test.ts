@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { localizeRoot, resolveLanguage, translate } from '../src/presentation/shared/localization';
 import { LighthouseApplication } from '../src/application/gameApplication';
 import { NIGHT_CONFIG } from '../src/content/night';
@@ -6,7 +6,8 @@ import { NIGHT_CATALOG } from '../src/content/nights';
 import { screenContent } from '../src/presentation/screens';
 import { createPreparationUiState } from '../src/presentation/preparation/preparationState';
 import { ENEMIES } from '../src/content/enemies';
-import type { SaveStore } from '../src/contracts';
+import { UPGRADES } from '../src/content/upgrades';
+import type { ApplicationView, SaveStore } from '../src/contracts';
 
 // Minimal DOM surface makes the reversible projection testable without a browser or a DOM dependency.
 class TextNode {
@@ -81,24 +82,36 @@ describe('complete current screen and content translations', () => {
     }
     expect(translate('Мощность I · 12 урона/с', 'en')).toBe('Power I · 12 damage/s');
   });
-  it('covers current enemy descriptions and every preparation night, settings and upgrade details', () => {
+  let view: ApplicationView;
+  beforeAll(() => {
     const store: SaveStore = { read: () => null, write: () => undefined };
     const app = new LighthouseApplication(store, NIGHT_CONFIG, () => ({ id: 'translation', seed: 1 }), undefined, NIGHT_CATALOG);
-    for (const screen of ['menu', 'settings', 'development', 'preparation'] as const) {
-      app.view.screen = screen;
-      for (const node of app.view.upgrades) {
-        const html = translate(screenContent(app.view, node.definition.id, false), 'en');
-        expect(html.match(/[А-Яа-яЁё][А-Яа-яЁё ]*/g) ?? [], screen + ':' + node.definition.id).toEqual([]);
-      }
-    }
-    for (const night of NIGHT_CATALOG) {
-      app.view.config = night.config; app.view.selectedNightId = night.id; app.view.screen = 'preparation';
-      for (const panel of [null, 'devices', 'lens', 'ability', 'recon', 'night', 'shards', 'pearls'] as const) {
-        const state = { ...createPreparationUiState(), panel };
-        const html = translate(screenContent(app.view, undefined, false, false, undefined, state), 'en');
-        expect(html.match(/[А-Яа-яЁё][А-Яа-яЁё ]*/g) ?? [], night.id + ':' + panel).toEqual([]);
-      }
-    }
+    view = app.view;
+  });
+
+  // Only development uses selectedId; other screens need one render, not one per upgrade.
+  it.each(['menu', 'settings', 'preparation'] as const)('covers the %s screen', screen => {
+    const html = translate(screenContent({ ...view, screen }, undefined, false), 'en');
+    expect(html.match(/[А-Яа-яЁё][А-Яа-яЁё ]*/g) ?? []).toEqual([]);
+  });
+
+  it.each(UPGRADES.map(upgrade => upgrade.id))('covers upgrade details: %s', id => {
+    const html = translate(screenContent({ ...view, screen: 'development' }, id, false), 'en');
+    expect(html.match(/[А-Яа-яЁё][А-Яа-яЁё ]*/g) ?? []).toEqual([]);
+  });
+
+  const preparationCases = NIGHT_CATALOG.flatMap(night =>
+    ([null, 'devices', 'lens', 'ability', 'recon', 'night', 'shards', 'pearls'] as const)
+      .map(panel => ({ night, panel, label: night.id + ':' + panel })),
+  );
+  it.each(preparationCases)('covers preparation: $label', ({ night, panel }) => {
+    const state = { ...createPreparationUiState(), panel };
+    const nightView = { ...view, config: night.config, selectedNightId: night.id, screen: 'preparation' as const };
+    const html = translate(screenContent(nightView, undefined, false, false, undefined, state), 'en');
+    expect(html.match(/[А-Яа-яЁё][А-Яа-яЁё ]*/g) ?? []).toEqual([]);
+  });
+
+  it('covers current enemy descriptions', () => {
     for (const enemy of Object.values(ENEMIES)) expect(translate(enemy.name + ': ' + enemy.description, 'en')).not.toMatch(/[А-Яа-яЁё]/);
   });
 });

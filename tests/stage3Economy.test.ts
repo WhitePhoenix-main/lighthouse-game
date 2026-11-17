@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import type { LensId, NightId, SaveData, SaveStore, UpgradeId } from '../src/contracts';
 import { emptySave, SaveRepository } from '../src/application/saves';
 import { NIGHT_CATALOG } from '../src/content/nights';
@@ -98,14 +98,23 @@ describe('third expansion economy and affordable combat characterization', () =>
     expect(repo.current.profile.resources).toBe(148);
   });
 
-  it('compares affordable basic, resonant and a separately purchased slowing alternative across seeds and normal/early waves', () => {
-    const { repo, beforeLens } = route(false);
-    const alternative = repository(beforeLens).repo;
-    alternative.purchaseLens('slowing');
-    expect(alternative.current.profile.bossMaterials).toBe(2);
-    const before = repo.current;
-    const rows = (['winged-tide', 'far-shore'] as const).flatMap(id => [3, 42, 81].flatMap(seed =>
-      [false, true].flatMap(earlyCalls => (['basic', 'resonant', 'slowing'] as const).map(lensId => {
+  describe('affordable basic, resonant and separately purchased slowing comparisons', () => {
+    let snapshot: SaveData, beforeLens: SaveData;
+    beforeAll(() => {
+      // Earn the equipment once, then reload independent saves for each scenario.
+      const earned = route(false);
+      snapshot = earned.repo.current;
+      beforeLens = earned.beforeLens;
+    });
+    const scenarios = (['winged-tide', 'far-shore'] as const).flatMap(id => [3, 42, 81].flatMap(seed =>
+      [false, true].map(earlyCalls => ({ id, seed, earlyCalls }))));
+    it.each(scenarios)('compares lenses for $id, seed $seed, early calls: $earlyCalls', ({ id, seed, earlyCalls }) => {
+      const repo = repository(snapshot).repo;
+      const alternative = repository(beforeLens).repo;
+      alternative.purchaseLens('slowing');
+      expect(alternative.current.profile.bossMaterials).toBe(2);
+      const before = repo.current;
+      const rows = (['basic', 'resonant', 'slowing'] as const).map(lensId => {
         const owner = lensId === 'slowing' ? alternative : repo;
         expect(owner.current.profile.unlockedLenses).toContain(lensId);
         const config = prepare(owner, id, lensId);
@@ -116,14 +125,15 @@ describe('third expansion economy and affordable combat characterization', () =>
           damage: config.lighthouseHealth - result.health,
           deviceDamage: result.devices.reduce((sum, device) => sum + config.devices.definitions[device.kind].health - device.health, 0),
           seconds: result.seconds, reward: result.reward, repair, net: result.reward - repair };
-      }))));
-    console.table(rows);
-    expect(rows).toHaveLength(36);
-    expect(rows.filter(row => !row.earlyCalls).every(row => row.outcome === 'victory')).toBe(true);
-    // Characterize early calls rather than demanding universal lens superiority.
-    expect(repo.current.profile.resources).toBe(before.profile.resources);
-    expect(repo.current.profile.bossMaterials).toBe(before.profile.bossMaterials);
-    expect(repo.current.profile.devices).toEqual(before.profile.devices);
+      });
+      console.table(rows);
+      expect(rows).toHaveLength(3);
+      if (!earlyCalls) expect(rows.every(row => row.outcome === 'victory')).toBe(true);
+      // Characterize early calls rather than demanding universal lens superiority.
+      expect(repo.current.profile.resources).toBe(before.profile.resources);
+      expect(repo.current.profile.bossMaterials).toBe(before.profile.bossMaterials);
+      expect(repo.current.profile.devices).toEqual(before.profile.devices);
+    });
   });
 
   it('leaves control gaps with two full-branch bells even when their pulses are staggered', () => {
