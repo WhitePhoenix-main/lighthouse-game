@@ -1,3 +1,4 @@
+import { CHAPTER_TERRAIN, validateTerrain } from './terrain';
 import { createLateNights } from './lateNights';
 import type { NightDefinition } from '../contracts';
 import { getBossRules } from './boss';
@@ -6,7 +7,7 @@ import { NIGHT_CONFIG } from './night';
 /** Preliminary turning/pressure playtest schedules, not final campaign balance.
  * Regular streams overlap at wave edges; urgent enemies have explicit gaps.
  * Keep NIGHT_CONFIG.waves unchanged for synthetic regression fixtures. */
-const base = () => ({ ...structuredClone(NIGHT_CONFIG), earlyBonusPerSecond: .2, terrain: { shoreX: 0, landOnlyPlacement: true }, availableDevices: [], flash: { ...NIGHT_CONFIG.flash, enabled: false } });
+const base = () => ({ ...structuredClone(NIGHT_CONFIG), rulesVersion: 'prototype-23-irregular-shore', earlyBonusPerSecond: .2, terrain: structuredClone(CHAPTER_TERRAIN), availableDevices: [], flash: { ...NIGHT_CONFIG.flash, enabled: false } });
 export const NIGHT_CATALOG: readonly NightDefinition[] = [
   { id: 'first-light', name: 'Первый свет', description: 'Удерживайте свет и учитесь переключать угрозы.', chapter: 'Туманный берег', requires: null, optional: false,
     config: { ...base(), victoryReward: 72, waveInterval: 30, waves: [
@@ -61,6 +62,7 @@ export function validateNightDefinitions(nights: readonly NightDefinition[]): vo
       || night.config.id !== night.id || !night.config.rulesVersion.trim() || !night.config.waves.length
       || !Number.isFinite(night.config.stepSeconds) || night.config.stepSeconds <= 0) throw new Error('Неверное определение ночи.');
     const config = night.config;
+    validateTerrain(config.terrain);
     const positive = [config.worldRadius, config.spawnRadius, config.lighthouseRadius, config.lighthouseHealth, config.waveInterval,
       config.beam.range, config.beam.halfAngle, config.beam.maxTargets, config.beam.turnSpeed];
     if (positive.some(value => !Number.isFinite(value) || value <= 0)
@@ -89,7 +91,3 @@ export function validateNightDefinitions(nights: readonly NightDefinition[]): vo
   }
 }
 validateNightDefinitions(NIGHT_CATALOG);
-
-
-
-

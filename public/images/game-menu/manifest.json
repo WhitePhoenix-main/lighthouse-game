@@ -1,6 +1,4 @@
 {
-  "source": "art/game-menu-v1/source.png",
-  "reference": "art/play-screen-exploration-2026-11-16/03-tidal-stones-engraved.png",
   "states": [
     "idle",
     "hover",
@@ -9,80 +7,123 @@
   ],
   "sprites": {
     "continue-desktop": {
-      "frameWidth": 256,
-      "frameHeight": 128,
+      "frameWidth": 610,
+      "frameHeight": 352,
       "frames": 4,
+      "source": "art/game-menu-v2/desktop.png",
       "sourceCrop": {
-        "left": 45,
-        "top": 38,
-        "width": 720,
-        "height": 362
+        "left": 75,
+        "top": 510,
+        "width": 610,
+        "height": 352
       }
     },
     "trials-desktop": {
-      "frameWidth": 224,
-      "frameHeight": 96,
+      "frameWidth": 443,
+      "frameHeight": 232,
       "frames": 4,
+      "source": "art/game-menu-v2/desktop.png",
       "sourceCrop": {
-        "left": 800,
-        "top": 100,
-        "width": 700,
-        "height": 290
+        "left": 680,
+        "top": 625,
+        "width": 443,
+        "height": 232
       }
     },
     "new-game-desktop": {
-      "frameWidth": 224,
-      "frameHeight": 96,
+      "frameWidth": 465,
+      "frameHeight": 232,
       "frames": 4,
+      "source": "art/game-menu-v2/desktop.png",
       "sourceCrop": {
-        "left": 45,
-        "top": 438,
-        "width": 670,
-        "height": 278
+        "left": 1121,
+        "top": 625,
+        "width": 465,
+        "height": 232
+      }
+    },
+    "back-desktop": {
+      "frameWidth": 275,
+      "frameHeight": 79,
+      "frames": 4,
+      "source": "art/game-menu-v2/mobile.png",
+      "sourceCrop": {
+        "left": 175,
+        "top": 1625,
+        "width": 485,
+        "height": 140
       }
     },
     "continue-mobile": {
-      "frameWidth": 320,
-      "frameHeight": 136,
+      "frameWidth": 814,
+      "frameHeight": 510,
       "frames": 4,
+      "source": "art/game-menu-v2/mobile.png",
       "sourceCrop": {
-        "left": 744,
-        "top": 510,
-        "width": 755,
-        "height": 174
+        "left": 10,
+        "top": 670,
+        "width": 814,
+        "height": 510
       }
     },
-    "secondary-mobile": {
-      "frameWidth": 320,
-      "frameHeight": 64,
+    "trials-mobile": {
+      "frameWidth": 780,
+      "frameHeight": 210,
       "frames": 4,
+      "source": "art/game-menu-v2/mobile.png",
       "sourceCrop": {
-        "left": 744,
-        "top": 510,
-        "width": 755,
-        "height": 174
+        "left": 30,
+        "top": 1190,
+        "width": 780,
+        "height": 210
       }
     },
-    "back": {
-      "frameWidth": 48,
-      "frameHeight": 40,
+    "new-game-mobile": {
+      "frameWidth": 790,
+      "frameHeight": 205,
       "frames": 4,
+      "source": "art/game-menu-v2/mobile.png",
       "sourceCrop": {
-        "left": 130,
-        "top": 786,
-        "width": 180,
-        "height": 170
+        "left": 25,
+        "top": 1398,
+        "width": 790,
+        "height": 205
+      }
+    },
+    "back-mobile": {
+      "frameWidth": 485,
+      "frameHeight": 140,
+      "frames": 4,
+      "source": "art/game-menu-v2/mobile.png",
+      "sourceCrop": {
+        "left": 175,
+        "top": 1625,
+        "width": 485,
+        "height": 140
       }
     },
     "floor-desktop": {
-      "frameWidth": 768,
-      "frameHeight": 108,
+      "frameWidth": 1672,
+      "frameHeight": 211,
       "frames": 1,
+      "source": "art/game-menu-v2/floor-desktop-reference.png",
       "sourceCrop": {
-        "left": 425,
-        "top": 800,
-        "width": 1060,
-        "height": 166
+        "left": 0,
+        "top": 730,
+        "width": 1672,
+        "height": 211
+      }
+    },
+    "floor-mobile": {
+      "frameWidth": 841,
+      "frameHeight": 770,
+      "frames": 1,
+      "source": "art/game-menu-v2/floor-mobile-reference.png",
+      "sourceCrop": {
+        "left": 0,
+        "top": 1100,
+        "width": 841,
+        "height": 770
       }
     }
   }

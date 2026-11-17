@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { drawSettingsPixelText, settingsTextWidth } from '../src/presentation/settingsLettering';
+import { drawSettingsPixelText, settingsTextWidth } from '../src/presentation/shared/settingsLettering';
 
 interface Transform { a: number; b: number; c: number; d: number; e: number; f: number }
 interface Rectangle { x: number; y: number; width: number; height: number; ink: string }
@@ -42,6 +42,12 @@ function paintedPixels(rectangles: readonly Rectangle[]): Map<string, string> {
 }
 
 describe('settings pixel lettering', () => {
+  it('renders the shared skill-tree title and overview with Ш and Ё in the project lettering', () => {
+    const { context, rectangles } = recordingCanvas(identity);
+    expect(() => drawSettingsPixelText(context, 'ДРЕВО УЛУЧШЕНИЙ ВСЁ ДРЕВО', 1, 8, 2, foreground)).not.toThrow();
+    expect(rectangles.some(rect => rect.ink === foreground)).toBe(true);
+    expect(rectangles.every(rect => rect.y >= 0)).toBe(true);
+  });
   for (const dpr of [1, 1.25, 2]) for (const uiScale of [0.63, 0.87, 1.125]) {
     it(`keeps strokes opaque and joined at UI scale ${uiScale}, DPR ${dpr}`, () => {
       const factor = uiScale * dpr;

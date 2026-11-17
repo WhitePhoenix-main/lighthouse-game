@@ -35,6 +35,12 @@ jobs:
       - name: Test game
         run: pnpm test
 
+      - name: Check known legacy failures for regressions
+        run: pnpm test:legacy:baseline
+
+      - name: Audit balance
+        run: pnpm test:audits
+
       - name: Build game
         run: pnpm build
 

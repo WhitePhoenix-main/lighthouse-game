@@ -1,0 +1,120 @@
+/* Combat chrome uses the same sliced slate and lettering as preparation. */
+.lighthouse-app.is-battle {
+  --battle-top: 86px; --battle-bottom: 114px; --battle-ink: #e7cba1;
+  position: relative; display: flex; flex-direction: column; width: 100%; max-width: none;
+  height: 100dvh; min-height: 0; margin: 0; padding: var(--battle-top) 0 var(--battle-bottom);
+  overflow: hidden; background: #071923;
+}
+.is-battle .masthead { display: none; }
+.is-battle .ocean > canvas:not(.chapter-world-underlay) { position: absolute; inset: 0; z-index: 1; }
+.is-battle .chapter-world-underlay { z-index: 0; }
+.is-battle .overlay { z-index: 10; }
+.lighthouse-app.is-battle .battle-rail { display: contents; }
+.lighthouse-app.is-battle .play-area { flex: 1 1 auto; width: 100%; height: auto; min-height: 0; margin: 0; border: 0; border-radius: 0; }
+.is-battle .map-label, .is-battle .range-label { display: none; }
+.is-battle .battle-slate { border: 9px solid transparent; border-image: url('/images/preparation/ui/slate.png') 20 23 fill / 9px / 0 stretch; border-radius: 0; background: transparent; image-rendering: pixelated; box-shadow: none; }
+.is-battle .statusbar { position: absolute; z-index: 5; inset: 0 0 auto; height: var(--battle-top); min-height: 0; display: grid; grid-template-columns: minmax(220px, 29%) minmax(0,1fr) 112px 56px; gap: 24px; align-items: center; padding: 7px 14px 9px; background: #081b25 url('/images/preparation/ui/texture.png') repeat; border-bottom: 4px solid transparent; border-image: url('/images/preparation/ui/edge.png') 4 stretch; }
+.is-battle .integrity { grid-column: auto; grid-row: auto; width: 100%; height: 62px; display: flex; align-items: center; padding: 0 10px; gap: 12px; }
+.is-battle .battle-beacon { flex: 0 0 30px; width: 30px; height: 46px; object-fit: contain; image-rendering: pixelated; }
+.is-battle .battle-integrity-body { flex: 1; min-width: 0; }
+.is-battle .battle-health-heading { display: flex; justify-content: space-between; gap: 8px; }
+.is-battle .battle-health-heading .battle-pixel { width: 44%; }
+.is-battle .battle-health-heading .battle-health-value { width: 56%; }
+.is-battle .health-track { height: 12px; margin: 3px 0 0; border: 2px solid #020e15; border-radius: 0; box-shadow: 0 0 0 1px #60717a; background: #04111b; }
+.is-battle .health-track i { background: linear-gradient(#a4ee9e,#52ba78); }
+.is-battle .health-track i.critical { background: #ed7463; }
+.is-battle .health-track i.under-attack { background: #ffdfac; }
+.is-battle .night-state { min-width: 0; margin: 0; border-inline: 1px solid #a87936; padding-inline: 16px; }
+.is-battle .night-state .battle-pixel { height: 25px; }
+.is-battle .battle-pixel { position: relative; display: block; min-width: 0; height: 24px; font: 16px/24px monospace; letter-spacing: 0; white-space: nowrap; overflow: hidden; }
+.is-battle .battle-pixel > span { color: var(--battle-ink); }
+.is-battle .battle-pixel.has-pixel-art > span { color: transparent; }
+.is-battle .battle-pixel canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.is-battle .battle-muted { --battle-ink: #adbec8; font-size: 12px; }
+.is-battle .battle-clock { height: 36px; font-size: 26px; }
+.is-battle .statusbar button.quiet { width: 52px; height: 52px; padding: 0; font: bold 30px Georgia,serif; color: #e7cba1; }
+.is-battle .statusbar button.quiet span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.is-battle .battle-controls { position: absolute; z-index: 5; inset: auto 0 0; height: var(--battle-bottom); min-height: 0; max-height: none; display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 18px; align-items: stretch; gap: 0 26px; padding: 10px 18px 4px; background: #081b25 url('/images/preparation/ui/texture.png') repeat; border-top: 4px solid #526876; }
+.is-battle .battle-hud-icon { width: 54px; height: 54px; object-fit: contain; flex: 0 0 auto; image-rendering: pixelated; }
+.is-battle .light-status { gap: 14px; min-width: 0; padding: 2px 16px; }
+.is-battle .battle-lens-copy, .is-battle .battle-action-copy { display: block; flex: 1; min-width: 0; }
+.is-battle .battle-controls .flash-button { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 2px 16px; text-align: left; border-image-source: url('/images/preparation/ui/amber.png'); }
+.is-battle .flash-button .battle-pixel { --battle-ink: #ffc35c; }
+.is-battle .flash-button:disabled { opacity: .7; }
+.is-battle .battle-flash-detail { font-size: 13px; }
+.is-battle .battle-controls .call-wave { min-width: 0; padding: 5px 12px; text-align: center; }
+.is-battle .call-wave:disabled { opacity: .7; }
+.is-battle .battle-wave-note { grid-column: 3; height: 18px; font-size: 10px; }
+.is-battle .battle-brief { position: absolute; z-index: 8; top: calc(var(--battle-top) + 6px); left: 8px; }
+.is-battle .battle-brief summary { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #778b93; color: #c7d3d7; background: #0a1c26d9; cursor: pointer; list-style: none; font: bold 22px Georgia,serif; }
+.is-battle .battle-brief summary::-webkit-details-marker { display: none; }
+.is-battle .battle-brief summary:focus-visible { outline: 3px solid #ffcf7a; }
+.is-battle .battle-brief-body { width: min(390px,calc(100vw - 16px)); max-height: calc(100dvh - var(--battle-top) - var(--battle-bottom) - 62px); overflow: auto; padding: 12px; font-size: 13px; background-color: #0a1c26; }
+.is-battle .shield-status.battle-objectives { position: absolute; z-index: 6; top: calc(var(--battle-top) + 8px); left: 60px; right: 8px; display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 4px 12px; margin: 0; padding: 5px 8px; max-height: none; min-height: 0; width: fit-content; max-width: calc(100% - 68px); background: #071923e8; color: #b9d8dd; font: 12px/1.5 monospace; pointer-events: none; }
+.is-battle .battle-objectives .ship-status { margin: 0; padding: 0; font: inherit; }
+.is-battle:has(.battle-objectives:not([hidden])) .boss-status { top: calc(var(--battle-top) + 62px); }
+.is-battle .battle-brief .legend { display: flex; flex-wrap: wrap; padding: 0; gap: 10px; margin: 10px 0 0; }
+.is-battle .battle-brief .legend .keyboard-hint { margin: 0; }
+.is-battle .boss-status { position: absolute; z-index: 6; top: calc(var(--battle-top) + 8px); left: 50%; transform: translateX(-50%); width: min(520px,calc(100% - 130px)); margin: 0; padding: 6px 10px; background: #071923e8; font-size: 12px; }
+.lighthouse-app.is-battle .battle-devices { position: absolute; z-index: 9; inset: auto 12px calc(var(--battle-bottom) + 10px) auto; width: min(440px,calc(100% - 24px)); padding: 0; }
+.is-battle .battle-device-list { display: none; }
+.is-battle .battle-devices:not([data-device-open="true"]) { display: none; }
+.is-battle:has(.battle-device-access[open]) .battle-devices { display: block; }
+.is-battle:has(.battle-device-access[open]) .battle-device-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 30dvh; overflow: auto; padding: 8px; background: #0c202bf5; border: 1px solid #75878c; }
+.is-battle .battle-device-access { position: absolute; z-index: 10; right: 8px; bottom: calc(var(--battle-bottom) + 8px); }
+.is-battle .battle-device-access summary { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 3px 8px; background: #0b202bdc; color: #c5d0d5; border: 1px solid #75878c; cursor: pointer; list-style: none; font-size: 12px; }
+.is-battle .battle-device-access summary::-webkit-details-marker { display: none; }
+.is-battle .battle-device-access summary:focus-visible { outline: 3px solid #ffcf7a; }
+.is-battle .battle-device-access .battle-hud-icon { width: 30px; height: 30px; }
+.is-battle:has(.battle-device-access[open]) .battle-devices { bottom: calc(var(--battle-bottom) + 58px); }
+.lighthouse-app.is-battle .battle-rail .device-command-panel { position: relative; inset: auto; width: 100%; max-height: min(42dvh,calc(100dvh - var(--battle-top) - var(--battle-bottom) - 25px)); overflow: auto; margin: 0; background: #0c202bf5; border: 2px solid #75878c; border-radius: 0; }
+.is-battle .device-command-panel button { min-height: 44px; }
+.is-battle .device-command-panel button { background: #102431; border-color: #75878c; border-radius: 0; }
+.is-battle .device-description summary { padding: 12px 0; min-height: 44px; cursor: pointer; color: #b8c9d0; }
+.is-battle .save-error { position: absolute; z-index: 20; top: var(--battle-top); left: 0; right: 0; }
+@media (max-width: 650px) and (min-height: 501px) {
+  .lighthouse-app.is-battle { --battle-top: 96px; --battle-bottom: 146px; }
+  .is-battle .statusbar { grid-template-columns: minmax(0,1fr) 78px 44px; grid-template-rows: 43px 37px; gap: 2px 8px; padding: 5px 8px 7px; }
+  .is-battle .integrity { grid-column: 1 / 3; height: 43px; padding: 0 7px; gap: 8px; border-width: 6px; border-image-width: 6px; }
+  .is-battle .battle-beacon { font-size: 28px; flex-basis: 25px; }
+  .is-battle .battle-health-heading .battle-pixel { height: 20px; font-size: 15px; }
+  .is-battle .health-track { height: 10px; margin-top: 0; }
+  .is-battle .statusbar button.quiet { grid-column: 3; grid-row: 1; width: 44px; height: 44px; }
+  .is-battle .night-state { grid-column: 1; grid-row: 2; padding: 0 5px; border-right: 0; }
+  .is-battle .night-state .battle-pixel { height: 18px; font-size: 12px; }
+  .is-battle .night-state .battle-muted { font-size: 12px; }
+  .is-battle .battle-clock { grid-column: 2 / 4; grid-row: 2; height: 30px; font-size: 23px; }
+  .is-battle .battle-controls { grid-template-columns: 1.05fr 1fr; grid-template-rows: 43px 63px 18px; gap: 5px 9px; padding: 5px 7px 3px; }
+  .is-battle .light-status { grid-column: 1 / -1; padding: 0 12px; gap: 10px; }
+  .is-battle .battle-hud-icon { width: 38px; height: 38px; }
+  .is-battle .light-status .battle-pixel { height: 17px; font-size: 13px; }
+  .is-battle .light-status .battle-muted { font-size: 11px; }
+  .is-battle .battle-controls .flash-button { padding: 1px 5px; gap: 4px; }
+  .is-battle .flash-button .battle-pixel { font-size: 14px; height: 23px; }
+  .is-battle .flash-button .battle-flash-detail { font-size: 11px; height: 18px; }
+  .is-battle .battle-controls .call-wave { padding: 3px; }
+  .is-battle .call-wave .battle-pixel { font-size: 13px; height: 23px; }
+  .is-battle .call-wave .battle-muted { font-size: 10px; height: 18px; }
+  .is-battle .battle-wave-note { grid-column: 1 / -1; font-size: 11px; }
+}
+@media (max-height: 500px) and (min-width: 651px) {
+  .lighthouse-app.is-battle { --battle-top: 66px; --battle-bottom: 82px; }
+  .is-battle .statusbar { grid-template-columns: minmax(210px,29%) minmax(0,1fr) 96px 44px; gap: 14px; padding: 3px 8px; }
+  .is-battle .integrity { height: 51px; padding: 0 5px; gap: 5px; }
+  .is-battle .battle-beacon { font-size: 28px; flex-basis: 24px; }
+  .is-battle .battle-health-heading .battle-pixel { font-size: 13px; height: 20px; }
+  .is-battle .statusbar button.quiet { width: 44px; height: 44px; }
+  .is-battle .night-state { padding-inline: 8px; }
+  .is-battle .night-state .battle-pixel { font-size: 13px; height: 21px; }
+  .is-battle .night-state .battle-muted { font-size: 10px; }
+  .is-battle .battle-clock { font-size: 21px; }
+  .is-battle .battle-controls { gap: 0 12px; padding: 5px 10px 2px; grid-template-rows: 1fr 16px; }
+  .is-battle .battle-hud-icon { width: 36px; height: 36px; }
+  .is-battle .light-status, .is-battle .battle-controls .flash-button { gap: 6px; padding: 0 7px; }
+  .is-battle .battle-controls .battle-pixel { height: 19px; font-size: 12px; }
+  .is-battle .battle-controls .battle-muted, .is-battle .battle-controls .battle-flash-detail { font-size: 10px; }
+  .is-battle .battle-controls .battle-wave-note { font-size: 9px; height: 16px; }
+}
+:root[data-text-size="large"] .is-battle .battle-pixel { font-size: 18px; }
+:root[data-text-size="large"] .is-battle .battle-muted { font-size: 14px; }
+:root[data-text-size="large"] .is-battle .battle-brief-body { font-size: 16px; }

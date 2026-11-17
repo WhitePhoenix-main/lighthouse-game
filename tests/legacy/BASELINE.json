@@ -1,0 +1,1151 @@
+{
+  "recordedOn": "2026-11-18",
+  "status": "Known failures recorded before the structural refactor; not classified as harmless",
+  "totals": {
+    "files": 113,
+    "passedFiles": 77,
+    "failedFiles": 36,
+    "tests": 1636,
+    "passed": 1406,
+    "failed": 230
+  },
+  "files": [
+    {
+      "file": "balance200Lenses.test.ts",
+      "tests": 1,
+      "failed": [
+        {
+          "name": "checks lens roles on prolonged targets and tests armor tuning in copies only",
+          "error": "AssertionError: expected 1 to be 0.8 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "bossProgression.test.ts",
+      "tests": 28,
+      "failed": [
+        {
+          "name": "lens economy and configuration preserves the original lens prices and sequential two-node trees",
+          "error": "AssertionError: expected [ Array(4) ] to have a length of 2 but got 4"
+        }
+      ]
+    },
+    {
+      "file": "combatBalance.test.ts",
+      "tests": 36,
+      "failed": [
+        {
+          "name": "provisional turning/pressure balance measures multiple seeds and reachable early equipment",
+          "error": "AssertionError: armored-front/3: expected 'defeat' to be 'victory' // Object.is equality"
+        },
+        {
+          "name": "provisional turning/pressure balance separates scheduled urgent enemies across wave edges",
+          "error": "AssertionError: expected 6.4 to be greater than or equal to 12"
+        }
+      ]
+    },
+    {
+      "file": "defenseIntegration.test.ts",
+      "tests": 8,
+      "failed": [
+        {
+          "name": "permanent defense devices and local saves starts only after saving the free attempt and retains it when a start write fails",
+          "error": "AssertionError: expected { Object (version, profile, ...) } to match object { version: 5, …(2) }"
+        }
+      ]
+    },
+    {
+      "file": "expandedLenses.test.ts",
+      "tests": 15,
+      "failed": [
+        {
+          "name": "expanded lens catalogue and preserved purchases retains every old lens price, multiplier and upgrade prerequisite/effect",
+          "error": "AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]"
+        }
+      ]
+    },
+    {
+      "file": "expandedProgression.test.ts",
+      "tests": 9,
+      "failed": [
+        {
+          "name": "first expansion preserves progression has exactly 122 real purchases and preserves the original 14 node costs and beam effects",
+          "error": "AssertionError: expected [ Array(160) ] to have a length of 82 but got 160"
+        },
+        {
+          "name": "first expansion preserves progression loads old v5 without changing resources, ownership, damage or lens progress (legacy=false)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression loads old v5 without changing resources, ownership, damage or lens progress (legacy=true)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression grants exactly one first harpoon across before write failure, repeat and reload",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression grants exactly one first harpoon across after write failure, repeat and reload",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression retains damaged owned bodies and repair prices when buying a damage upgrade",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression keeps harpoon damage and deployment after loss, charges at most 25% to repair and never refills health for free",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression recovers an existing v5 active attempt without adding new devices or retroactive rewards",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "first expansion preserves progression applies additive mechanics without changing the shared shield regeneration per generator",
+          "error": "AssertionError: expected 114 to be close to 100, received difference is 14, but expected 0.005"
+        }
+      ]
+    },
+    {
+      "file": "expansionEconomy.test.ts",
+      "tests": 5,
+      "failed": [
+        {
+          "name": "first expansion economy and combat characterization counts all 87 paid nodes and their total resource/material prices",
+          "error": "AssertionError: expected 200 to be 122 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "expansionPresentation.test.ts",
+      "tests": 3,
+      "failed": [
+        {
+          "name": "expanded development presentation reports the full data-driven catalog and meaningful reduction/rotation units",
+          "error": "AssertionError: expected [ …(160) ] to have a length of 82 but got 160"
+        }
+      ]
+    },
+    {
+      "file": "lateModeBalance.test.ts",
+      "tests": 1,
+      "failed": [
+        {
+          "name": "makes transition accessible while reproducing assault and counting service on every outcome",
+          "error": "AssertionError: expected true to be false // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "lateModePresentation.test.ts",
+      "tests": 5,
+      "failed": [
+        {
+          "name": "explicit late trial modes in presentation keeps mode selection and retry before the long night list and explains the reward total",
+          "error": "AssertionError: expected -1 to be less than -1"
+        },
+        {
+          "name": "explicit late trial modes in presentation labels preparation and battle with the chosen mode but labels the result with the completed attempt mode",
+          "error": "AssertionError: expected '<section class=\"preparation-screen\" a…' to contain 'Броневой фронт · Переходный / ПОДГОТО…'"
+        }
+      ]
+    },
+    {
+      "file": "lensPresentation.test.ts",
+      "tests": 5,
+      "failed": [
+        {
+          "name": "lens and boss presentation keeps lens trees separate and shows both currencies and sequential requirements",
+          "error": "AssertionError: expected [ …(160) ] to have a length of 82 but got 160"
+        }
+      ]
+    },
+    {
+      "file": "localization.test.ts",
+      "restoredTo": "tests/localization.test.ts",
+      "tests": 7,
+      "failed": [
+        {
+          "name": "complete current screen and content translations covers current enemy descriptions and every preparation night, settings and upgrade details",
+          "error": "AssertionError: development:beam-power-1:изучено: expected '<section class=\"skill-tree-screen\" da…' not to match /[А-Яа-яЁё]/"
+        }
+      ]
+    },
+    {
+      "file": "nightPresentation.test.ts",
+      "tests": 6,
+      "failed": [
+        {
+          "name": "chapter presentation projects unlocks, integer slots and the conditional hostile-target bonus",
+          "error": "AssertionError: Target cannot be null or undefined."
+        },
+        {
+          "name": "combat presentation facts uses ship state for waiting, lit, rescued and lost feedback without changing it",
+          "error": "AssertionError: expected '<section class=\"preparation-screen\" a…' to contain 'Корабль и существа перекрывают друг д…'"
+        }
+      ]
+    },
+    {
+      "file": "nightProgression.test.ts",
+      "tests": 25,
+      "failed": [
+        {
+          "name": "equipment tree and land validates unlock restrictions and keeps all device circles on land",
+          "error": "AssertionError: expected false to be true // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "persistentDevices.test.ts",
+      "tests": 41,
+      "failed": [
+        {
+          "name": "persistent devices migrations migrates v1, preserves profile and refunds a legacy rental once",
+          "error": "AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]"
+        },
+        {
+          "name": "persistent devices migrations migrates v2, preserves profile and refunds a legacy rental once",
+          "error": "AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]"
+        },
+        {
+          "name": "persistent devices migrations migrates v3, preserves profile and refunds a legacy rental once",
+          "error": "AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]"
+        },
+        {
+          "name": "persistent devices migrations migrates v4, preserves profile and refunds a legacy rental once",
+          "error": "AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]"
+        },
+        {
+          "name": "device ownership operations rejects locked types, forged ids, insufficient resources and operations during battle",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "device ownership operations retains owned objects in reserve, allows destroyed placement and rejects foreign placements",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "device ownership operations repairs damage for at most 25%, and keeps the trap charge independent",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "device ownership operations can recharge a destroyed consumed trap without repairing it",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "device ownership operations does not repair or recharge when resources are insufficient",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions preserves damage, consumed traps and reserve on victory exactly once",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions preserves damage, consumed traps and reserve on defeat exactly once",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions interruption preserves preparation purchases, repairs and positions, discards combat changes and rewards",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions rejects a paid new attempt, forged snapshot, mutated result and missing result objects",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain purchase write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain repair write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain recharge write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain begin write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain settle write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions reconciles an uncertain placements write and repeats safely",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions keeps the previous state on failed purchase and retries with the same id",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "persistent outcome transactions retains damage in the atomic result only after storage accepts settlement",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 0",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 1",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 2",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 3",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 4",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 5",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 6",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 7",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 8",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects malformed inventory 9",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "v5 device validation rejects corrupted active snapshots and unmarked positive rental costs",
+          "error": "Error: Повреждён экземпляр устройства."
+        }
+      ]
+    },
+    {
+      "file": "preparation.test.ts",
+      "tests": 6,
+      "failed": [
+        {
+          "name": "persistent preparation selects a type without buying and saves placed owned instances across reloads",
+          "error": "AssertionError: expected [] to have a length of 1 but got +0"
+        },
+        {
+          "name": "persistent preparation buys extra instances explicitly and returns placed devices to reserve for free",
+          "error": "AssertionError: expected +0 to be 80 // Object.is equality"
+        },
+        {
+          "name": "persistent preparation starts at zero balance with owned devices and records zero placement cost",
+          "error": "AssertionError: expected { inventory: [], …(7) } to match object { cost: +0, remaining: +0, …(1) }"
+        },
+        {
+          "name": "persistent preparation rejects invalid placement without moving owned objects",
+          "error": "AssertionError: expected undefined to be false // Object.is equality"
+        },
+        {
+          "name": "persistent preparation does not expose an unsaved placement and can retry saving it",
+          "error": "AssertionError: expected [] to have a length of 1 but got +0"
+        },
+        {
+          "name": "persistent preparation keeps pre-night owned placement after interruption without adding a refund",
+          "error": "AssertionError: expected false to be true // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "presentationDevices.test.ts",
+      "tests": 5,
+      "failed": [
+        {
+          "name": "device presentation shows condition, reserve, separate purchase and restoration controls with affordability",
+          "error": "AssertionError: expected '<section class=\"device-preparation\" a…' to contain 'На поле · Разрушено 0/20 · Заряд изра…'"
+        },
+        {
+          "name": "device presentation distinguishes spent traps from destroyed devices and limits non-cannon menus to information",
+          "error": "AssertionError: expected 'Разрушено' to be 'Израсходована' // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "progression.test.ts",
+      "tests": 8,
+      "failed": [
+        {
+          "name": "upgrade tree and availability has three independent two-node branches with preliminary prices",
+          "error": "AssertionError: expected [ Array(160) ] to have a length of 82 but got 160"
+        },
+        {
+          "name": "derived night configuration adds only purchased stats; all branches remain combinable and order-independent",
+          "error": "AssertionError: expected 58 to be 42 // Object.is equality"
+        },
+        {
+          "name": "derived night configuration provides current and next values without exposing mutable catalog objects",
+          "error": "AssertionError: expected [ …(160) ] to have a length of 82 but got 160"
+        }
+      ]
+    },
+    {
+      "file": "stage10FlashEngineering.test.ts",
+      "tests": 63,
+      "failed": [
+        {
+          "name": "stage 10 purchases and compatibility appends twelve nodes, preserves v6 and previous totals",
+          "error": "AssertionError: expected [ …(50) ] to have a length of 12 but got 50"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-guard-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-guard-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-guard-3' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-emergency-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.15 to be close to -0.15, received difference is 0.3, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-emergency-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-emergency-3' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.09999999999999998 to be close to -0.1, received difference is 0.19999999999999998, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-heavy-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'hull-heavy-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'shield-restore-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility 'shield-restore-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 10 purchases and compatibility survives before-write failure once without healing or recharging",
+          "error": "Error: Не хватает ресурсов: 145"
+        },
+        {
+          "name": "stage 10 purchases and compatibility survives after-write failure once without healing or recharging",
+          "error": "Error: Не хватает ресурсов: 145"
+        },
+        {
+          "name": "stage 10 purchases and compatibility changes only flash, object capacity and paid repair costs",
+          "error": "AssertionError: expected { radius: 255, damage: 46, …(5) } to deeply equal { radius: 240, damage: 46, …(3) }"
+        },
+        {
+          "name": "stage 10 flash behavior extends radial reach, hits flying enemies and armor, without lens amplification",
+          "error": "AssertionError: expected [ 954, 954, 978, 1000 ] to deeply equal [ 954, 954, 984, 1000 ]"
+        },
+        {
+          "name": "stage 10 flash behavior damages the boss once even with several tentacles inside the larger radius",
+          "error": "AssertionError: expected 78 to be 72 // Object.is equality"
+        },
+        {
+          "name": "stage 10 engineering and economy allows six objects but keeps type caps and does not grant free bodies",
+          "error": "AssertionError: expected true to be false // Object.is equality"
+        },
+        {
+          "name": "stage 10 engineering and economy combines repair discounts before rounding without changing recharge, grants or damage",
+          "error": "Error: Не хватает ресурсов: 145"
+        },
+        {
+          "name": "stage 10 persistent service charges discounted repair once across a before-write failure, keeping rearm separate",
+          "error": "Error: Не хватает ресурсов: 145"
+        },
+        {
+          "name": "stage 10 persistent service charges discounted repair once across a after-write failure, keeping rearm separate",
+          "error": "Error: Не хватает ресурсов: 145"
+        }
+      ]
+    },
+    {
+      "file": "stage11FlashEngineering.test.ts",
+      "tests": 53,
+      "failed": [
+        {
+          "name": "stage 11 purchases and compatibility appends thirteen nodes, preserves v6 and previous totals",
+          "error": "AssertionError: expected [ …(38) ] to have a length of 13 but got 38"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-guard-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-guard-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-guard-3' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-emergency-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.15 to be close to -0.15, received difference is 0.3, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-emergency-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-emergency-3' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.09999999999999998 to be close to -0.1, received difference is 0.19999999999999998, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-heavy-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'hull-heavy-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'shield-restore-1' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility 'shield-restore-2' gates purchase, previews the right units and translates RU/EN",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 11 purchases and compatibility survives before-write failure once without healing or recharging",
+          "error": "Error: Не хватает ресурсов: 205"
+        },
+        {
+          "name": "stage 11 purchases and compatibility survives after-write failure once without healing or recharging",
+          "error": "Error: Не хватает ресурсов: 205"
+        },
+        {
+          "name": "stage 11 special flash and targeting adds only the intended stats and keeps damage, income, repair and beam rules",
+          "error": "AssertionError: expected { radius: 185, …(3) } to deeply equal { radius: 155, …(3) }"
+        },
+        {
+          "name": "stage 11 condition, recharge and economy keeps discounted recharge atomic after before-write failure and separate from repairs",
+          "error": "Error: Не хватает ресурсов: 205"
+        },
+        {
+          "name": "stage 11 condition, recharge and economy keeps discounted recharge atomic after after-write failure and separate from repairs",
+          "error": "Error: Не хватает ресурсов: 205"
+        },
+        {
+          "name": "stage 11 condition, recharge and economy buys extra bodies, runs eight placements and preserves normalized condition and charges",
+          "error": "Error: Не хватает ресурсов: 205"
+        }
+      ]
+    },
+    {
+      "file": "stage2Presentation.test.ts",
+      "tests": 4,
+      "failed": [
+        {
+          "name": "stage 2 presentation reports all 87 paid nodes and translates the new content with meaningful units",
+          "error": "AssertionError: expected [ …(160) ] to have a length of 82 but got 160"
+        }
+      ]
+    },
+    {
+      "file": "stage2Progression.test.ts",
+      "tests": 11,
+      "failed": [
+        {
+          "name": "second expansion preserves profiles and purchases preserves a complete stage-one v5 profile including damaged harpoon (legacy=false)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases preserves a complete stage-one v5 profile including damaged harpoon (legacy=true)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases migrates a v4 profile owning a harpoon without granting a mortar or the new lens",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases grants one first mortar atomically despite a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases grants one first mortar atomically despite a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases keeps a destroyed mortar and pays repair once across a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases keeps a destroyed mortar and pays repair once across a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases pays each lens currency once across a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases pays each lens currency once across a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases interrupts an old active attempt without changing paid progress or adding rewards",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "second expansion preserves profiles and purchases applies all new effects only to their weapon or selected lens",
+          "error": "AssertionError: expected { id: 'mortar', name: 'Мортира', …(7) } to match object { damage: 36, …(3) }"
+        }
+      ]
+    },
+    {
+      "file": "stage3Progression.test.ts",
+      "tests": 10,
+      "failed": [
+        {
+          "name": "third expansion preserves profiles and buys protection without healing loads all previous 61 purchases and damaged bodies unchanged (legacy=false)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing loads all previous 61 purchases and damaged bodies unchanged (legacy=true)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing grants one first bell despite a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing grants one first bell despite a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing preserves 0 health and its repair quote when buying the guard node",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing preserves 13.4 health and its repair quote when buying the guard node",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing pays each resonance currency once across a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing pays each resonance currency once across a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing interrupts an old active attempt without retroactive items or rewards",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "third expansion preserves profiles and buys protection without healing keeps new effects scoped and displays actual multipliers and intervals",
+          "error": "AssertionError: expected { id: 'bell', …(8) } to match object { damage: +0, range: 170, …(2) }"
+        }
+      ]
+    },
+    {
+      "file": "stage4Economy.test.ts",
+      "tests": 7,
+      "failed": [
+        {
+          "name": "fourth expansion economy from earned resources prices the complete catalogue at 122 nodes, 8945 shards and 59 pearls",
+          "error": "AssertionError: expected 200 to be 122 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "stage4Progression.test.ts",
+      "tests": 11,
+      "failed": [
+        {
+          "name": "fourth expansion persistence and bounded combat repair preserves all previous 74 purchases and bodies (legacy=false)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair preserves all previous 74 purchases and bodies (legacy=true)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair grants one lamp despite a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair grants one lamp despite a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair persists repaired health on victory, but a fresh charge budget cannot fix old damage",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair persists repaired health on defeat, but a fresh charge budget cannot fix old damage",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair commits repaired health and reward together through a before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair commits repaired health and reward together through a after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair discards combat repairs/damage on interruption and retains paid purchases",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair does not heal an owned lamp when buying protection or charge capacity",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fourth expansion persistence and bounded combat repair has 122 real purchases, scoped effects and the finite maximum repair budget",
+          "error": "AssertionError: expected 200 to be 122 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "stage5Economy.test.ts",
+      "tests": 4,
+      "failed": [
+        {
+          "name": "core-device expansion economy adds eighteen real nodes without changing the previous eighty-seven prices",
+          "error": "AssertionError: expected 200 to be 122 // Object.is equality"
+        },
+        {
+          "name": "core-device expansion economy keeps full hull restoration capped by the old body price, with an explicit barrier discount only",
+          "error": "AssertionError: expected 251 to be 230 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "stage5Progression.test.ts",
+      "tests": 13,
+      "failed": [
+        {
+          "name": "fifth expansion normalized device ownership loads all prior 87 purchases and fractional bodies without rewriting v5",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership preserves damage fractions and invoices through all three ranks, including reserve and ruined bodies",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership shows actual HP in preparation while storing normalized HP and a stable repair quote",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership applies the barrier discount once with a floored full-repair cap and leaves other tariffs intact",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership keeps exact fractional starts and repair thresholds across repeated conversions, and rejects any actual overheal",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership normalizes the real application result after victory using the frozen attempt config",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership normalizes the real application result after defeat using the frozen attempt config",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership retains the upgraded attempt-start repair ceiling and never pays away old damage",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership retries upgraded attempt start, paid repair and result atomically after before-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership retries upgraded attempt start, paid repair and result atomically after after-write failure",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership interrupts an old/new v5 active attempt without changing ownership or refunding purchases (upgraded=false)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership interrupts an old/new v5 active attempt without changing ownership or refunding purchases (upgraded=true)",
+          "error": "Error: Повреждён экземпляр устройства."
+        },
+        {
+          "name": "fifth expansion normalized device ownership keeps snapshot/result validation strict in normalized units",
+          "error": "Error: Повреждён экземпляр устройства."
+        }
+      ]
+    },
+    {
+      "file": "stage6Economy.test.ts",
+      "tests": 4,
+      "failed": [
+        {
+          "name": "harpoon and trap expansion economy adds eleven nodes and preserves the previous catalogue prices",
+          "error": "AssertionError: expected [ …(89) ] to have a length of 11 but got 89"
+        },
+        {
+          "name": "harpoon and trap expansion economy funds every new node through real victories and repeats, reserving repairs and both ammunition charges",
+          "error": "AssertionError: beam-power-3: expected 'requires' to be 'available' // Object.is equality"
+        },
+        {
+          "name": "harpoon and trap expansion economy keeps repairs independent of persistent ammunition and prices missing charges explicitly",
+          "error": "AssertionError: expected 3 to be 4 // Object.is equality"
+        },
+        {
+          "name": "harpoon and trap expansion economy characterizes fully upgraded harpoons and two paid charges under overlapping waves",
+          "error": "Error: Для Мощность III требуется Мощность II"
+        }
+      ]
+    },
+    {
+      "file": "stage6Progression.test.ts",
+      "tests": 33,
+      "failed": [
+        {
+          "name": "sixth expansion charge persistence migrates every old 105 purchase without changing balances, normalized HP or positions",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence migrates a v5 active snapshot and consumed=false as exactly one or zero charges",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence migrates a v5 active snapshot and consumed=true as exactly one or zero charges",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence preserves v5 single charges even if its purchase list already contains the capacity node",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence upgrades capacity without refilling existing bodies and fully charges newly purchased bodies",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence grants the first newly unlocked trap its full current capacity",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence recharges a partial body atomically across a before-write failure",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence recharges a partial body atomically across a after-write failure",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence quotes 0/2/4 and keeps repairs separate from charges",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence persists a partial-charge victory, normalizes HP and settles only once",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence persists a partial-charge defeat, normalizes HP and settles only once",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence carries partial charges through real application victory and retry",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence carries partial charges through real application defeat and retry",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence does not refill an empty trap during repair and charges four to fill both slots",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence restores exact partial charges and damage after interruption without refunding maintenance",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count undefined",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count -1",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count 0.5",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count 3",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count null",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count 1",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects invalid v6 charge count NaN",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects inconsistent consumed flags, charge fields on nontraps and altered snapshots",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence rejects missing, increasing or inconsistent result counts without modifying the active attempt",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence starts with a placed empty trap without replenishing it",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence starts with a placed ruined trap without replenishing it",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence validates actual battle counts before normalization can conceal malformed or refilled results",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence makes charge-capacity upgrade and settlement idempotent after a before-write failure",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        },
+        {
+          "name": "sixth expansion charge persistence makes charge-capacity upgrade and settlement idempotent after a after-write failure",
+          "error": "Error: Для Экономная перезарядка I требуется Второй заряд"
+        }
+      ]
+    },
+    {
+      "file": "stage7Economy.test.ts",
+      "tests": 3,
+      "failed": [
+        {
+          "name": "stage 7 lens economy and specialization adds six purchases while preserving the previous aggregate prices",
+          "error": "AssertionError: expected 200 to be 122 // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "stage7Lenses.test.ts",
+      "tests": 23,
+      "failed": [
+        {
+          "name": "seventh expansion catalogue compatibility completes exactly the three old branches and keeps the 122-purchase budget",
+          "error": "AssertionError: expected [ Array(160) ] to have a length of 82 but got 160"
+        },
+        {
+          "name": "seventh expansion catalogue compatibility preserves all eight lens definitions and the prices, dependencies and effects of all old 27 nodes",
+          "error": "AssertionError: expected [ …(8) ] to deeply equal [ …(8) ]"
+        },
+        {
+          "name": "seventh expansion purchases and saves loads all previous 116 purchases as v6 without granting new nodes or changing fractional HP/charges",
+          "error": "AssertionError: expected 194 to be 116 // Object.is equality"
+        },
+        {
+          "name": "seventh expansion effects in the actual fixed-step battle widens armor-breaker by four full degrees and still selects one available target",
+          "error": "AssertionError: expected 98.53333333333333 to be close to 98.73333333333333, received difference is 0.20000000000000284, but expected 0.005"
+        },
+        {
+          "name": "seventh expansion effects in the actual fixed-step battle converts only the remaining base damage to health after upgraded armor damage and preserves chip damage",
+          "error": "AssertionError: expected +0 to be close to 0.5, received difference is 0.5, but expected 0.005"
+        }
+      ]
+    },
+    {
+      "file": "stage7Presentation.test.ts",
+      "tests": 3,
+      "failed": [
+        {
+          "name": "stage seven lens presentation renders 82 main nodes, 33 lens nodes and seven paid unlocks",
+          "error": "AssertionError: expected 'Не удалось сохранить или прочитать пр…' to be null"
+        },
+        {
+          "name": "stage seven lens presentation shows every new description, exact price, dependency and effect in RU and EN",
+          "error": "AssertionError: expected 'Не удалось сохранить или прочитать пр…' to be null"
+        },
+        {
+          "name": "stage seven lens presentation preparation projects the chosen lens stats after all six upgrades",
+          "error": "AssertionError: expected 'Не удалось сохранить или прочитать пр…' to be null"
+        }
+      ]
+    },
+    {
+      "file": "stage8General.test.ts",
+      "tests": 85,
+      "failed": [
+        {
+          "name": "stage 8 general progression adds twelve gated nodes without replacing old purchases and preserves v6",
+          "error": "AssertionError: expected [ { id: 'beam-power-3', …(7) }, …(77) ] to have a length of 12 but got 78"
+        },
+        {
+          "name": "stage 8 general progression 'hull-guard-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-guard-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-guard-3' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-emergency-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.15 to be close to -0.15, received difference is 0.3, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-emergency-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-emergency-3' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.09999999999999998 to be close to -0.1, received difference is 0.19999999999999998, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-heavy-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'hull-heavy-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'shield-restore-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression 'shield-restore-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression persists once after before-write failure without healing or refilling inventory",
+          "error": "Error: Не хватает ресурсов: 40"
+        },
+        {
+          "name": "stage 8 general progression persists once after after-write failure without healing or refilling inventory",
+          "error": "Error: Не хватает ресурсов: 40"
+        },
+        {
+          "name": "stage 8 general progression limits aggregate power while preserving device damage and lens specialization",
+          "error": "AssertionError: expected 58 to be 50 // Object.is equality"
+        },
+        {
+          "name": "stage 8 general progression applies new damage and linked bonus to 1 real selected targets",
+          "error": "AssertionError: expected 98.06666666666666 to be close to 98.33333333333333, received difference is 0.2666666666666657, but expected 0.005"
+        },
+        {
+          "name": "stage 8 general progression applies new damage and linked bonus to 2 real selected targets",
+          "error": "AssertionError: expected 97.48666666666666 to be close to 97.91666666666667, received difference is 0.4300000000000068, but expected 0.005"
+        }
+      ]
+    },
+    {
+      "file": "stage9General.test.ts",
+      "tests": 74,
+      "failed": [
+        {
+          "name": "stage 9 general ranks adds sixteen gated nodes without replacing old purchases and preserves v6",
+          "error": "AssertionError: expected [ { id: 'beam-power-5', …(7) }, …(65) ] to have a length of 16 but got 66"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-guard-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-guard-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-guard-3' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.03 to be close to -0.03, received difference is 0.06, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-emergency-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.15 to be close to -0.15, received difference is 0.3, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-emergency-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-emergency-3' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.09999999999999998 to be close to -0.1, received difference is 0.19999999999999998, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-heavy-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'hull-heavy-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.05 to be close to -0.05, received difference is 0.1, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'shield-restore-1' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks 'shield-restore-2' respects dependencies, victory gates, funds and RU/EN previews",
+          "error": "AssertionError: expected 0.1 to be close to -0.1, received difference is 0.2, but expected 0.005"
+        },
+        {
+          "name": "stage 9 general ranks persists once after before-write failure without healing or refilling inventory",
+          "error": "Error: Не хватает ресурсов: 25"
+        },
+        {
+          "name": "stage 9 general ranks persists once after after-write failure without healing or refilling inventory",
+          "error": "Error: Не хватает ресурсов: 25"
+        },
+        {
+          "name": "stage 9 general ranks limits aggregate power while preserving device damage and lens specialization",
+          "error": "AssertionError: expected { radius: 185, …(3) } to deeply equal { radius: 155, …(3) }"
+        }
+      ]
+    },
+    {
+      "file": "victoryEconomy.test.ts",
+      "tests": 16,
+      "failed": [
+        {
+          "name": "provisional six-night economy pays for a sequential route and charged repair operations without retroactive grants",
+          "error": "Error: Устройство должно целиком находиться на суше."
+        },
+        {
+          "name": "provisional six-night economy keeps the latest shore ahead of early repeats and the short boss after repair reserves",
+          "error": "AssertionError: expected 'defeat' to be 'victory' // Object.is equality"
+        },
+        {
+          "name": "provisional six-night economy keeps later farming ahead with identical complete beam builds and immediate wave calls",
+          "error": "AssertionError: expected false to be true // Object.is equality"
+        }
+      ]
+    },
+    {
+      "file": "victoryPresentation.test.ts",
+      "tests": 3,
+      "failed": [
+        {
+          "name": "victory reward presentation promises the configured reward on every clear including repeats",
+          "error": "AssertionError: expected '<section class=\"preparation-screen\" a…' to contain 'За каждую победу: +83 ◈'"
+        }
+      ]
+    }
+  ]
+}

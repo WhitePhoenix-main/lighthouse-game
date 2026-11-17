@@ -1,0 +1,195 @@
+{
+  "status": "Reference proposal, unchanged canonical world; straight shoreX remains in game",
+  "terrainFactor": 0.75,
+  "oldTerrainBounds": {
+    "minX": -1500,
+    "maxX": 1500,
+    "minY": -1428.5714285714287,
+    "maxY": 1428.5714285714287
+  },
+  "newTerrainBounds": {
+    "minX": -1125,
+    "maxX": 1125,
+    "minY": -1071.4285714285716,
+    "maxY": 1071.4285714285716
+  },
+  "desktopBaselineZoom": 0.9001956947162427,
+  "layouts": [
+    {
+      "id": "mobile",
+      "camera": {
+        "width": 780,
+        "height": 1688,
+        "zoom": 0.9808219178082191,
+        "centerX": 0,
+        "centerY": 49.95810055865922
+      },
+      "field": {
+        "x": 0,
+        "y": 300,
+        "width": 780,
+        "height": 990
+      },
+      "fieldFraction": 0.5864928909952607,
+      "requiredScreenBounds": {
+        "minX": 32,
+        "minY": 544.4000000000001,
+        "maxX": 748,
+        "maxY": 1045.6
+      },
+      "activeFieldTerrainCoverage": true,
+      "terrainCoversFullCanvas": false,
+      "spriteDimensions": [
+        {
+          "id": "upper",
+          "width": 72.58082191780822,
+          "height": 48.50788098247532
+        },
+        {
+          "id": "lighthouse",
+          "width": 69.97067652995358,
+          "height": 186.3561643835616
+        },
+        {
+          "id": "barrier",
+          "width": 58.84931506849315,
+          "height": 58.23416543363085
+        },
+        {
+          "id": "pier",
+          "width": 142.21917808219177,
+          "height": 58.30986301369863
+        },
+        {
+          "id": "lower",
+          "width": 72.58082191780822,
+          "height": 48.50788098247533
+        }
+      ],
+      "worldPositions": [
+        {
+          "id": "lighthouse",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "upper",
+          "x": -140,
+          "y": -140
+        },
+        {
+          "id": "lower",
+          "x": -140,
+          "y": 140
+        },
+        {
+          "id": "barrier",
+          "x": -230,
+          "y": 0
+        },
+        {
+          "id": "pier",
+          "x": 0,
+          "y": 110
+        }
+      ],
+      "rules": {
+        "worldRadius": 400,
+        "spawnRadius": 365,
+        "lighthouseRadius": 30,
+        "beamRange": 300,
+        "beamHalfAngle": 0.20943951023931953,
+        "placementRadius": 300,
+        "shieldRadius": 155
+      }
+    },
+    {
+      "id": "desktop",
+      "camera": {
+        "width": 1672,
+        "height": 941,
+        "zoom": 0.9001956947162427,
+        "centerX": 0,
+        "centerY": 41.65760869565217
+      },
+      "field": {
+        "x": 0,
+        "y": 96,
+        "width": 1672,
+        "height": 674
+      },
+      "fieldFraction": 0.7162592986184909,
+      "requiredScreenBounds": {
+        "minX": 507.4285714285714,
+        "minY": 203,
+        "maxX": 1164.5714285714287,
+        "maxY": 663
+      },
+      "activeFieldTerrainCoverage": true,
+      "terrainCoversFullCanvas": true,
+      "spriteDimensions": [
+        {
+          "id": "upper",
+          "width": 66.61448140900197,
+          "height": 44.52040154018086
+        },
+        {
+          "id": "lighthouse",
+          "width": 64.2188970546262,
+          "height": 171.0371819960861
+        },
+        {
+          "id": "barrier",
+          "width": 54.01174168297457,
+          "height": 53.44715901729887
+        },
+        {
+          "id": "pier",
+          "width": 130.5283757338552,
+          "height": 53.51663405088063
+        },
+        {
+          "id": "lower",
+          "width": 66.61448140900197,
+          "height": 44.52040154018087
+        }
+      ],
+      "worldPositions": [
+        {
+          "id": "lighthouse",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "upper",
+          "x": -140,
+          "y": -140
+        },
+        {
+          "id": "lower",
+          "x": -140,
+          "y": 140
+        },
+        {
+          "id": "barrier",
+          "x": -230,
+          "y": 0
+        },
+        {
+          "id": "pier",
+          "x": 0,
+          "y": 110
+        }
+      ],
+      "rules": {
+        "worldRadius": 400,
+        "spawnRadius": 365,
+        "lighthouseRadius": 30,
+        "beamRange": 300,
+        "beamHalfAngle": 0.20943951023931953,
+        "placementRadius": 300,
+        "shieldRadius": 155
+      }
+    }
+  ]
+}

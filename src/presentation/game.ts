@@ -1,32 +1,48 @@
-import { mortarFlight } from './mortar';
-import { resonanceStatus, resonanceDescription, focusStatus, focusDescription, burnDescription, burnStatus } from './lenses';
+import { mortarFlight } from './battle/mortar';
+import { resonanceStatus, resonanceDescription, focusStatus, focusDescription, burnDescription, burnStatus } from './shared/lenses';
 import Phaser from 'phaser';
 import type { ApplicationView, BattleState, DeviceState, EnemyState, GameApplication, NightConfig } from '../contracts';
 import './style.css';
-import './menu.css';
-import './menuFog.css';
-import './menuTitle.css';
-import './settings.css';
-import './gameMenu.css';
-import { layoutGameMenu } from './gameMenu';
-import { mountGameMenuTransition } from './gameMenuTransition';
-import { mountMenuAudio } from './menuAudio';
-import { mountEffectsAudio } from './effectsAudio';
-import { localizeRoot, resolveLanguage, translate } from './localization';
-import { layoutReferenceSettings } from './referenceSettings';
-import { layoutReferenceMenu, mountMenuMotion } from './referenceMenu';
-import { mountMenuWindows } from './menuWindows';
-import { mountMenuTitle } from './menuTitle';
-import { mountMenuButtons } from './menuButtons';
-import { menuScenery, layoutMenuScenery } from './menuScenery';
-import { mountSettingsTransition } from './settingsTransition';
-import { renderPlacementPreview } from './preparation';
+import './menu/menu.css';
+import './menu/menuFog.css';
+import './menu/menuTitle.css';
+import './settings/settings.css';
+import './menu/gameMenu.css';
+import './skill-tree/skillTree.css';
+import './preparation/preparation.css';
+import './battle/battleHud.css';
+import { battleHudMarkup, updateBattleHud } from './battle/battleHud';
+import { loadBattleArtwork, paintBattleEnemy, paintBattleNight, battleEnemyBounds } from './battle/battleArtwork';
+import { BEAM_LIGHT_STOPS, beamLightGeometry, paintBattleBeam, paintBeamGuide } from './battle/battleBeam';
+import type { BattleArtwork } from './battle/battleArtwork';
+import { battleBarStyle, clampBarFraction, enemyBarRequest } from './battle/battleIndicators';
+import { createPreparationUiState } from './preparation/preparationState';
+import { mountPreparationControls } from './preparation/preparationControls';
+import { loadChapterWorldAssets, paintChapterWorld } from './shared/world/chapterWorld';
+import { createWorldCamera, WORLD_PROJECTION_Y, deviceSprite, spriteBounds } from './shared/world/worldGeometry';
+import type { ChapterWorldAssets, WorldCamera } from './shared/world/worldTypes';
+import { createSkillTreeState } from './skill-tree/skillTree';
+import { mountSkillTreeControls } from './skill-tree/skillTreeControls';
+import { layoutSkillTreeArtwork } from './skill-tree/skillTreeArtwork';
+import { layoutGameMenu } from './menu/gameMenu';
+import { mountGameMenuTransition } from './menu/gameMenuTransition';
+import { mountMenuAudio } from './menu/menuAudio';
+import { mountEffectsAudio } from './battle/effectsAudio';
+import { localizeRoot, resolveLanguage, translate } from './shared/localization';
+import { layoutReferenceSettings } from './settings/referenceSettings';
+import { layoutReferenceMenu, mountMenuMotion } from './menu/referenceMenu';
+import { mountMenuWindows } from './menu/menuWindows';
+import { mountMenuTitle } from './menu/menuTitle';
+import { mountMenuButtons } from './menu/menuButtons';
+import { menuScenery, layoutMenuScenery } from './menu/menuScenery';
+import { mountSettingsTransition } from './settings/settingsTransition';
+import { renderPlacementPreview } from './preparation/preparation';
 import { screenContent, nightLabel } from './screens';
-import { drawCombatFeedback } from './feedback';
-import { battleDevicePanel } from './devices';
-import { drawCoast } from './coast';
-import { bellSlowStatus, bossStatus, tentacleStatus, enemyThreat, shipStatus, shieldStatus as shieldStatusText } from './nightPresentation';
-import { layoutIndicators, type IndicatorRequest } from './indicatorLayout';
+import { drawCombatFeedback } from './battle/feedback';
+import { battleDevicePanel } from './shared/devices';
+import { drawCoast } from './battle/coast';
+import { bellSlowStatus, bossStatus, tentacleStatus, enemyThreat, shipStatus, shieldStatus as shieldStatusText } from './battle/nightPresentation';
+import { layoutIndicators, type IndicatorRequest } from './battle/indicatorLayout';
 
 const TAU = Math.PI * 2;
 const clock = (seconds: number): string => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -38,10 +54,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       <div class="save-error" role="alert" hidden><span data-error></span><button data-action="save">Повторить сохранение</button></div>
       <section class="play-area"><div class="ocean" data-canvas role="img" aria-label="Побережье с маяком: суша слева, море справа. Направляйте свет движением мыши или касанием."></div><div class="map-label">СЕВЕРНЫЙ БЕРЕГ <span>•</span> <span data-night-label></span></div><div class="range-label">Пунктир — дальность света</div><div class="overlay" data-overlay></div></section>
       <div class="battle-rail">
-      <section class="statusbar" aria-label="Состояние ночи"><div class="integrity"><span>ПРОЧНОСТЬ МАЯКА <b data-health></b></span><div class="health-track"><i data-health-bar></i></div></div><div class="night-state"><span data-phase>ПОДГОТОВКА</span><strong data-timer>Берег ждёт</strong></div><button class="quiet" data-action="pause" hidden>Ⅱ <span>Пауза</span></button></section>
-      <section class="boss-status" data-boss-status hidden aria-label="Общее здоровье босса"><strong data-boss-text></strong><div class="health-track"><i data-boss-health></i></div></section><div class="shield-status"><div data-shield-status></div><div class="ship-status" data-ship-status role="status"></div></div><footer class="battle-controls"><div class="light-status"><span class="live-dot"></span><div><strong data-targets>Свет всегда включён</strong><small data-hint>Мышь — наведение · Касание — удержание и движение</small><small class="night-earnings" data-earnings></small><small data-victory-reward></small></div></div><button class="flash-button" data-action="flash"><strong>✧ Вспышка</strong><small data-flash-status></small></button><button class="call-wave" data-action="wave" disabled><span data-wave-button>Следующая волна</span><small data-wave-detail></small></button></footer>
-      <section class="battle-devices" data-battle-devices></section>
-      <div class="legend"><span><i class="legend-hp"></i> здоровье</span><span><i class="legend-armor"></i> броня</span><span><i class="legend-lit"></i> получает урон</span><span><i class="legend-stun"></i> оглушение</span><span class="keyboard-hint">Esc — меню / пауза</span></div>
+      ${battleHudMarkup()}
       </div>
     </main>`;
   const find = <T extends HTMLElement>(selector: string): T => {
@@ -50,6 +63,17 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     return element;
   };
   const canvasHost = find('[data-canvas]');
+  const battleWorld = document.createElement('canvas');
+  battleWorld.className = 'chapter-world-underlay';
+  battleWorld.setAttribute('aria-hidden', 'true');
+  Object.assign(battleWorld.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', pointerEvents: 'none' });
+  canvasHost.prepend(battleWorld);
+  const battleWorldContext = battleWorld.getContext('2d');
+  let chapterAssets: ChapterWorldAssets | null = null;
+  let battleArtwork: BattleArtwork | null = null;
+  let destroyed = false;
+  void loadChapterWorldAssets().then(assets => { if (!destroyed) chapterAssets = assets; }).catch(() => { /* The geometric renderer remains usable while artwork is unavailable. */ });
+  void loadBattleArtwork().then(assets => { if (!destroyed) battleArtwork = assets; }).catch(() => { /* Existing silhouettes keep combat usable if sprites cannot load. */ });
   const shell = find('.lighthouse-app');
   const menuAudio = mountMenuAudio(root, application);
   const effectsAudio = mountEffectsAudio(root, application);
@@ -102,6 +126,10 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   const errorBox = find('.save-error');
   let overlayKey = '';
   let selectedUpgrade = application.view.upgrades[0]?.definition.id;
+  const treeState = createSkillTreeState();
+  const treeControls = mountSkillTreeControls(overlay, treeState, () => application.view, () => renderHud(application.view));
+  const preparationState = createPreparationUiState();
+  const preparationControls = mountPreparationControls(overlay, application, preparationState, () => renderHud(application.view));
   let confirmAbandon = false;
   let confirmNewGame = false;
   let previousScreen = '';
@@ -143,7 +171,11 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     shell.classList.toggle('is-main-menu', view.screen === 'menu');
     shell.classList.toggle('is-settings', view.screen === 'settings');
     shell.classList.toggle('is-game-menu', view.screen === 'game-menu');
-    sceneryActive = view.screen === 'menu' || view.screen === 'settings' || view.screen === 'game-menu';
+    shell.classList.toggle('is-development', view.screen === 'development');
+    shell.classList.toggle('is-preparation', view.screen === 'preparation');
+    shell.classList.toggle('is-battle', view.screen === 'battle');
+    shell.classList.toggle('battle-paused', view.screen === 'battle' && view.paused);
+    sceneryActive = view.screen === 'development' || view.screen === 'menu' || view.screen === 'settings' || view.screen === 'game-menu';
     shell.classList.toggle('has-menu-scenery', sceneryActive);
     sceneryLayer.classList.toggle('is-inactive', !sceneryActive);
     sceneryLayer.classList.toggle('menu-motion-paused', !sceneryActive);
@@ -167,7 +199,11 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       const active = document.activeElement instanceof HTMLElement && devicePanel.contains(document.activeElement) ? document.activeElement : null;
       const action = active?.dataset.action, priority = active?.dataset.priority, enemyId = active?.dataset.enemyId, deviceId = active?.dataset.deviceId;
       const menuScroll = devicePanel.querySelector('.device-command-panel')?.scrollTop ?? 0;
+      const descriptionOpen = devicePanel.dataset.selectedDevice === String(selectedDevice) && (devicePanel.querySelector<HTMLDetailsElement>('.device-description')?.open ?? false);
       devicePanel.innerHTML = panelHtml; devicePanelKey = panelHtml;
+      devicePanel.dataset.selectedDevice = String(selectedDevice);
+      const description = devicePanel.querySelector<HTMLDetailsElement>('.device-description');
+      if (description) description.open = descriptionOpen;
       const menu = devicePanel.querySelector('.device-command-panel');
       if (menu) menu.scrollTop = menuScroll;
       if (active) [...devicePanel.querySelectorAll<HTMLElement>('[data-action]')].find((entry) => entry.dataset.action === action && entry.dataset.priority === priority && entry.dataset.enemyId === enemyId && entry.dataset.deviceId === deviceId)?.focus({ preventScroll: true });
@@ -223,12 +259,14 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     find('[data-victory-reward]').textContent = battle ? `При победе: +${config.victoryReward} ◈` : '';
     document.documentElement.dataset.textSize = view.settings.textSize;
     const isBattle = view.screen === 'battle';
+    find('.battle-rail').hidden = !isBattle;
     root.querySelector('.lighthouse-app')?.classList.toggle('screen-page', !isBattle);
     for (const selector of ['.statusbar', '.battle-controls', '.legend', '.map-label', '.range-label', '.battle-devices', '.shield-status']) find(selector).hidden = !isBattle;
     devicePanel.hidden = !isBattle || view.paused;
-    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.lateNightModes, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon]);
-    const keyed = key + '/' + confirmNewGame;
-    if (keyed === overlayKey || (view.screen === 'settings' && settingsPointerHeld && !view.settingsError)) { renderPlacementPreview(overlay, view); localize(); return; }
+    devicePanel.dataset.deviceOpen = String(selectedDevice !== null);
+    const key = JSON.stringify([view.screen, view.paused, view.error, view.settings, view.settingsError, view.result, view.interrupted, view.hasProgress, view.profile, view.upgrades, config, view.nights, view.selectedNightId, view.lateNightModes, view.selectedLensId, view.lenses, view.preparation.selectedType, view.preparation.placements, view.preparation.cost, view.preparation.remaining, view.preparation.canStart, view.preparation.reason, selectedUpgrade, confirmAbandon, treeState]);
+    const keyed = key + '/' + confirmNewGame + '/' + JSON.stringify(preparationState);
+    if (keyed === overlayKey || (view.screen === 'settings' && settingsPointerHeld && !view.settingsError)) { renderPlacementPreview(overlay, view); localize(); preparationControls.sync(); return; }
     const scrollSurface = overlay.querySelector<HTMLElement>('.reference-settings') ?? overlay;
     const scrollTop = scrollSurface.scrollTop;
     const focused = (document.activeElement instanceof HTMLElement || document.activeElement instanceof SVGElement) && root.contains(document.activeElement) ? document.activeElement : null;
@@ -243,7 +281,10 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     overlay.hidden = isBattle && !view.paused;
     canvasHost.setAttribute('aria-hidden', String(!isBattle));
     overlay.className = 'overlay screen-' + view.screen + (view.screen === 'preparation' ? ' preparation' : '');
-    overlay.innerHTML = screenContent(view, selectedUpgrade, confirmAbandon, confirmNewGame);
+    treeControls.capture();
+    preparationControls.capture();
+    overlay.innerHTML = screenContent(view, selectedUpgrade, confirmAbandon, confirmNewGame, treeState, preparationState);
+    treeControls.restore();
     // Standalone menu markup includes a scene; the game uses its persistent sibling.
     overlay.querySelector('.avalon-menu > .menu-scenery')?.remove();
     layoutReferenceMenu(overlay);
@@ -261,7 +302,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       if (restore && (!screenChanged || oldScreen === 'development' || oldScreen === 'settings')) restore.focus({ preventScroll: true });
       else if (screenChanged || wasHidden) overlay.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
       else if (focused && !focused.isConnected) {
-        const fallback = overlay.querySelector<HTMLElement>('.tree-node[aria-pressed="true"]') ?? overlay.querySelector<HTMLElement>('[data-action="confirm-abandon"]') ?? overlay.querySelector<HTMLElement>('h1');
+        const fallback = overlay.querySelector<HTMLElement>('.skill-node[aria-pressed="true"]') ?? overlay.querySelector<HTMLElement>('[data-action="confirm-abandon"]') ?? overlay.querySelector<HTMLElement>('h1');
         fallback?.focus({ preventScroll: true });
       }
       (overlay.querySelector<HTMLElement>('.reference-settings') ?? overlay).scrollTop = screenChanged ? screenScroll.get(view.screen) ?? 0 : scrollTop;
@@ -274,6 +315,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     }
     renderPlacementPreview(overlay, view);
     localize();
+    preparationControls.sync();
   }
 
   function localize(): void {
@@ -281,6 +323,8 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     document.documentElement.lang = language;
     document.title = translate('Свет Авалона', language);
     localizeRoot(root, language);
+    updateBattleHud(root, application.view);
+    layoutSkillTreeArtwork(overlay, language);
   }
 
   class CoastScene extends Phaser.Scene {
@@ -289,6 +333,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     private cx = 0;
     private cy = 0;
     private unit = 1;
+    private camera: WorldCamera | null = null;
     create(): void {
       this.ink = this.add.graphics();
       syncViewport(this.scale);
@@ -303,19 +348,24 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         if (!battle) return;
         if (choosingTarget && selectedDevice !== null) {
           const enemy = [...battle.enemies].reverse().find((entry) => {
-            const p = this.point(entry.x, entry.y);
-            return entry.health > 0 && Math.hypot(pointer.x - p.x, (pointer.y - p.y) / .84) <= Math.max(14, view.config.enemies[entry.kind].radius * this.unit);
+            const body = this.enemyBody(entry, view.config);
+            return entry.health > 0 && pointer.x >= body.x - 6 && pointer.x <= body.x + body.width + 6 && pointer.y >= body.y - 6 && pointer.y <= body.y + body.height + 6;
           });
           if (enemy) pinTarget(enemy.id);
           else if (battle.boss && battle.boss.health > 0) {
-            const tentacle = battle.boss.tentacles.find(entry => { const p = this.point(entry.x, entry.y); return Math.hypot(pointer.x - p.x, (pointer.y - p.y) / .84) <= Math.max(14, (view.config.boss?.radius ?? 15) * this.unit); });
+            const tentacle = battle.boss.tentacles.find(entry => { const p = this.point(entry.x, entry.y); return Math.hypot(pointer.x - p.x, (pointer.y - p.y) / WORLD_PROJECTION_Y) <= Math.max(14, (view.config.boss?.radius ?? 15) * this.unit); });
             if (tentacle) pinTarget(tentacle.id);
           }
           return;
         }
         const device = [...battle.devices].reverse().find((entry) => {
           const p = this.point(entry.x, entry.y);
-          return Math.hypot(pointer.x - p.x, (pointer.y - p.y) / .84) <= Math.max(14, view.config.devices.definitions[entry.kind].radius * this.unit);
+          const spec = deviceSprite(entry.kind);
+          if (spec && chapterAssets) {
+            const b = spriteBounds(entry.x, entry.y, spec);
+            return pointer.x >= this.cx + b.minX * this.unit - 6 && pointer.x <= this.cx + b.maxX * this.unit + 6 && pointer.y >= this.cy + b.minY * this.unit - 6 && pointer.y <= this.cy + b.maxY * this.unit + 6;
+          }
+          return Math.hypot(pointer.x - p.x, (pointer.y - p.y) / WORLD_PROJECTION_Y) <= Math.max(14, view.config.devices.definitions[entry.kind].radius * this.unit);
         });
         if (device) { inspectDevice(device.id); renderHud(application.view); return; }
         this.aim(pointer);
@@ -326,7 +376,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       if (application.view.screen !== 'battle' || application.view.paused || selectedDevice !== null ||
         !(pointer.event.target instanceof HTMLCanvasElement) ||
         pointer.x < 0 || pointer.y < 0 || pointer.x > this.scale.width || pointer.y > this.scale.height) return;
-      application.command({ type: 'aim', angle: Math.atan2((pointer.y - this.cy) / .84, pointer.x - this.cx) });
+      application.command({ type: 'aim', angle: Math.atan2((pointer.y - this.cy) / WORLD_PROJECTION_Y, pointer.x - this.cx) });
     }
     update(_time: number, delta: number): void {
       application.advance(delta);
@@ -338,22 +388,44 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       this.draw(view);
     }
     private point(x: number, y: number): Phaser.Math.Vector2 {
-      return new Phaser.Math.Vector2(this.cx + x * this.unit, this.cy + y * this.unit * .84);
+      return new Phaser.Math.Vector2(this.cx + x * this.unit, this.cy + y * this.unit * WORLD_PROJECTION_Y);
     }
     private ring(radius: number, color: number, alpha: number, width = 1): void {
       this.ink.lineStyle(width, color, alpha);
-      this.ink.strokeEllipse(this.cx, this.cy, radius * this.unit * 2, radius * this.unit * 1.68);
+      this.ink.strokeEllipse(this.cx, this.cy, radius * this.unit * 2, radius * this.unit * (WORLD_PROJECTION_Y * 2));
     }
     private draw(view: ApplicationView): void {
       const { config, battle } = view;
       const g = this.ink;
       const w = this.scale.width, h = this.scale.height;
-      this.cx = w / 2;
-      this.cy = h / 2 + 8;
-      this.unit = Math.min((w - 38) / (config.worldRadius * 2), (h - 48) / (config.worldRadius * 1.68));
-      this.unit = Math.max(.05, this.unit);
       g.clear();
-      drawCoast(g, w, h, this.cx, this.cy, this.unit);
+      if (view.screen !== 'battle') {
+        battleWorldContext?.clearRect(0, 0, battleWorld.width, battleWorld.height);
+        for (const label of this.labels.values()) label.destroy();
+        this.labels.clear();
+        return;
+      }
+      const camera = createWorldCamera(config, w, h, { mode: 'battle', devices: battle?.devices ?? [] });
+      this.camera = camera;
+      battleWorld.dataset.worldCamera = JSON.stringify(camera);
+      battleWorld.dataset.worldReady = String(chapterAssets !== null);
+      this.cx = camera.x;
+      this.cy = camera.y;
+      this.unit = camera.zoom;
+      if (chapterAssets && battleWorldContext) {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        if (battleWorld.width !== Math.round(w * dpr) || battleWorld.height !== Math.round(h * dpr)) {
+          battleWorld.width = Math.round(w * dpr); battleWorld.height = Math.round(h * dpr);
+        }
+        battleWorldContext.setTransform(dpr, 0, 0, dpr, 0, 0);
+        paintChapterWorld(battleWorldContext, chapterAssets, config, camera, {
+          devices: (battle?.devices ?? []).map(device => ({ ...device, maxHealth: config.devices.definitions[device.kind].health })),
+          showRanges: false, showHealthBars: false,
+          paintGround: ctx => paintBeamGuide(ctx, camera, config, battle?.desiredBeamAngle ?? -.75),
+        });
+        if (battle) paintBattleNight(battleWorldContext, camera, config, battle);
+        paintBattleBeam(battleWorldContext, camera, config, battle?.beamAngle ?? -.75);
+      } else drawCoast(g, w, h, this.cx, this.cy, this.unit, config.terrain, WORLD_PROJECTION_Y);
       this.ring(config.worldRadius * 1.045, 0x547980, .24);
       this.drawBeam(config, battle?.beamAngle ?? -.75);
       if (battle?.shield.maximum) this.ring(config.shield.radius, battle.shield.current > 0 ? 0x80d9f7 : 0x69808a, battle.shield.current > 0 ? .85 : .3, battle.shield.current > 0 ? 2 : 1);
@@ -361,7 +433,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       if (selected) {
         const p = this.point(selected.x, selected.y);
         g.lineStyle(2, 0xb8edff, .9); g.strokeEllipse(p.x, p.y, 36, 30);
-        if (selected.kind === 'cannon' || selected.kind === 'harpoon' || selected.kind === 'mortar' || selected.kind === 'bell' || selected.kind === 'repair-lamp') { g.lineStyle(1, 0xb8edff, .4); g.strokeEllipse(p.x, p.y, config.devices.definitions[selected.kind].range * this.unit * 2, config.devices.definitions[selected.kind].range * this.unit * 1.68); }
+        if (selected.kind === 'cannon' || selected.kind === 'harpoon' || selected.kind === 'mortar' || selected.kind === 'bell' || selected.kind === 'repair-lamp') { g.lineStyle(1, 0xb8edff, .4); g.strokeEllipse(p.x, p.y, config.devices.definitions[selected.kind].range * this.unit * 2, config.devices.definitions[selected.kind].range * this.unit * (WORLD_PROJECTION_Y * 2)); }
       }
       for (const device of battle?.devices ?? []) this.drawDevice(device, config, battle!);
       if (battle?.ship) this.drawShip(config, battle);
@@ -370,6 +442,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       // Restore northern silhouettes immediately after the tower, before southern
       // enemies. A late x-ray pass would incorrectly paint over nearer threats.
       const restoreNorthernThreats = (): void => {
+        if (chapterAssets && battleWorldContext) return;
         const towerRadius = Math.max(12, config.lighthouseRadius * this.unit);
         for (const enemy of enemies) {
           const p = this.point(enemy.x, enemy.y);
@@ -400,25 +473,24 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       if (battle) drawCombatFeedback(g, battle, config, (x, y) => this.point(x, y), this.unit);
       if (battle) this.drawAim(config, battle.desiredBeamAngle);
       const tower = Math.max(12, config.lighthouseRadius * this.unit);
-      const bodies = enemies.map((enemy) => {
-        const p = this.point(enemy.x, enemy.y), radius = Math.max(7, config.enemies[enemy.kind].radius * this.unit);
-        return { x: p.x - radius * 1.3, y: p.y - radius * 1.2, width: radius * 2.6, height: radius * 2.5 };
-      });
+      const bodies = enemies.map((enemy) => this.enemyBody(enemy, config));
       if (battle?.ship) { const p = this.point(battle.ship.x, battle.ship.y), r = Math.max(10, battle.ship.radius * this.unit); bodies.push({ x: p.x-r*1.4, y:p.y-r*1.2, width:r*2.8, height:r*2.6+10 }); }
       for (const tip of battle?.boss?.health && battle.boss.health > 0 ? battle.boss.tentacles : []) { const p = this.point(tip.x, tip.y), r = Math.max(9, (config.boss?.radius ?? 16) * this.unit); bodies.push({ x: p.x-r*1.3, y: p.y-r*1.2, width: r*2.6, height: r*2.4 }); }
       bodies.push({ x: this.cx - tower * 1.2, y: this.cy - tower * 4.1, width: tower * 2.4, height: tower * 4.8 });
       // Device health strips are reserved before enemy health is laid out.
       const deviceBars = (battle?.devices ?? []).filter((device) => device.health > 0).map((device) => {
         const p = this.point(device.x, device.y), radius = Math.max(5, config.devices.definitions[device.kind].radius * this.unit);
-        const width = Math.max(20, radius * 2) + 2;
-        return { x: p.x - width / 2, y: p.y + radius + 3, width, height: 5 };
+        const style = battleBarStyle(false, view.settings.textSize === 'large', radius * 2, true);
+        return { x: p.x - style.width / 2, y: p.y + radius + 3, width: style.width, height: style.height };
       });
       const indicators = layoutIndicators(enemies.map((enemy) => {
-        const p = this.point(enemy.x, enemy.y), definition = config.enemies[enemy.kind], radius = Math.max(7, definition.radius * this.unit);
-        const width = Math.max(28, radius * 2.4) + 4;
-        return { id: enemy.id, x: p.x - width / 2, y: p.y - radius - 14, width, height: definition.armor > 0 ? 14 : 8 };
+        const body = this.enemyBody(enemy, config);
+        return enemyBarRequest(enemy.id, body, battleBarStyle(config.enemies[enemy.kind].armor > 0, view.settings.textSize === 'large', body.width));
       }), { width: w, height: h }, bodies, deviceBars);
       const indicatorById = new Map(indicators.map((indicator) => [indicator.id, indicator]));
+      battleWorld.dataset.indicators = JSON.stringify(indicators);
+      battleWorld.dataset.enemyBodies = JSON.stringify(enemies.map(enemy => ({ id: enemy.id, ...this.enemyBody(enemy, config) })));
+      battleWorld.dataset.artworkReady = String(battleArtwork !== null);
       for (const enemy of enemies) {
         const p = this.point(enemy.x, enemy.y), radius = Math.max(7, config.enemies[enemy.kind].radius * this.unit);
         const indicator = indicatorById.get(enemy.id)!;
@@ -463,7 +535,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       for (const projectile of battle.mortarProjectiles) {
         const destination = this.point(projectile.x, projectile.y), radius = projectile.blastRadius * this.unit;
         // Thin landing zone stays behind health strips; the shell follows simulation ticks.
-        g.lineStyle(1.5,0xe8a471,.5); g.strokeEllipse(destination.x,destination.y,radius*2,radius*1.68);
+        g.lineStyle(1.5,0xe8a471,.5); g.strokeEllipse(destination.x,destination.y,radius*2,radius*(WORLD_PROJECTION_Y*2));
         g.lineBetween(destination.x-4,destination.y,destination.x+4,destination.y);
         g.lineBetween(destination.x,destination.y-3,destination.x,destination.y+3);
         const flight = mortarFlight(projectile,battle.tick), p = this.point(flight.x,flight.y);
@@ -481,12 +553,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         }
         if (event.type === 'bell-pulse' && age >= 0 && age <= .65) {
           const p = this.point(event.x,event.y), radius = event.radius*this.unit*Math.min(1,age/.4);
-          g.lineStyle(2,0x8fe4ca,.8*(1-age/.65)); g.strokeEllipse(p.x,p.y,radius*2,radius*1.68);
+          g.lineStyle(2,0x8fe4ca,.8*(1-age/.65)); g.strokeEllipse(p.x,p.y,radius*2,radius*(WORLD_PROJECTION_Y*2));
         }
         if(event.type !== 'mortar-impact' || age < 0 || age > .45) continue;
         const p = this.point(event.x,event.y), radius = event.radius*this.unit;
-        g.fillStyle(0xe49c67,.12*(1-age/.45)); g.fillEllipse(p.x,p.y,radius*2,radius*1.68);
-        g.lineStyle(2,0xf2bb85,.8*(1-age/.45)); g.strokeEllipse(p.x,p.y,radius*2,radius*1.68);
+        g.fillStyle(0xe49c67,.12*(1-age/.45)); g.fillEllipse(p.x,p.y,radius*2,radius*(WORLD_PROJECTION_Y*2));
+        g.lineStyle(2,0xf2bb85,.8*(1-age/.45)); g.strokeEllipse(p.x,p.y,radius*2,radius*(WORLD_PROJECTION_Y*2));
       }
     }
     private drawBoss(config: NightConfig, battle: Readonly<BattleState>): void {
@@ -527,6 +599,15 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     private drawDevice(device: DeviceState, config: NightConfig, battle: Readonly<BattleState>): void {
       const g = this.ink, definition = config.devices.definitions[device.kind];
       const p = this.point(device.x, device.y), r = Math.max(5, definition.radius * this.unit);
+      if (chapterAssets && battleWorldContext) {
+        if (device.health > 0 && !device.consumed && device.lastShot && (battle.tick - device.lastShot.tick) * config.stepSeconds < .16) {
+          const hit = this.point(device.lastShot.x, device.lastShot.y);
+          g.lineStyle(2, device.kind === 'harpoon' ? 0x91f2ff : 0xffdf98, .9);
+          g.lineBetween(p.x, p.y, hit.x, hit.y);
+          g.fillStyle(0xffedb5); g.fillCircle(p.x, p.y, 3);
+        }
+        return;
+      }
       if (device.consumed && device.health > 0) {
         g.lineStyle(1.5, 0xbab3db, .55); g.strokeCircle(p.x, p.y, r * .7);
         g.lineBetween(p.x - r * .5, p.y, p.x + r * .5, p.y);
@@ -590,6 +671,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       }
     }
     private drawDeviceSilhouettes(config: NightConfig, battle: Readonly<BattleState> | null): void {
+      if (chapterAssets && battleWorldContext) return;
       const g = this.ink, towerRadius = Math.max(12, config.lighthouseRadius * this.unit);
       for (const device of battle?.devices ?? []) {
         const p = this.point(device.x, device.y);
@@ -615,28 +697,37 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       if (device.health <= 0 || device.consumed) return;
       const g = this.ink, definition = config.devices.definitions[device.kind];
       const p = this.point(device.x, device.y), r = Math.max(5, definition.radius * this.unit);
-      const width = Math.max(20, r * 2);
-      g.fillStyle(0x092025); g.fillRect(p.x - width / 2 - 1, p.y + r + 3, width + 2, 5);
-      g.fillStyle(device.health < definition.health * .3 ? 0xffa185 : 0x8dd5af);
-      g.fillRect(p.x - width / 2, p.y + r + 4, width * Math.max(0, device.health / definition.health), 3);
+      const style = battleBarStyle(false, application.view.settings.textSize === 'large', r * 2, true);
+      const width = style.width - style.padding * 2, x = p.x - style.width / 2, y = p.y + r + 3;
+      g.fillStyle(0x040e15, 1); g.fillRect(x, y, style.width, style.height);
+      g.fillStyle(0x284b39); g.fillRect(x + style.padding, y + style.padding, width, style.fillHeight);
+      g.fillStyle(device.health < definition.health * .3 ? 0xff9b78 : 0xa1d99d);
+      g.fillRect(x + style.padding, y + style.padding, width * clampBarFraction(device.health, definition.health), style.fillHeight);
       const ceiling = (device.startHealth ?? device.health) / definition.health;
-      if (ceiling < 1) { g.lineStyle(1,0xe6ddaf,.9); const x=p.x-width/2+width*ceiling; g.lineBetween(x,p.y+r+3,x,p.y+r+8); }
+      if (ceiling < 1) { g.lineStyle(1,0xe6ddaf,.9); const markX=x+style.padding+width*ceiling; g.lineBetween(markX,y,markX,y+style.height); }
     }
     private drawBeam(config: NightConfig, angle: number): void {
-      const g = this.ink, points = [this.point(0, 0)];
-      for (let i = 0; i <= 32; i++) {
-        const a = angle - config.beam.halfAngle + config.beam.halfAngle * 2 * i / 32;
-        points.push(this.point(Math.cos(a) * config.beam.range, Math.sin(a) * config.beam.range));
+      const g = this.ink;
+      // The geometric fallback uses the same soft light, with longitudinal
+      // slices in place of Canvas gradients. This is decorative, not a hitbox.
+      if (!(chapterAssets && battleWorldContext) && this.camera) {
+        const lift = Math.max(12, config.lighthouseRadius * this.unit) * 3.1;
+        const { bands } = beamLightGeometry(this.camera, config.beam, angle, { x: this.cx, y: this.cy - lift });
+        const lerp = (from: {x:number;y:number}, to: {x:number;y:number}, t: number) => ({ x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t });
+        for (const band of bands) for (let index = 0; index < 24; index++) {
+          const start = index / 24, end = (index + 1) / 24, middle = (start + end) / 2;
+          const stop = BEAM_LIGHT_STOPS.findIndex(([position]) => position > middle);
+          const before = BEAM_LIGHT_STOPS[stop - 1]!, after = BEAM_LIGHT_STOPS[stop]!;
+          const strength = before[1] + (after[1] - before[1]) * (middle - before[0]) / (after[0] - before[0]);
+          g.fillStyle(0xffd382, band.opacity * strength);
+          g.fillPoints([lerp(band.points[0], band.points[1], start), lerp(band.points[0], band.points[1], end), lerp(band.points[3], band.points[2], end), lerp(band.points[3], band.points[2], start)], true);
+        }
       }
-      g.fillStyle(0xffd580, .16); g.fillPoints(points, true);
-      g.lineStyle(1, 0xffda91, .38); g.strokePoints(points, true);
-      const end = this.point(Math.cos(angle) * config.beam.range, Math.sin(angle) * config.beam.range);
-      g.lineStyle(1, 0xffebac, .3); g.lineBetween(this.cx, this.cy, end.x, end.y);
       for (let i = 0; i < 100; i += 2) {
         const a = i / 100 * TAU, b = (i + .75) / 100 * TAU;
         const p = this.point(Math.cos(a) * config.beam.range, Math.sin(a) * config.beam.range);
         const q = this.point(Math.cos(b) * config.beam.range, Math.sin(b) * config.beam.range);
-        g.lineStyle(1, 0xb9d6c5, .28); g.lineBetween(p.x, p.y, q.x, q.y);
+        g.lineStyle(1.5, 0xe9bf6c, .68); g.lineBetween(p.x, p.y, q.x, q.y);
       }
     }
     /** Cool dashed guide and hollow diamond distinguish intent from the warm damaging beam. */
@@ -646,10 +737,12 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       g.lineStyle(1, 0x9ce8f4, .6);
       // Start outside the tower. Dashes remain constant in screen pixels on phones.
       const length = Math.hypot(end.x - this.cx, end.y - this.cy);
-      for (let distance = Math.max(28, config.lighthouseRadius * this.unit * 1.4); distance < length - 10; distance += 14) {
-        const from = distance / length, to = Math.min(distance + 6, length - 10) / length;
-        g.lineBetween(this.cx + (end.x - this.cx) * from, this.cy + (end.y - this.cy) * from,
-          this.cx + (end.x - this.cx) * to, this.cy + (end.y - this.cy) * to);
+      if (!(chapterAssets && battleWorldContext)) {
+        for (let distance = Math.max(28, config.lighthouseRadius * this.unit * 1.4); distance < length - 10; distance += 14) {
+          const from = distance / length, to = Math.min(distance + 6, length - 10) / length;
+          g.lineBetween(this.cx + (end.x - this.cx) * from, this.cy + (end.y - this.cy) * from,
+            this.cx + (end.x - this.cx) * to, this.cy + (end.y - this.cy) * to);
+        }
       }
       const diamond = [{ x: end.x, y: end.y - 7 }, { x: end.x + 6, y: end.y },
         { x: end.x, y: end.y + 7 }, { x: end.x - 6, y: end.y }];
@@ -657,6 +750,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       g.lineStyle(2, 0x9ce8f4, 1); g.strokePoints(diamond, true);
     }
     private drawLighthouse(config: NightConfig, battle: Readonly<BattleState> | null): void {
+      if (chapterAssets && battleWorldContext) return;
       const g = this.ink, x = this.cx, y = this.cy, s = this.unit;
       const r = Math.max(12, config.lighthouseRadius * s);
       const damaged = battle && battle.lighthouseHealth < config.lighthouseHealth * .3;
@@ -669,6 +763,11 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       g.fillStyle(0xffdc92); g.fillRect(x - r * .4, y - r * 3.4, r * .8, r * .52);
       g.fillStyle(0x263e43); g.fillTriangle(x - r * .7, y - r * 3.45, x + r * .7, y - r * 3.45, x, y - r * 4);
       g.fillStyle(0x243c3b); g.fillRoundedRect(x - r * .17, y - r * .6, r * .34, r * .65, r * .12);
+    }
+    private enemyBody(enemy: EnemyState, config: NightConfig): { x: number; y: number; width: number; height: number } {
+      if (battleArtwork && chapterAssets && battleWorldContext && this.camera) return battleEnemyBounds(enemy, config, this.camera);
+      const p = this.point(enemy.x, enemy.y), radius = Math.max(7, config.enemies[enemy.kind].radius * this.unit);
+      return { x: p.x - radius * 1.3, y: p.y - radius * 1.2, width: radius * 2.6, height: radius * 2.5 };
     }
     private drawEnemy(enemy: EnemyState, config: NightConfig, battle: Readonly<BattleState>): void {
       const g = this.ink, definition = config.enemies[enemy.kind];
@@ -684,7 +783,24 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
       g.fillStyle(0x04191c, .5); g.fillEllipse(p.x + 2, p.y + r * .6, r * 2.4, r * .8);
       if ((enemy.burn?.remainingTicks ?? 0) > 0) { g.lineStyle(1.5,0xc8865b,.7); g.strokeEllipse(p.x,p.y+r*.5,r*2.5,r*.65); g.fillStyle(0xe5a16b,.8); g.fillCircle(p.x+r,p.y+r*.25,2); }
       if (bellSlowStatus(enemy, battle.tick, battle.devices)) { g.lineStyle(1.5,0x8fe4ca,.85); g.strokeEllipse(p.x,p.y+r*.7,r*3,r*.8); }
-      if (lit) { g.lineStyle(2, 0xffd57a, .95); g.strokeEllipse(p.x, p.y, r * 2.7, r * 2.35); }
+      if (lit) {
+        const body = this.enemyBody(enemy, config);
+        g.lineStyle(1.5, 0xffdf8e, .95);
+        const y = body.y + body.height * .6;
+        g.lineBetween(body.x - 3, y, body.x - 3, y + 7);
+        g.lineBetween(body.x - 3, y + 7, body.x + 3, y + 7);
+        g.lineBetween(body.x + body.width + 3, y, body.x + body.width + 3, y + 7);
+        g.lineBetween(body.x + body.width + 3, y + 7, body.x + body.width - 3, y + 7);
+      }
+      if (battleArtwork && chapterAssets && battleWorldContext && this.camera) {
+        paintBattleEnemy(battleWorldContext, battleArtwork, enemy, config, battle, this.camera);
+        if (enemy.kind === 'minotaur' && (enemy.chargePhase === 'windup' || enemy.chargePhase === 'charging')) {
+          const body = this.enemyBody(enemy, config), x = body.x + body.width + 4, y = body.y + body.height * .4;
+          g.lineStyle(2, enemy.chargePhase === 'charging' ? 0xff7955 : 0xffb16e, 1);
+          for (let i = 0; i < 2; i++) { const dx = i * 5; g.lineBetween(x+dx,y-4,x+dx+4,y); g.lineBetween(x+dx+4,y,x+dx,y+4); }
+        }
+        return;
+      }
       if (enemy.kind === 'ghost') {
         g.lineStyle(3, 0x09212b, 1); g.strokeCircle(p.x, p.y - r * .25, r * .8);
         g.fillStyle(lit ? 0xffedb5 : 0xc3e6de, .92);
@@ -714,7 +830,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         const angle = Math.atan2(-enemy.y, -enemy.x);
         g.fillStyle(0x9c9980);
         for (const dx of [-.65, .65]) for (const dy of [-.55, .55]) g.fillEllipse(p.x + r * dx, p.y + r * dy, r * .65, r * .5);
-        g.fillCircle(p.x + Math.cos(angle) * r, p.y + Math.sin(angle) * r * .84, r * .42);
+        g.fillCircle(p.x + Math.cos(angle) * r, p.y + Math.sin(angle) * r * WORLD_PROJECTION_Y, r * .42);
         g.fillStyle(enemy.armor > 0 ? (lit ? 0xc8b570 : 0x829c8a) : 0x907568); g.fillEllipse(p.x, p.y, r * 1.9, r * 1.5);
         g.lineStyle(2, 0x09212b); g.strokeEllipse(p.x, p.y, r * 1.9, r * 1.5);
         g.strokeTriangle(p.x, p.y - r * .6, p.x - r * .55, p.y + r * .32, p.x + r * .55, p.y + r * .32);
@@ -722,11 +838,17 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     }
     private drawEnemyIndicators(enemy: EnemyState, config: NightConfig, indicator: IndicatorRequest): void {
       const g = this.ink, definition = config.enemies[enemy.kind];
-      const barWidth = indicator.width - 4, barX = indicator.x + 2, barY = indicator.y + 2;
-      g.fillStyle(0x040e15); g.fillRoundedRect(indicator.x, indicator.y, indicator.width, indicator.height, 2);
-      g.fillStyle(0x583d3b); g.fillRect(barX, barY, barWidth, 4);
-      g.fillStyle(0xffb198); g.fillRect(barX, barY, barWidth * Math.max(0, enemy.health / definition.health), 4);
-      if (definition.armor > 0) { g.fillStyle(0x354c58); g.fillRect(barX, barY + 6, barWidth, 4); g.fillStyle(0xb5e1fa); g.fillRect(barX, barY + 6, barWidth * Math.max(0, enemy.armor / definition.armor), 4); }
+      const style = battleBarStyle(definition.armor > 0, application.view.settings.textSize === 'large');
+      const barWidth = indicator.width - style.padding * 2, barX = indicator.x + style.padding, barY = indicator.y + style.padding;
+      g.fillStyle(0x040e15, 1); g.fillRect(indicator.x, indicator.y, indicator.width, indicator.height);
+      // Armor sits above health, with a black gap; depletion never removes its track.
+      const healthY = barY + (definition.armor > 0 ? style.fillHeight + style.gap : 0);
+      g.fillStyle(0x5a272d); g.fillRect(barX, healthY, barWidth, style.fillHeight);
+      g.fillStyle(0xf27369); g.fillRect(barX, healthY, barWidth * clampBarFraction(enemy.health, definition.health), style.fillHeight);
+      if (definition.armor > 0) {
+        g.fillStyle(0x294653); g.fillRect(barX, barY, barWidth, style.fillHeight);
+        g.fillStyle(0x9edff2); g.fillRect(barX, barY, barWidth * clampBarFraction(enemy.armor, definition.armor), style.fillHeight);
+      }
     }
     private drawBlockedLabels(enemies: readonly EnemyState[], config: NightConfig, battle: Readonly<BattleState>, indicators: readonly IndicatorRequest[]): void {
       type Bounds = { x: number; y: number; width: number; height: number };
@@ -785,8 +907,11 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
 
   // Explicit host sizing avoids RESIZE mode overwriting resize() with its
   // cached parent size when a screen transition changes layout within a frame.
-  const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: false, antialias: true, scale: { mode: Phaser.Scale.NONE, width: canvasHost.clientWidth, height: canvasHost.clientHeight }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
-  const resize = new ResizeObserver(() => { if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutGameMenu(overlay, application.view); layoutSharedScenery(); settingsTransition.sync(); gameMenuTransition.sync(); });
+  // Before the first HUD layout the hidden coast can have zero height. WebGL
+  // allocates render targets during boot and cannot create a 0px framebuffer.
+  // Use a valid bootstrap size; syncViewport fits the real field once visible.
+  const game = new Phaser.Game({ type: Phaser.AUTO, parent: canvasHost, backgroundColor: '#0a1b26', transparent: true, antialias: false, scale: { mode: Phaser.Scale.NONE, width: Math.max(1, canvasHost.clientWidth), height: Math.max(1, canvasHost.clientHeight) }, scene: CoastScene, input: { activePointers: 2 }, audio: { noAudio: true }, banner: false });
+  const resize = new ResizeObserver(() => { treeControls.resize(); if (game.isBooted) syncViewport(game.scale); layoutReferenceMenu(overlay); layoutReferenceSettings(overlay, application.view); layoutGameMenu(overlay, application.view); layoutSharedScenery(); settingsTransition.sync(); gameMenuTransition.sync(); });
   resize.observe(canvasHost);
   resize.observe(shell);
   const placementPoint = (map: SVGSVGElement, x: number, y: number): DOMPoint | null => {
@@ -802,12 +927,17 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   };
   function inspectDevice(id: number): void {
     selectedDevice = id; choosingTarget = false; targetNotice = ''; rememberedTarget = null; pendingTarget = null;
+    const access = root.querySelector<HTMLDetailsElement>('.battle-device-access');
+    if (access) access.open = false;
   }
   function closeDevice(): void {
     const id = selectedDevice;
     selectedDevice = null; choosingTarget = false; rememberedTarget = null; pendingTarget = null; targetNotice = '';
+    const access = root.querySelector<HTMLDetailsElement>('.battle-device-access');
+    if (access) access.open = false;
     renderHud(application.view);
-    devicePanel.querySelector<HTMLElement>('[data-action="inspect-device"][data-device-id="' + id + '"]')?.focus({ preventScroll: true });
+    const returnControl = root.querySelector<HTMLElement>('.battle-device-access summary') ?? devicePanel.querySelector<HTMLElement>('[data-action="inspect-device"][data-device-id="' + id + '"]');
+    returnControl?.focus({ preventScroll: true });
   }
   function pinTarget(id: number): void {
     if (selectedDevice === null) return;
@@ -909,8 +1039,9 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
         const node = application.view.upgrades.find((entry) => entry.definition.id === button.dataset.upgrade);
         if (node) {
           selectedUpgrade = node.definition.id;
+          treeState.selectedId = node.definition.id;
+          treeState.inspectorOpen = true;
           renderHud(application.view);
-          if (window.matchMedia('(max-width: 800px)').matches) root.querySelector('.node-details')?.scrollIntoView({ block: 'nearest' });
         }
         break;
       }
@@ -988,7 +1119,7 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
     else if (application.view.screen === 'game-menu') { gameMenuTransition.close(() => { application.back(); renderHud(application.view); }); return; }
     else if (application.view.screen === 'battle') {
       if (application.view.paused) application.resume(); else application.pause();
-    } else if (application.view.screen === 'preparation') application.openMainMenu();
+    } else if (application.view.screen === 'preparation') application.openGameMenu();
     renderHud(application.view);
   };
   // Preserve the pressed DOM node until its click fires. Live health updates
@@ -1029,5 +1160,5 @@ export function mountGame(root: HTMLElement, application: GameApplication): { de
   root.addEventListener('pointermove', placementMove);
   window.addEventListener('keydown', keydown);
   renderHud(application.view);
-  return { destroy() { menuAudio.destroy(); effectsAudio.destroy(); settingsTransition.destroy(); gameMenuTransition.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
+  return { destroy() { destroyed = true; preparationControls.destroy(); treeControls.destroy(); menuAudio.destroy(); effectsAudio.destroy(); settingsTransition.destroy(); gameMenuTransition.destroy(); menuMotion.destroy(); menuWindows.destroy(); menuTitle.destroy(); menuButtons.destroy(); clearTimeout(panelReleaseTimer); root.removeEventListener('input', changeVolume); root.removeEventListener('change', changeVolume); root.removeEventListener('pointerdown', panelPointerDown); window.removeEventListener('pointerup', panelPointerUp); window.removeEventListener('pointercancel', panelPointerCancel); resize.disconnect(); root.removeEventListener('click', click); root.removeEventListener('pointermove', placementMove); window.removeEventListener('keydown', keydown); game.destroy(true); root.replaceChildren(); } };
 }

@@ -1,3 +1,4 @@
+import { isLandCircle } from '../content/terrain';
 import type { DeviceKind, DevicePlacement, NightConfig, PlacementCheck } from '../contracts';
 
 const invalid = (reason: string): PlacementCheck => ({ valid: false, reason });
@@ -8,7 +9,7 @@ export function checkPlacement(config: NightConfig, placements: readonly DeviceP
   const definition = rules.definitions[kind];
   if (!definition || !Number.isFinite(x) || !Number.isFinite(y)) return invalid('Недопустимые координаты или тип устройства.');
   if (config.availableDevices !== undefined && !config.availableDevices.includes(kind)) return invalid('Устройство ещё не открыто в дереве развития.');
-  if (config.terrain?.landOnlyPlacement && x + definition.radius > config.terrain.shoreX + 1e-9) return invalid('Устройство должно целиком находиться на суше.');
+  if (config.terrain?.landOnlyPlacement && !isLandCircle(config.terrain, { x, y }, definition.radius)) return invalid('Устройство должно целиком находиться на суше.');
   if (placements.length >= rules.maxObjects) return invalid(`Общий предел: ${rules.maxObjects} объекта.`);
   if (placements.filter(item => item.kind === kind).length >= rules.perType[kind]) return invalid(`Предел для «${definition.name}»: ${rules.perType[kind]}.`);
   const types = new Set(placements.map(item => item.kind));
@@ -33,4 +34,3 @@ export function checkDraft(config: NightConfig, placements: readonly DevicePlace
   }
   return { valid: true, reason: '' };
 }
-

@@ -1,0 +1,23 @@
+Generation mode: built-in image_gen (edit).
+Scope: local visual revision only; no executable interface or rules changed.
+Change: remove the decorative copper rule and central diamond below the menu heading; restore continuous pixel-art sky.
+Preserved: tall composition, integrated illustrated chapter card, four actions, borderless scenic dimming and typography.
+Saved chapter and night remain illustrative sample data.
+Edit source: art/concepts/play-menu-2026-11-17/portrait-v4-illustrated-card.png
+User feedback reference (not used as imagegen input): codex-clipboard-029f04ee-69f9-4cc3-87f7-c6659b9ecb66.png
+
+FINAL PROMPT
+
+Use case: precise-object-edit / ui-mockup.
+Make ONE minimal local edit to the attached tall pixel-art mobile game-selection concept.
+
+REMOVE the decorative horizontal copper rule and its central copper diamond located immediately BELOW the heading "ВЫБОР ИГРЫ" and ABOVE the main background lighthouse. Remove both left and right segments of that rule and the entire diamond.
+Fill only the pixels occupied by that ornament with naturally continuous dark-blue pixel-art night sky and subtle cloud shapes matching their surroundings. The heading should float directly on the sky, with clean breathing room underneath.
+Do NOT replace the ornament with another separator, flourish, underline, frame, icon or banner.
+
+Preserve EVERYTHING else: exact tall 9:20 composition and pixel style, heading wording and position, upper scenery, lighthouse and its rooftop cross, moon, ruined arch, ship, continuous darkened sea background, the illustrated Continue card with chapter text integrated directly into the coast, card border, all four buttons and all spacing.
+Keep these texts unchanged and readable:
+"ВЫБОР ИГРЫ", "ГЛАВА I", "ТУМАННЫЙ БЕРЕГ", "НОЧЬ 3", "ПРОДОЛЖИТЬ", "ИСПЫТАНИЯ", "НОВАЯ ИГРА", left arrow plus "НАЗАД".
+Retain the copper borders on the individual card and buttons; ONLY the heading divider and diamond are being removed.
+No other changes, no new objects or text, no phone frame, no watermark, no smoothing or photorealism.
+Deliver only the complete edited mobile screen.

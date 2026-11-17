@@ -1,0 +1,23 @@
+import { LighthouseApplication } from '../../src/application/gameApplication';
+import { emptySave } from '../../src/application/saves';
+import { NIGHT_CONFIG } from '../../src/content/night';
+import { NIGHT_CATALOG } from '../../src/content/nights';
+import { mountGame } from '../../src/presentation/game';
+import { bindLifecycle } from '../../src/platform/browser';
+
+const params = new URLSearchParams(location.search);
+const save = emptySave();
+save.profile.resources = params.has('empty') ? 0 : 450;
+save.profile.bossMaterials = params.has('empty') ? 0 : 6;
+save.profile.wonNightIds = ['first-light', 'broken-shore'];
+if (params.has('developed')) save.profile.purchasedUpgrades = ['beam-power-1', 'beam-power-2', 'beam-width-1', 'beam-width-2', 'beam-range-1', 'beam-range-2', 'paired-light', 'lighthouse-health-1', 'lighthouse-health-2', 'beam-turn-1', 'beam-turn-2'];
+let raw: string | null = JSON.stringify(save), writes = 0, fail = false;
+const settings = { version: 3, language: params.get('language') === 'en' ? 'en' : 'ru', textSize: params.has('large') ? 'large' : 'normal', soundEnabled: false, musicVolume: 50, effectsVolume: 70 };
+const store = { read: () => raw, write(value: string) { if (fail) throw Error('fixture quota'); raw = value; writes++; } };
+const create = () => new LighthouseApplication(store, NIGHT_CONFIG, () => ({ id: 'tree-fixture', seed: 42 }), { read: () => JSON.stringify(settings), write: () => {} }, NIGHT_CATALOG);
+const app = create();
+app.openPreparation(); app.openDevelopment();
+Object.assign(window, { skillTreeFixture: { app, writes: () => writes, raw: () => raw, fail(value: boolean) { fail = value; }, reload: create } });
+const lifecycle = bindLifecycle(app);
+const game = mountGame(document.querySelector<HTMLElement>('#app')!, app);
+import.meta.hot?.dispose(() => { lifecycle(); game.destroy(); });

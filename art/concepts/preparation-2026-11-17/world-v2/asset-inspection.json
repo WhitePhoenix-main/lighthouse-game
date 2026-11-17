@@ -1,0 +1,83 @@
+{
+  "lighthouse-main.png": {
+    "size": [
+      1024,
+      1536
+    ],
+    "alphaExtrema": [
+      0,
+      254
+    ],
+    "transparentPixels": 1185069,
+    "alphaBoundingBox": [
+      257,
+      84,
+      759,
+      1421
+    ]
+  },
+  "props-atlas.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "alphaExtrema": [
+      0,
+      255
+    ],
+    "transparentPixels": 1335194,
+    "alphaBoundingBox": [
+      16,
+      182,
+      1085,
+      1097
+    ],
+    "frames": {
+      "cannon": [
+        113,
+        212,
+        514,
+        480
+      ],
+      "barrier": [
+        798,
+        182,
+        1085,
+        466
+      ],
+      "pier": [
+        16,
+        851,
+        616,
+        1097
+      ],
+      "empty": null
+    }
+  },
+  "terrain-padded.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "alphaExtrema": [
+      255,
+      255
+    ],
+    "transparentPixels": 0,
+    "alphaBoundingBox": [
+      0,
+      0,
+      1536,
+      1024
+    ]
+  },
+  "terrain-coast-irregular-v1.png": {
+    "size": [
+      1536,
+      1024
+    ],
+    "bitDepth": 8,
+    "colorType": 2,
+    "note": "Opaque terrain output; visual review confirms a complete background. Alpha bounds metadata is only required for the separate sprites."
+  }
+}

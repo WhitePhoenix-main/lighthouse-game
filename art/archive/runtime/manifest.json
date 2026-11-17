@@ -1,0 +1,47 @@
+{
+  "status": "historical-runtime-exports",
+  "reason": "Replaced screens; not loaded by current application. Preserved outside public for provenance.",
+  "files": [
+    {
+      "original": "public/images/settings-landscape.webp",
+      "archive": "art/archive/runtime/images/settings-landscape.webp",
+      "bytes": 872472,
+      "sha256": "2673b3d2543269f5244d8317d8e38789c3238dfaa5c8d742589fcd8dceb44958"
+    },
+    {
+      "original": "public/images/settings-portrait.webp",
+      "archive": "art/archive/runtime/images/settings-portrait.webp",
+      "bytes": 1263176,
+      "sha256": "fe202fed990b38a291432644438ea3676de230d24f10035b1b88c93846bcc032"
+    },
+    {
+      "original": "public/images/menu-layers/landscape-background-v2.webp",
+      "archive": "art/archive/runtime/images/menu-layers/landscape-background-v2.webp",
+      "bytes": 346762,
+      "sha256": "f40d7d3b6dc9b3a63ded08cee95305a854dd849a488fcc2b6fe8965568c8c0c9"
+    },
+    {
+      "original": "public/images/menu-layers/portrait-background-v2.webp",
+      "archive": "art/archive/runtime/images/menu-layers/portrait-background-v2.webp",
+      "bytes": 389004,
+      "sha256": "8dcf9f4ac0a29b8563e99f5fab3389df41d2c8a5e64f3a201999869c37ef75e1"
+    },
+    {
+      "original": "public/images/game-menu/back.png",
+      "archive": "art/archive/runtime/images/game-menu/back.png",
+      "bytes": 15222,
+      "sha256": "fa1a1e361293371da8753efc10b4f6226b4dbbabbadf5636062ba1651402246e"
+    },
+    {
+      "original": "public/images/game-menu/secondary-mobile.png",
+      "archive": "art/archive/runtime/images/game-menu/secondary-mobile.png",
+      "bytes": 113045,
+      "sha256": "dc69d3ad8130e8a9df97ec4f32695219b1dff6204d7f19587d7f6d373712550d"
+    }
+  ],
+  "consolidated": {
+    "removed": "public/images/skill-tree/lighthouse.png",
+    "canonical": "public/images/preparation/world/lighthouse-main.png",
+    "bytes": 1379188
+  }
+}

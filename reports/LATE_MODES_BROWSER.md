@@ -41,7 +41,7 @@
 
 ## Воспроизведение и артефакты
 
-- `node tools/verify-late-modes.cjs` — целевой Chrome-прогон; запускает локальный Vite на 5198 и закрывает свой браузер/сервер.
+- `node tools/browser/verify-late-modes.cjs` — целевой Chrome-прогон; запускает локальный Vite на 5198 и закрывает свой браузер/сервер.
 - `pnpm exec vitest run tests/lateModePresentation.test.ts --reporter=dot` — **5/5**.
 - `pnpm build` — успешно, включая проверку типов; сохраняется предупреждение Vite о крупном чанке (~1.56 МБ).
 - Общий набор тестов и матрицы боевого баланса не запускались.

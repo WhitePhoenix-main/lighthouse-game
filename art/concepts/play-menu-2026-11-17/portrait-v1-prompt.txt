@@ -1,0 +1,42 @@
+Generation mode: built-in image_gen.
+Scope: mobile portrait visual concept only. No game interface or rules changed.
+Saved chapter and night shown are illustrative sample data.
+Four actions: Continue, Trials, New Game, Back. Chapter/night selection belongs to the next screen.
+References:
+- art/concepts/play-menu-2026-11-17/landscape-v1.png
+- sprites/previews/portrait.png
+- public/images/settings-portrait.webp
+
+FINAL PROMPT
+
+Use case: ui-mockup.
+Adapt the established game-selection concept into ONE polished MOBILE PORTRAIT 9:16 screen for the Russian pixel-art game "Свет Авалона".
+
+Input image roles:
+Image 1 is the EDIT TARGET: the established LANDSCAPE game-selection concept. Preserve its visual identity, four actions, illustrated Continue card, blue stone and fine copper borders. Recompose for a narrow portrait smartphone, do not squeeze the desktop columns.
+Image 2 is the SUPPORTING MOBILE SCENERY reference: the actual portrait main menu, with its familiar lighthouse, ruined arch, amber light, dark blue clouds, moon and sea. Preserve those recognizable scenic motifs.
+Image 3 is the SUPPORTING MOBILE UI STYLE AND LAYOUT reference: the portrait settings concept. Follow its scenic upper header flowing into a dark slate lower panel, warm ivory Cyrillic serif pixel lettering and crisp pixel-art treatment. Do not copy its settings controls or its text.
+
+Format and composition:
+A single full-bleed 9:16 portrait game screenshot concept. No phone hardware frame, no comparison board, no desktop screen.
+Show the moonlit coast and glowing lighthouse clearly in the upper quarter of the screen, like the portrait settings reference. Below, use ONE coherent wide dark navy stone panel with modest worn masonry corners, subtle foliage and copper details. Do not cover the lighthouse lantern with the panel. Keep enough recognizable scenery visible above the controls.
+All actions form a single vertical column with generous tap areas and comfortable gutters. Treat this as a feasible 360-390 CSS pixel-wide phone layout: main labels around 22-26 CSS px, metadata at least 16 CSS px, secondary controls at least 48 CSS px high. Keep the entire interface visible with safe breathing room at top and bottom. No tiny desktop text.
+
+Interface in order:
+1. Panel heading exactly "ВЫБОР ИГРЫ", with the thin copper divider and small diamond motif used in the landscape design.
+2. ONE dominant Continue card, nearly full panel width. Its upper part is a wide shallow illustration of a misty coast with a small glowing lighthouse, matching the existing landscape card. No monsters. Below the thumbnail, center readable passive saved-campaign information on separate lines:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 3"
+At the bottom of the same card, a large clear action label exactly "ПРОДОЛЖИТЬ". The whole card is one click target. Thin copper-orange frame and restrained warm edge emphasis distinguish it as the primary action.
+3. A wide secondary stone button below the card labeled exactly "ИСПЫТАНИЯ".
+4. Another equally wide secondary stone button underneath, labeled exactly "НОВАЯ ИГРА".
+5. A separate somewhat narrower tertiary stone return button at the bottom, with a left arrow and the exact label "НАЗАД".
+
+Keep the shared aesthetic: carefully placed visible pixels, cool midnight/navy/slate blue, copper edging, amber lighthouse light, warm ivory type. Match the original concept's crisp Cyrillic letter shapes and restrained fantasy atmosphere. Avoid noisy ornament around the controls. The Continue action must remain visually dominant, secondary buttons equal, Back distinct and easy to reach.
+
+Strict constraints:
+Exactly four actions: Continue, Trials, New Game, Back. Chapter/night information is passive and illustrative, not a selector. No level picker, arrows beside metadata, carousel, chapter tabs, night tiles, extra buttons, shop, upgrades, currency, status bars, battle HUD, settings controls, logo, monsters or character portraits.
+Use all Russian text exactly as specified, correctly spelled and easy to read.
+No English, watermarks, annotations, tiny captions, smartphone frame or visual presentation border.
+This is a mobile adaptation of the established screen, not a new art direction. Preserve visual coherence with the landscape version.

@@ -1,0 +1,280 @@
+[
+  {
+    "id": "mobile",
+    "file": "field-mobile.png",
+    "width": 780,
+    "height": 1688,
+    "camera": {
+      "width": 780,
+      "height": 1688,
+      "zoom": 0.9808219178082191,
+      "centerX": 0,
+      "centerY": 49.95810055865922
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -713.4246575342465,
+      "y": 59.383561643835606,
+      "width": 2206.849315068493,
+      "height": 1471.2328767123288
+    },
+    "areas": [
+      {
+        "x": 32,
+        "y": 544.4000000000001,
+        "width": 716,
+        "height": 501.19999999999993,
+        "color": "#9BBCCB",
+        "dashed": true,
+        "radius": 365
+      },
+      {
+        "x": 95.75342465753425,
+        "y": 589.027397260274,
+        "width": 588.4931506849315,
+        "height": 411.94520547945206,
+        "color": "#E9C77D",
+        "dashed": true,
+        "radius": 300
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 205.507397260274,
+        "y": 651.8268075017935,
+        "width": 72.58082191780822,
+        "height": 48.50788098247532,
+        "world": {
+          "x": -140,
+          "y": -140
+        },
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 355.0146617350232,
+        "y": 625.4158904109589,
+        "width": 69.97067652995358,
+        "height": 186.3561643835616,
+        "world": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 134.986301369863,
+        "y": 746.0833010357501,
+        "width": 58.84931506849315,
+        "height": 58.23416543363085,
+        "world": {
+          "x": -230,
+          "y": 0
+        },
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 355.86739726027395,
+        "y": 835.5373698630137,
+        "width": 142.21917808219177,
+        "height": 58.30986301369863,
+        "world": {
+          "x": 0,
+          "y": 110
+        }
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 205.507397260274,
+        "y": 844.0679033922045,
+        "width": 72.58082191780822,
+        "height": 48.50788098247533,
+        "world": {
+          "x": -140,
+          "y": 140
+        },
+        "health": 42,
+        "maxHealth": 70
+      }
+    ],
+    "legend": []
+  },
+  {
+    "id": "desktop",
+    "file": "field-desktop.png",
+    "width": 1672,
+    "height": 941,
+    "camera": {
+      "width": 1672,
+      "height": 941,
+      "zoom": 0.9001956947162427,
+      "centerX": 0,
+      "centerY": 41.65760869565217
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -176.7201565557731,
+      "y": -242.14677103718202,
+      "width": 2025.4403131115462,
+      "height": 1350.293542074364
+    },
+    "areas": [
+      {
+        "x": 507.4285714285714,
+        "y": 203,
+        "width": 657.1428571428572,
+        "height": 460,
+        "color": "#9BBCCB",
+        "dashed": true,
+        "radius": 365
+      },
+      {
+        "x": 565.9412915851271,
+        "y": 243.958904109589,
+        "width": 540.1174168297456,
+        "height": 378.0821917808219,
+        "color": "#E9C77D",
+        "dashed": true,
+        "radius": 300
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 666.6731898238747,
+        "y": 301.59603242383275,
+        "width": 66.61448140900197,
+        "height": 44.52040154018086,
+        "world": {
+          "x": -140,
+          "y": -140
+        },
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 803.8905514726869,
+        "y": 277.35616438356163,
+        "width": 64.2188970546262,
+        "height": 171.0371819960861,
+        "world": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 601.9491193737769,
+        "y": 388.104386425469,
+        "width": 54.01174168297457,
+        "height": 53.44715901729887,
+        "world": {
+          "x": -230,
+          "y": 0
+        },
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 804.6731898238747,
+        "y": 470.20508806262234,
+        "width": 130.5283757338552,
+        "height": 53.51663405088063,
+        "world": {
+          "x": 0,
+          "y": 110
+        }
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 666.6731898238747,
+        "y": 478.03438858821636,
+        "width": 66.61448140900197,
+        "height": 44.52040154018087,
+        "world": {
+          "x": -140,
+          "y": 140
+        },
+        "health": 42,
+        "maxHealth": 70
+      }
+    ],
+    "legend": []
+  }
+]

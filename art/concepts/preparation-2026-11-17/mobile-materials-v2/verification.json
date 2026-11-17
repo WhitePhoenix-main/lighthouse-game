@@ -1,0 +1,62 @@
+{
+  "scope": "Static mobile color/material study of selected historical illustration; not current world geometry",
+  "size": [
+    887,
+    1774
+  ],
+  "mapROI": {
+    "x": 34,
+    "y": 440,
+    "width": 800,
+    "height": 660
+  },
+  "sources": [
+    {
+      "path": "user-mobile-reference.png",
+      "sha256": "bcc0b94272d0e84455f0f6f2a44ccaa43a40fea149752864ed49798cba75eef7"
+    },
+    {
+      "path": "ui-chrome.png",
+      "sha256": "e192cf11823af20f573dae31d2a268455ba9d9ed9f8be2086bf857de45cc09fb"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.png",
+      "sha256": "244189d9b2729c68a3b1cb28e821a16b9a7cc8473597570b411b21c5a8e5a1f2"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.json",
+      "sha256": "e74ca8ea0cdb8d19f95e5f20da4a3fb0c8aec8229cbdcaa32774d9dd919ecbeb"
+    },
+    {
+      "path": "../full-screen-v1/glyphs.json",
+      "sha256": "0ae9767e11edbe304ffeb85fe6daafe5dfc31f0bf7322a2c769dfa5f89af0ad8"
+    }
+  ],
+  "transforms": {
+    "source": "native coordinates, identity",
+    "chrome": "native coordinates, identity",
+    "map": "identity; no recolor or scaling; guaranteed ROI restored from native source after overlay to neutralize isolated A=1 alpha dust"
+  },
+  "checks": {
+    "nativeCanvas": true,
+    "allTextBoundsValid": true,
+    "sourceIconAspectPreserved": true,
+    "renderAndPixelParity": "passed",
+    "sourceHashesUnchanged": true
+  },
+  "iconRounding": "Uniform source scale followed by nearest whole pixel destination; less than 1px quantization per axis",
+  "pixelParity": {
+    "roi": {
+      "x": 34,
+      "y": 440,
+      "width": 800,
+      "height": 660
+    },
+    "roiPixelsChecked": 528000,
+    "roiPixelsChanged": 0,
+    "roiChromeMaxAlpha": 1,
+    "transparentOpeningPixelsChecked": 626589,
+    "transparentOpeningPixelsChanged": 0,
+    "alphaBoundaryPolicy": "Native source ROI restored after overlay to neutralize A=1 dust; entire 800x660 ROI checked without exclusions. Outside ROI skip only alpha-positive chrome edge pixels."
+  }
+}

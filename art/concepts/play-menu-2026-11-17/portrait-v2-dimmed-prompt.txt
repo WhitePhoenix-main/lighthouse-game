@@ -1,0 +1,36 @@
+Generation mode: built-in image_gen (edit).
+Scope: alternate mobile portrait visual concept only; no implementation or rules changed.
+Change: outer stone frame and opaque enclosing panel replaced with translucent dimming over continuous scenery.
+Preserved: four actions, card illustration, passive sample saved-game information, labels and arrangement.
+Edit source: art/concepts/play-menu-2026-11-17/portrait-v1.png
+
+FINAL PROMPT
+
+Use case: ui-mockup / precise-object-edit.
+Edit the attached MOBILE PORTRAIT game-selection concept. Make ONE targeted variation: remove the enclosing stone panel and use a dark translucent overlay over the scenery, like an in-game settings overlay.
+
+Edit target: attached portrait concept.
+Preserve the same 9:16 portrait format, pixel-art style, Russian text, centered vertical layout, Continue card illustration, metadata, four action labels and hierarchy.
+
+CHANGE ONLY THE OUTER CONTAINER / BACKGROUND TREATMENT:
+- Completely remove the large rectangular masonry surround enclosing the entire menu: its top stone rail, both vertical stone rails, lower stone rail, stone corners, panel foliage and moss.
+- Remove the opaque navy slab filling that outer frame.
+- The scenic coast must now be a SINGLE continuous full-bleed background extending behind the entire screen and behind the controls. Keep the familiar lighthouse, moon, ruined arch, distant ship and rocky sea. Extend the existing scenery naturally down behind the menu; do not create a separate upper banner or a visible boundary between upper scenery and menu area.
+- Lay a smooth TRANSLUCENT deep navy-black dimming scrim over the background: darker behind the menu text, with a gentle gradient. The lighthouse and coastline remain recognizable above, and faint rocks, sea and waves are still visible through the dimming in the side margins and gaps between controls. Do NOT substitute a solid color or a framed panel.
+- Menu heading, divider, Continue card and buttons now float directly on the darkened scenery with comfortable screen margins.
+- KEEP the existing fine copper outlines on the individual Continue card and buttons; only the large enclosing stone frame is removed. Preserve the card's illustrated thumbnail and opaque dark information band for readability.
+- Keep the original relative arrangement, dimensions and spacing of the controls as close as possible. Do not add new ornament or move the title into a header bar.
+
+UNCHANGED TEXT, exact:
+"ВЫБОР ИГРЫ"
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 3"
+"ПРОДОЛЖИТЬ"
+"ИСПЫТАНИЯ"
+"НОВАЯ ИГРА"
+A left arrow plus "НАЗАД".
+
+Exactly four actions: Continue, Trials, New Game, Back. Chapter and night are passive sample saved-game information, not a selector.
+Maintain sharp readable warm ivory Cyrillic serif pixel lettering, cool blue scenery, amber lighthouse light and restrained copper controls. No desktop view, phone hardware frame, comparison board, extra captions, watermarks, English, level picker, shop, resources, extra buttons or settings controls.
+Deliver only the edited full-screen mobile UI image.

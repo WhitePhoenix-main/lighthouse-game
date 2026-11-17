@@ -1,0 +1,89 @@
+{
+  "status": "Desktop reference scale proposal only; canonical world and mobile unchanged",
+  "sourceSceneSha256": "67d7c013f126655be20c5e0aeb2e6785c23808b490691bca21fbffd6f1a0a6dd",
+  "sourceTexture": "../world-v2/terrain-coast-irregular-v1.png",
+  "sourceTextureUnchanged": true,
+  "baseline": "../full-screen-v1/field-layouts.json#field-desktop.png",
+  "terrainOnlyWorldFactor": 0.75,
+  "oldTerrainWorldBounds": {
+    "minX": -1500,
+    "maxX": 1500,
+    "minY": -1428.5714285714287,
+    "maxY": 1428.5714285714287
+  },
+  "newTerrainWorldBounds": {
+    "minX": -1125,
+    "maxX": 1125,
+    "minY": -1071.4285714285716,
+    "maxY": 1071.4285714285716
+  },
+  "oldProjectedTextureSize": {
+    "width": 2700.587084148728,
+    "height": 1800.3913894324855
+  },
+  "newProjectedTextureSize": {
+    "width": 2025.4403131115462,
+    "height": 1350.293542074364
+  },
+  "fixedObjectZoom": 0.9001956947162427,
+  "newCamera": {
+    "centerX": 0,
+    "centerY": 0,
+    "zoom": 0.9001956947162427,
+    "width": 1672,
+    "height": 941
+  },
+  "worldOriginScreen": {
+    "x": 836,
+    "y": 470.5
+  },
+  "freeField": {
+    "minX": 0,
+    "maxX": 1672,
+    "minY": 96,
+    "maxY": 770
+  },
+  "requiredMargin": 24,
+  "requiredBounds": {
+    "minX": 507.4285714285714,
+    "minY": 240.5,
+    "maxX": 1164.5714285714287,
+    "maxY": 700.5
+  },
+  "checks": {
+    "spriteDimensionsExactlyEqualBaseline": true,
+    "sourceSpriteAspectPreserved": true,
+    "worldPositionsAndRulesUnchanged": true,
+    "textureCoversEntireCanvas": true,
+    "requiredBoundsClearPanels": true,
+    "terrainScaleOnly": true,
+    "textBoundsValid": true
+  },
+  "sprites": [
+    {
+      "id": "upper",
+      "width": 66.61448140900197,
+      "height": 44.52040154018086
+    },
+    {
+      "id": "lighthouse",
+      "width": 64.2188970546262,
+      "height": 171.0371819960861
+    },
+    {
+      "id": "barrier",
+      "width": 54.01174168297457,
+      "height": 53.44715901729887
+    },
+    {
+      "id": "pier",
+      "width": 130.5283757338552,
+      "height": 53.51663405088063
+    },
+    {
+      "id": "lower",
+      "width": 66.61448140900197,
+      "height": 44.52040154018087
+    }
+  ]
+}

@@ -1,0 +1,518 @@
+[
+  {
+    "file": "preview-portrait.png",
+    "width": 780,
+    "height": 780,
+    "padding": 48,
+    "mode": "overview",
+    "selected": null,
+    "camera": {
+      "zoom": 0.936986301369863,
+      "centerX": 0,
+      "centerY": 0
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -1015.4794520547946,
+      "y": -546.9863013698631,
+      "width": 2810.958904109589,
+      "height": 1873.9726027397262
+    },
+    "areas": [
+      {
+        "x": 48,
+        "y": 150.60000000000002,
+        "width": 684,
+        "height": 478.79999999999995,
+        "color": "#B5CED0",
+        "dashed": true
+      },
+      {
+        "x": 108.90410958904107,
+        "y": 193.23287671232876,
+        "width": 562.1917808219179,
+        "height": 393.5342465753425,
+        "color": "#F2D78C",
+        "dashed": true
+      }
+    ],
+    "legend": [
+      {
+        "label": "МАЯК · 300",
+        "color": "#F2D78C"
+      },
+      {
+        "label": "ПОЯВЛЕНИЕ · 365",
+        "color": "#B5CED0"
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 213.75287671232877,
+        "y": 253.22560940115466,
+        "width": 69.33698630136986,
+        "height": 46.33993099443173,
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 356.57825227200544,
+        "y": 227.9950684931507,
+        "width": 66.84349545598917,
+        "height": 178.02739726027394
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 146.3835616438356,
+        "y": 343.26952221850985,
+        "width": 56.21917808219178,
+        "height": 55.63152116844065,
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 357.39287671232876,
+        "y": 428.72564383561644,
+        "width": 135.86301369863014,
+        "height": 55.70383561643836
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 213.75287671232877,
+        "y": 436.8749244696478,
+        "width": 69.33698630136986,
+        "height": 46.33993099443174,
+        "health": 42,
+        "maxHealth": 70
+      }
+    ]
+  },
+  {
+    "file": "preview-selected.png",
+    "width": 780,
+    "height": 780,
+    "padding": 48,
+    "mode": "overview",
+    "selected": "lower",
+    "camera": {
+      "zoom": 0.936986301369863,
+      "centerX": 0,
+      "centerY": 0
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -1015.4794520547946,
+      "y": -546.9863013698631,
+      "width": 2810.958904109589,
+      "height": 1873.9726027397262
+    },
+    "areas": [
+      {
+        "x": 48,
+        "y": 150.60000000000002,
+        "width": 684,
+        "height": 478.79999999999995,
+        "color": "#B5CED0",
+        "dashed": true
+      },
+      {
+        "x": 108.90410958904107,
+        "y": 193.23287671232876,
+        "width": 562.1917808219179,
+        "height": 393.5342465753425,
+        "color": "#F2D78C",
+        "dashed": true
+      },
+      {
+        "x": 108.90410958904107,
+        "y": 376.8821917808219,
+        "width": 299.83561643835617,
+        "height": 209.8849315068493,
+        "color": "#8FE4EC",
+        "dashed": true
+      }
+    ],
+    "legend": [
+      {
+        "label": "МАЯК · 300",
+        "color": "#F2D78C"
+      },
+      {
+        "label": "ПОЯВЛЕНИЕ · 365",
+        "color": "#B5CED0"
+      },
+      {
+        "label": "ПУШКА · 160",
+        "color": "#8FE4EC"
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 213.75287671232877,
+        "y": 253.22560940115466,
+        "width": 69.33698630136986,
+        "height": 46.33993099443173,
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 356.57825227200544,
+        "y": 227.9950684931507,
+        "width": 66.84349545598917,
+        "height": 178.02739726027394
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 146.3835616438356,
+        "y": 343.26952221850985,
+        "width": 56.21917808219178,
+        "height": 55.63152116844065,
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 357.39287671232876,
+        "y": 428.72564383561644,
+        "width": 135.86301369863014,
+        "height": 55.70383561643836
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 213.75287671232877,
+        "y": 436.8749244696478,
+        "width": 69.33698630136986,
+        "height": 46.33993099443174,
+        "health": 42,
+        "maxHealth": 70
+      }
+    ]
+  },
+  {
+    "file": "preview-landscape.png",
+    "width": 1280,
+    "height": 480,
+    "padding": 24,
+    "mode": "overview",
+    "selected": null,
+    "camera": {
+      "zoom": 0.8454011741682975,
+      "centerX": 0,
+      "centerY": 0
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -628.1017612524463,
+      "y": -605.4011741682975,
+      "width": 2536.2035225048926,
+      "height": 1690.802348336595
+    },
+    "areas": [
+      {
+        "x": 331.4285714285714,
+        "y": 24,
+        "width": 617.1428571428572,
+        "height": 432,
+        "color": "#B5CED0",
+        "dashed": true
+      },
+      {
+        "x": 386.37964774951075,
+        "y": 62.46575342465752,
+        "width": 507.2407045009785,
+        "height": 355.06849315068496,
+        "color": "#F2D78C",
+        "dashed": true
+      }
+    ],
+    "legend": [
+      {
+        "label": "МАЯК · 300",
+        "color": "#F2D78C"
+      },
+      {
+        "label": "ПОЯВЛЕНИЕ · 365",
+        "color": "#B5CED0"
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 480.98003913894325,
+        "y": 116.59453479803426,
+        "width": 62.55968688845402,
+        "height": 41.810464055126374,
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 609.8450396439147,
+        "y": 93.83013698630137,
+        "width": 60.30992071217069,
+        "height": 160.6262230919765
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 420.19569471624266,
+        "y": 197.83716290391868,
+        "width": 50.72407045009785,
+        "height": 50.19385368581111,
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 610.5800391389432,
+        "y": 274.9404305283757,
+        "width": 122.58317025440314,
+        "height": 50.25909980430529
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 480.98003913894325,
+        "y": 282.29316493502057,
+        "width": 62.55968688845402,
+        "height": 41.81046405512638,
+        "health": 42,
+        "maxHealth": 70
+      }
+    ]
+  },
+  {
+    "file": "preview-battle.png",
+    "width": 780,
+    "height": 780,
+    "padding": 48,
+    "mode": "battle",
+    "selected": null,
+    "camera": {
+      "zoom": 0.855,
+      "centerX": 0,
+      "centerY": 0
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -892.5,
+      "y": -465,
+      "width": 2565,
+      "height": 1710
+    },
+    "areas": [
+      {
+        "x": 77.92500000000001,
+        "y": 171.54750000000004,
+        "width": 624.15,
+        "height": 436.9049999999999,
+        "color": "#B5CED0",
+        "dashed": true
+      },
+      {
+        "x": 133.5,
+        "y": 210.45000000000002,
+        "width": 513,
+        "height": 359.09999999999997,
+        "color": "#F2D78C",
+        "dashed": true
+      }
+    ],
+    "legend": [
+      {
+        "label": "МАЯК · 300",
+        "color": "#F2D78C"
+      },
+      {
+        "label": "ПОЯВЛЕНИЕ · 365",
+        "color": "#B5CED0"
+      }
+    ],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 229.1745,
+        "y": 265.19336857855365,
+        "width": 63.269999999999996,
+        "height": 42.28518703241895,
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 359.50265519820493,
+        "y": 242.17050000000003,
+        "width": 60.99468960359012,
+        "height": 162.44999999999996
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 167.70000000000002,
+        "y": 347.35843902439024,
+        "width": 51.3,
+        "height": 50.76376306620209,
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 360.246,
+        "y": 425.33715,
+        "width": 123.975,
+        "height": 50.829750000000004
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 229.1745,
+        "y": 432.77336857855363,
+        "width": 63.269999999999996,
+        "height": 42.28518703241896,
+        "health": 42,
+        "maxHealth": 70
+      }
+    ]
+  }
+]

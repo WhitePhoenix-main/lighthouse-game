@@ -1,0 +1,452 @@
+{
+  "version": 10,
+  "date": "2026-11-17",
+  "status": "reference-source-ported-to-runtime",
+  "generator": "Programmatic composition of existing project artwork; source rasters previously created with built-in image_gen",
+  "finalOutputs": [
+    {
+      "file": "responsive-v4/mobile.png",
+      "role": "current-full-mobile-preparation-reference",
+      "size": [
+        780,
+        1688
+      ],
+      "notes": "CSS390x844 at DPR2, field58.65%, shared world/camera, compact equipment shelf."
+    },
+    {
+      "file": "responsive-v4/desktop.png",
+      "role": "current-full-desktop-preparation-reference",
+      "size": [
+        1672,
+        941
+      ],
+      "notes": "Shared scene, continuous stone strips and fixed baseline sprite dimensions."
+    },
+    {
+      "file": "responsive-v4/mobile-at-390.png",
+      "role": "mobile-logical-size-preview",
+      "size": [
+        390,
+        844
+      ],
+      "notes": "Programmatic size preview, not a physical phone screenshot."
+    },
+    {
+      "file": "mobile-slate-v3/mobile-slate.png",
+      "role": "previous-slate-mobile-material-study",
+      "size": [
+        887,
+        1774
+      ],
+      "notes": "Low-saturation graphite slate, menu beige text and quiet stone edges align with existing main/settings. Historical map illustration fixed in native coordinates; not new world geometry."
+    },
+    {
+      "file": "mobile-materials-v2/mobile-warm.png",
+      "role": "previous-warm-mobile-material-study",
+      "size": [
+        887,
+        1774
+      ],
+      "notes": "Selected historical mobile illustration remains fixed; charcoal stone, dark oak and brass chrome. Not a new source of world geometry."
+    },
+    {
+      "file": "full-screen-v1/full-mobile.png",
+      "role": "previous-full-mobile-world-reference",
+      "size": [
+        887,
+        1774
+      ]
+    },
+    {
+      "file": "full-screen-v1/full-desktop.png",
+      "role": "previous-full-desktop-world-reference",
+      "size": [
+        1672,
+        941
+      ]
+    },
+    {
+      "file": "world-v2/preview-portrait.png",
+      "role": "source-world-overview",
+      "notes": "Camera-derived programmatic render of actual base-night radii, padded ground, separate main-page lighthouse and nearby pier."
+    },
+    {
+      "file": "world-v2/preview-selected.png",
+      "role": "source-world-selected-cannon"
+    },
+    {
+      "file": "world-v2/preview-landscape.png",
+      "role": "source-world-wide-view"
+    },
+    {
+      "file": "world-v2/preview-battle.png",
+      "role": "same-world-zoom-out"
+    },
+    {
+      "file": "camera-demo.html",
+      "role": "adaptive-camera-and-area-preview"
+    },
+    {
+      "file": "world-v2/lighthouse-main.png",
+      "role": "transparent-main-menu-lighthouse-derivative"
+    },
+    {
+      "file": "world-v2/props-atlas.png",
+      "role": "transparent-cannon-barrier-pier-atlas"
+    },
+    {
+      "file": "world-v2/terrain-coast-irregular-v1.png",
+      "role": "current-padded-irregular-rocky-terrain"
+    }
+  ],
+  "intermediateOutputs": [
+    "desktop-v1.png",
+    "portrait-split-v1.png",
+    "portrait-pixel-ranges-v1.png"
+  ],
+  "rejectedOutputs": [
+    {
+      "file": "portrait-split-v3.png",
+      "reason": "Frame-ratio edit altered canvas proportions and added a side gutter; retain the better-composed v2 as the final split mockup."
+    }
+  ],
+  "references": [
+    "../play-menu-2026-11-17/portrait-v7-back-without-arrow.png",
+    "../play-menu-2026-11-17/landscape-v5-tall-stones-no-arrow.png",
+    "mobile-materials-v2/user-mobile-reference.png"
+  ],
+  "exampleData": {
+    "resources": 136,
+    "bossMaterials": 3,
+    "nightId": "broken-shore",
+    "waveCount": 4,
+    "objects": 3,
+    "maxObjects": 4,
+    "types": 2,
+    "typeSlots": 2,
+    "lens": "basic",
+    "ability": "flash",
+    "selectedCannonHealth": 42,
+    "selectedCannonMaxHealth": 70,
+    "baseRepairCost": 2
+  },
+  "specification": "../../../docs/PREPARATION_SCREEN_DESIGN.md",
+  "verification": {
+    "sourceAudit": true,
+    "visualReview": true,
+    "jsonValidation": true,
+    "javascriptSyntax": true,
+    "localLinks": true,
+    "gameCodeChanged": true,
+    "browserInteractionTest": true,
+    "realPhoneTest": false,
+    "browserLimit": "Historical concept browser attempts timed out. The runtime transfer was verified in isolated headless Chrome with emulated viewport/touch, not on a physical phone.",
+    "originalMenuGlyphParity": true,
+    "geometryTestsPassed": 16,
+    "independentReview": true,
+    "sharedWorldTextureSet": true,
+    "baseNightDataSnapshot": true,
+    "sourceAlphaInspection": true,
+    "terrainAspectPreserved": true,
+    "programmaticPreviewVisualReview": true,
+    "irregularCoastVisualReview": true,
+    "exportUsesCurrentTerrain": true,
+    "fullScreenDimensions": true,
+    "fullScreenLayoutBounds": true,
+    "fullScreenVisualReview": true,
+    "fullScreenGlyphWidths": true,
+    "transparentUiIconAtlas": true,
+    "mobileMaterialStudy": {
+      "nativeCanvas": true,
+      "textBounds": true,
+      "labelFrameFits": true,
+      "nineSliceFrameFits": true,
+      "sourceIconAspectPreserved": true,
+      "sourceHashesUnchanged": true,
+      "roiPixelsChecked": 528000,
+      "roiPixelsChanged": 0,
+      "mapInteriorPixelsChecked": 631828,
+      "mapInteriorPixelsChanged": 0,
+      "cornerBlitsValidated": 44,
+      "staticVisualReview": true,
+      "independentStaticReview": true,
+      "browserTest": false,
+      "realPhoneTest": false
+    },
+    "responsivePair": {
+      "sharedCoordinatesAndRules": true,
+      "spriteAspect": true,
+      "desktopSpriteDimensionsExactlyBaseline": true,
+      "terrainCoversActiveField": true,
+      "textBoundsAndNoTextOverlap": true,
+      "textIconNoOverlap": true,
+      "panelTextFits": true,
+      "mapToolsAvoidObjects": true,
+      "nineSliceCornerScale": 1,
+      "sourceSceneUnchanged": true,
+      "render": "passed",
+      "sourceHashesAfterRender": true,
+      "damagedObjectHealthbarsOnly": [
+        "lower"
+      ],
+      "wholeSkinStretch": false,
+      "geometryTestsPassed": 16,
+      "independentStaticReview": true,
+      "rootStaticReview": true,
+      "actualSettingsGlyphsCompared": 36,
+      "actualSettingsGlyphParity": true,
+      "mobileFieldFraction": 0.5864928909952607,
+      "mobileMinPrimaryGlyphCss": 14.625,
+      "mobileMinActionCss": 44,
+      "logical390PreviewReviewed": true,
+      "browserTest": false,
+      "realPhoneTest": false,
+      "newGameCodeChanged": false
+    }
+  },
+  "limitations": [
+    "Rules snapshot is the actual base broken-shore configuration without profile upgrades. Integration must read current ApplicationView.config.",
+    "Sprite presentation sizes and pier location remain preliminary.",
+    "Programmatic previews are exports of shared geometry and assets, not browser screenshots.",
+    "Earlier mobile material studies contain baked illustration maps; the current responsive-v4 pair reconstructs a shared world from scene-data and separate assets.",
+    "The mobile active field is fully covered by the single terrain texture. The outermost canvas behind UI may use the dark backdrop, without terrain duplication.",
+    "Current runtime uses shared traced shoreline geometry; historical concept snapshots remain unchanged. Six device types still use distinct pixel glyph artwork in the shared renderer.",
+    "Rewarded video integration, reward amounts and limits are not implemented; plus buttons display unavailability without issuing currency."
+  ],
+  "uiLayoutStudies": [
+    {
+      "file": "desktop-v3.png",
+      "notes": "Revised desktop toolbar, currency styling and plus buttons, Improvements and device-catalogue control. Terrain is illustrative, not exact world geometry."
+    },
+    {
+      "file": "portrait-overview-v1.png",
+      "notes": "One mobile map viewport with on-demand close-up. Terrain is illustrative, not an alternate production map."
+    }
+  ],
+  "supersededOutputs": [
+    "desktop-v2.png",
+    "portrait-split-v2.png",
+    "portrait-expanded-v1.png"
+  ],
+  "promptFiles": [
+    "prompts.json",
+    "revision-prompts.json",
+    "revision-2-prompts.json",
+    "shared-map-prompt.txt",
+    "revision-3-prompt.txt",
+    "revision-3-overlays.json",
+    "world-v2/prompts.json",
+    "world-v2/shore-revision-prompt.txt",
+    "full-screen-v1/ui-icons-prompt.txt",
+    "mobile-materials-v2/ui-chrome-prompt.txt",
+    "mobile-slate-v3/ui-chrome-prompt.txt",
+    "mobile-slate-v3/ui-chrome-correction-prompt.txt"
+  ],
+  "userCorrections": [
+    "Separate plus buttons for both currencies lead to future voluntary rewarded-ad offers.",
+    "Improvements opens the skill tree.",
+    "Scrollable device catalogue supports many types independently of placement limits.",
+    "One viewport; close-up only on explicit action.",
+    "Placement uses the general top-down view.",
+    "Preparation and battle share the same world and sprites; only camera zoom changes.",
+    "World shape is unrestricted; square 1:1 aspect ratio is not required.",
+    "Arthurian runic-shard and Celtic-mounted pearl styling; currency names unchanged.",
+    "All lettering, numbers and icons must follow the main menu pixel style.",
+    "Show lighthouse potential range and general monster-emergence region; show a device area only when selected.",
+    "Overall composition is liked but remains a working design for future revisions.",
+    "Terrain has off-camera margin and camera fit follows actual world areas and selected-device bounds.",
+    "Use a separate lighthouse sprite derived from the real main-page tower.",
+    "Place a decorative nearby pier without adding mechanics.",
+    "User prefers the supplied irregular rocky shoreline; a perfectly straight visual boundary is not required.",
+    "Provide complete portrait mobile and desktop screen references with all agreed controls and the current world.",
+    "Work on mobile and desktop separately; selected mobile layout is liked, but blue dominates the UI. Explore quieter neutral stone, dark oak and restrained warm accents.",
+    "After comparison with main and settings, try low-saturation blue-grey graphite slate instead of wood/olive, use existing menu text colors and quiet bevels, retain amber primary action.",
+    "Continue both desktop and mobile layouts in one visual system with Main, Settings and Game Selection; compact mobile UI, allocate more room to map, improve small labels and action affordances."
+  ],
+  "compositionFeedback": "Overall responsive reference approved for a trial runtime transfer; implementation complete, final art polish remains iterative.",
+  "previousStyleStudies": [
+    "portrait-pixel-ranges-v2.png",
+    "portrait-pixel-selected-v1.png"
+  ],
+  "worldData": {
+    "source": {
+      "nightId": "broken-shore",
+      "chapter": "Туманный берег",
+      "nightName": "Разбитый берег",
+      "rulesVersion": "prototype-22-late-modes",
+      "profileUpgrades": [],
+      "note": "Actual base night configuration; example placements and presentation scales only."
+    },
+    "rules": {
+      "worldRadius": 400,
+      "spawnRadius": 365,
+      "lighthouseRadius": 30,
+      "beamRange": 300,
+      "beamHalfAngle": 0.20943951023931953,
+      "placementRadius": 300,
+      "shieldRadius": 155
+    },
+    "projectionY": 0.7,
+    "terrain": {
+      "minX": -1500,
+      "maxX": 1500,
+      "minY": -1428.5714285714287,
+      "maxY": 1428.5714285714287
+    },
+    "pier": {
+      "id": "pier",
+      "kind": "pier",
+      "name": "Причал",
+      "x": 0,
+      "y": 110,
+      "radius": 0
+    },
+    "notes": "Base-night radii are actual current content. Sample placements, projection and sprite display sizes remain provisional; no saved profile read or modified.",
+    "visualCoastline": {
+      "style": "irregular stepped rock ledges with small headlands and inlets, based on the user reference",
+      "gameplayGeometryStatus": "The actual game still uses a straight shoreX boundary; this image is an art study, not a placement mask."
+    },
+    "currentGameLandBoundary": {
+      "shoreX": 0,
+      "landOnlyPlacement": true
+    }
+  },
+  "previousMapSourceSha256": "6157a8e71c49d06791243a8103a2fafcd15dd35245adb4cf1a037b5d892f76a4",
+  "assetHashes": {
+    "terrain-padded.png": "d0d9dea4865856791145fe8e9a8b7980d2efef5026d5e1d87f32692f1a6e7f4d",
+    "lighthouse-main.png": "04fac5d318eff0d4c478684bbf5fd3beb16917c59fa410a8253086f2ae5a9e4f",
+    "props-atlas.png": "3abe0a8b213f63d248c6c4fb612d50747ee15d17225ed88bbc6c9b6c0a7961bc",
+    "terrain-coast-irregular-v1.png": "3683c7b0e4521a03345c2aba6ff589f3aa1672b43ed84020669f856ea2e0bac3",
+    "full-screen-v1/ui-icons.png": "244189d9b2729c68a3b1cb28e821a16b9a7cc8473597570b411b21c5a8e5a1f2",
+    "mobile-materials-v2/ui-chrome.png": "e192cf11823af20f573dae31d2a268455ba9d9ed9f8be2086bf857de45cc09fb",
+    "mobile-materials-v2/user-mobile-reference.png": "bcc0b94272d0e84455f0f6f2a44ccaa43a40fea149752864ed49798cba75eef7",
+    "mobile-materials-v2/mobile-warm.png": "de3e89284dfbff9e25428595aa926538d7574f3ab06597390e56316e336b06eb",
+    "mobile-slate-v3/ui-chrome.png": "1029183fe3faec605d7d96a2bce8f13a2414abf3c68d0002034c336fb404585b",
+    "mobile-slate-v3/mobile-slate.png": "c5bdbe6b8602637f9ca5c5c9a86d2f691155ddca1c8a382b138ac176b5a9852e",
+    "responsive-v4/mobile.png": "4e9c6aa08074d3324365b29fbe7513bf9018123ba5742cec8c95a4275de4e9a7",
+    "responsive-v4/desktop.png": "c8a72da03e53e47437a23bc383a1028632308cf0432b3615696df577b1712893",
+    "responsive-v4/mobile-at-390.png": "57a3acbbaf3861bbc3460d1a4f6250a4fde1ce9aa7c14e9e94aeb1e8eba818f3"
+  },
+  "visualCoastline": {
+    "style": "irregular stepped rock ledges with small headlands and inlets, based on the user reference",
+    "gameplayGeometryStatus": "The actual game still uses a straight shoreX boundary; this image is an art study, not a placement mask."
+  },
+  "currentGameLandBoundary": {
+    "shoreX": 0,
+    "landOnlyPlacement": true
+  },
+  "referenceImages": [
+    "world-v2/shore-reference-user.png"
+  ],
+  "fullScreenReferences": {
+    "directory": "responsive-v4",
+    "layouts": "responsive-v4/layouts.json",
+    "fields": "responsive-v4/fields.json",
+    "cameras": "responsive-v4/cameras.json",
+    "calibration": "responsive-v4/calibration.json",
+    "verification": "responsive-v4/verification.json",
+    "specification": "responsive-v4/DESIGN_CONTRACT.md",
+    "state": "overview, no selected device",
+    "worldSource": "world-v2/scene-data.js",
+    "icons": "full-screen-v1/ui-icons.png",
+    "lettering": "full-screen-v1/glyphs.json",
+    "stoneSkin": "mobile-slate-v3/ui-chrome.png",
+    "terrainFactor": 0.75,
+    "sharedWorldPositions": true,
+    "sharedRadii": true,
+    "notes": "Shared scene and single viewport per layout; source/canonical assets unchanged. Static exports, no new game UI integration.",
+    "selectedDeviceArea": "Shown on selection in the intended UI; static overview exports show only lighthouse and emergence bounds"
+  },
+  "mobileMaterialStudy": {
+    "directory": "mobile-slate-v3",
+    "reference": "mobile-materials-v2/user-mobile-reference.png",
+    "chrome": "mobile-slate-v3/ui-chrome.png",
+    "chromeSize": [
+      953,
+      1651
+    ],
+    "layout": "mobile-slate-v3/layout.json",
+    "skinLayout": "mobile-slate-v3/ui-skin-layout.json",
+    "verification": "mobile-slate-v3/verification.json",
+    "sourceMapTransform": "identity",
+    "scope": "Static material study aligned with existing menu/settings; fixed historical map, canonical world and game unchanged",
+    "composition": "11 nine-slice panels with 44 unscaled corners; whole skin never stretched",
+    "palette": {
+      "ink": "#DFC7A2",
+      "muted": "#AAB7BE",
+      "background": "#08131D"
+    },
+    "review": "Root and independent visual designer inspected output against implemented settings/game-menu screenshots; no material issues found",
+    "browserTest": false,
+    "realPhoneTest": false,
+    "status": "historical-material-study",
+    "supersededBy": "responsive-v4/mobile.png"
+  },
+  "desktopStudy": {
+    "directory": "desktop-cohesion-v2",
+    "status": "historical-working-draft",
+    "preferredHistoricalReference": "desktop-v3.png",
+    "note": "User requested separate mobile work before further PC revision. Draft is not final.",
+    "currentReference": "responsive-v4/desktop.png"
+  },
+  "previousMobileMaterialStudies": [
+    {
+      "directory": "mobile-materials-v2",
+      "reference": "mobile-materials-v2/user-mobile-reference.png",
+      "chrome": "mobile-materials-v2/ui-chrome.png",
+      "layout": "mobile-materials-v2/layout.json",
+      "verification": "mobile-materials-v2/verification.json",
+      "sourceMapTransform": "identity",
+      "scope": "Static material study with a fixed historical illustration; canonical world and actual game unchanged",
+      "review": "Root and independent visual designer inspected static output; no material issues found",
+      "competitors": [
+        "https://store.steampowered.com/app/2849080/Kingdom_Rush_5_Alliance_TD/",
+        "https://gridpop.co/isle/press.html"
+      ],
+      "competitorArtCopied": false
+    }
+  ],
+  "previousFullScreenReferences": {
+    "directory": "full-screen-v1",
+    "layout": "full-screen-v1/layouts.json",
+    "fieldLayout": "full-screen-v1/field-layouts.json",
+    "state": "overview without selected device",
+    "worldSource": "world-v2/scene-data.js",
+    "icons": "full-screen-v1/ui-icons.png",
+    "lettering": "pixel-lettering.js",
+    "frames": "sprites/menu-buttons-v2/frame-states.png",
+    "notes": "Programmatic assembly of the real shared world and menu art; not independent AI redraws of the map."
+  },
+  "runtime": {
+    "date": "2026-11-18",
+    "documentation": "docs/PREPARATION_SCREEN.md",
+    "screenshots": "art/concepts/preparation-2026-11-17/runtime-v1",
+    "referenceApproval": "User liked the overall pair and explicitly asked to transfer it to the game.",
+    "rulesVersion": "prototype-23-irregular-shore",
+    "sharedWorld": true,
+    "oldPositionsPreserved": true,
+    "exactOwnedMoveAtomic": true,
+    "adsUnavailableNoReward": true,
+    "assets": [
+      "public/images/preparation/world",
+      "public/images/preparation/ui"
+    ],
+    "reports": [
+      "test-results/preparation-1794930653510-50636/report.json",
+      "test-results/preparation-1794932391043-3128/report.json"
+    ],
+    "verification": {
+      "typecheck": true,
+      "activeTestsPassed": 290,
+      "activeTestFiles": 17,
+      "build": true,
+      "browserGameplayChecks": 26,
+      "finalLayoutChecks": 11,
+      "runtimeErrors": 0,
+      "httpErrors": 0,
+      "independentRulesReview": true,
+      "independentVisualReview": true,
+      "realPhoneTest": false
+    }
+  }
+}

@@ -12,6 +12,9 @@
     "dev": "vite --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:audits": "vitest run --config vitest.audits.config.ts",
+    "test:legacy": "vitest run --config vitest.legacy.config.ts",
+    "test:legacy:baseline": "node --test tools/check-legacy-baseline.test.mjs && node tools/check-legacy-baseline.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },

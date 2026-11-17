@@ -1,0 +1,119 @@
+[
+  {
+    "file": "field-desktop.png",
+    "width": 1672,
+    "height": 941,
+    "padding": 24,
+    "mode": "overview",
+    "selected": null,
+    "camera": {
+      "zoom": 0.9001956947162427,
+      "centerX": 0,
+      "centerY": 0
+    },
+    "terrain": {
+      "asset": "terrain-coast-irregular-v1.png",
+      "x": -176.7201565557731,
+      "y": -204.64677103718202,
+      "width": 2025.4403131115462,
+      "height": 1350.293542074364
+    },
+    "areas": [
+      {
+        "x": 507.4285714285714,
+        "y": 240.5,
+        "width": 657.1428571428572,
+        "height": 460,
+        "color": "#9BBCCB",
+        "dashed": true
+      },
+      {
+        "x": 565.9412915851271,
+        "y": 281.45890410958907,
+        "width": 540.1174168297456,
+        "height": 378.0821917808219,
+        "color": "#E9C77D",
+        "dashed": true
+      }
+    ],
+    "legend": [],
+    "sprites": [
+      {
+        "id": "upper",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 666.6731898238747,
+        "y": 339.09603242383275,
+        "width": 66.61448140900197,
+        "height": 44.52040154018086,
+        "health": 70,
+        "maxHealth": 70
+      },
+      {
+        "id": "lighthouse",
+        "asset": "lighthouse-main.png",
+        "frame": {
+          "x": 257,
+          "y": 84,
+          "width": 502,
+          "height": 1337
+        },
+        "x": 803.8905514726869,
+        "y": 314.8561643835617,
+        "width": 64.2188970546262,
+        "height": 171.0371819960861
+      },
+      {
+        "id": "barrier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 798,
+          "y": 182,
+          "width": 287,
+          "height": 284
+        },
+        "x": 601.9491193737769,
+        "y": 425.60438642546893,
+        "width": 54.01174168297457,
+        "height": 53.44715901729887,
+        "health": 140,
+        "maxHealth": 140
+      },
+      {
+        "id": "pier",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 16,
+          "y": 851,
+          "width": 600,
+          "height": 246
+        },
+        "x": 804.6731898238747,
+        "y": 507.7050880626223,
+        "width": 130.5283757338552,
+        "height": 53.51663405088063
+      },
+      {
+        "id": "lower",
+        "asset": "props-atlas.png",
+        "frame": {
+          "x": 113,
+          "y": 212,
+          "width": 401,
+          "height": 268
+        },
+        "x": 666.6731898238747,
+        "y": 515.5343885882163,
+        "width": 66.61448140900197,
+        "height": 44.52040154018087,
+        "health": 42,
+        "maxHealth": 70
+      }
+    ]
+  }
+]

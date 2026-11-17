@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { settingsLayout, usesMobileSettingsLayout, type SettingsRect } from '../src/presentation/settingsLayout';
-import { settingsTextWidth } from '../src/presentation/settingsLettering';
+import { settingsLayout, usesMobileSettingsLayout, type SettingsRect } from '../src/presentation/settings/settingsLayout';
+import { settingsTextWidth } from '../src/presentation/shared/settingsLettering';
 
 const viewports = [[320, 568], [390, 844], [568, 320], [844, 390], [1000, 700], [1280, 720], [1672, 941], [768, 1024], [1024, 768]] as const;
 

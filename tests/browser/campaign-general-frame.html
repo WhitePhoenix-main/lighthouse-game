@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Этап A — контрольные сценарии</title>
+</head>
+<body>
+  <section id="campaign-controls" aria-label="Контрольные сценарии этапа A">
+    <strong>Этап A · предварительные параметры</strong>
+    <label>Сценарий <select id="control-scenario"><option value="turn">Разворот</option><option value="shield">Поле</option></select></label>
+    <label>Ранг <select id="control-rank"><option value="0">Без улучшения</option><option value="1">I</option><option value="2">II</option></select></label>
+    <button id="control-reset">Начать заново</button>
+    <button id="control-turn">Развернуть на 180°</button>
+    <button id="control-hit" hidden>Истощить поле</button>
+    <output id="control-status" aria-live="off"></output>
+  </section>
+  <div id="app"></div>
+  <script type="module" src="./campaign-general-frame.ts"></script>
+</body>
+</html>

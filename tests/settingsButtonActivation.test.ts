@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mountMenuButtons } from '../src/presentation/menuButtons';
+import { mountMenuButtons } from '../src/presentation/menu/menuButtons';
 
 afterEach(() => vi.useRealTimers());
 

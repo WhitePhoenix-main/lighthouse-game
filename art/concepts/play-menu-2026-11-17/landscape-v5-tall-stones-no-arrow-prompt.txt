@@ -1,0 +1,20 @@
+Generation mode: built-in image_gen (local edit).
+Scope: desktop game-selection visual reference only; no executable interface or rules changed.
+User preference: retain the taller irregular secondary stones with icons ABOVE their labels and the shared low foreground base, instead of flatter stones with inline icons.
+Change: preserve the preferred composition and remove only the Back arrow, centering its label.
+Edit source: user-supplied codex-clipboard-4d48ba92-274d-46a7-aac3-b7f8d600eafa.png (preferred landscape-v3 composition).
+Sample chapter and night 2 remain illustrative saved-game data.
+
+FINAL PROMPT
+
+Use case: precise-object-edit.
+The user explicitly prefers THIS desktop menu composition over a later variant. Keep this exact design: tall irregular stone menu tablets across the lower foreground, crossed-swords and rising-sun icons ABOVE their labels, larger warm-highlighted Continue tablet, common stone base, open lighthouse scenery.
+
+Make ONLY ONE tiny change to the attached image:
+On the small stone button in the TOP-LEFT corner, remove the left-pointing arrow beside "НАЗАД". Restore the matching slate texture in its place, then center the word "НАЗАД" horizontally on that SAME button.
+Preserve its existing text size, pixel-serif lettering, pale ivory color and vertical placement. The button must contain ONLY the word "НАЗАД", without any icon.
+
+Everything else must remain unchanged: complete 16:9 composition, background, lighting, lighthouse, moon, arch, ship, stone silhouettes and positions, tablet heights, icon positions ABOVE labels, text sizes, all labels, padding and spacing.
+Keep these texts exact: "ГЛАВА I", "ТУМАННЫЙ БЕРЕГ", "НОЧЬ 2", "ПРОДОЛЖИТЬ", "ИСПЫТАНИЯ", "НОВАЯ ИГРА", "НАЗАД".
+Do not replace secondary stones with flatter pill-shaped controls, do not move icons inline beside text, do not add any other objects or text, and do not restyle the image.
+Preserve sharp square-pixel art. Return only the complete edited desktop reference, with no phone/hardware frame or comparison board.

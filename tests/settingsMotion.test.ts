@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mountSettingsTransition } from '../src/presentation/settingsTransition';
+import { mountSettingsTransition } from '../src/presentation/settings/settingsTransition';
 
 afterEach(() => vi.unstubAllGlobals());
 

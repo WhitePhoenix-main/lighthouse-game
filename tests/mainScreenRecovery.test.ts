@@ -4,8 +4,8 @@ import { emptySave } from '../src/application/saves';
 import { NIGHT_CONFIG } from '../src/content/night';
 import { NIGHT_CATALOG } from '../src/content/nights';
 import { screenContent } from '../src/presentation/screens';
-import { translate } from '../src/presentation/localization';
-import { drawSettingsPixelText } from '../src/presentation/settingsLettering';
+import { translate } from '../src/presentation/shared/localization';
+import { drawSettingsPixelText } from '../src/presentation/shared/settingsLettering';
 
 function application(saved = false): LighthouseApplication {
   let raw = saved ? JSON.stringify(emptySave()) : null;

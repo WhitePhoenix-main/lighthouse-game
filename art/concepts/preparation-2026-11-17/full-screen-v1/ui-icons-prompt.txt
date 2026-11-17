@@ -1,0 +1,16 @@
+Use case: stylized-concept.
+Asset type: transparent PIXEL UI ICON ATLAS for full-screen preparation references of the existing Russian Arthurian lighthouse game "Свет Авалона".
+Input image is STYLE REFERENCE ONLY: the approved working preparation UI. Create a WIDE 2:1 RGBA atlas around1536x768 with EIGHT equal square cells, EXACTLY FOUR COLUMNS and TWO ROWS. No visible grid/borders/background. Each icon centered in its own cell, with wide transparent margins; no icon crosses a cell boundary. Real alpha transparency, no baked checkerboard.
+Style: finely handcrafted pixel sprites consistent with the reference's main-menu pixel lettering and slate/bronze fantasy. Visible clean stepped edges, limited careful pixel clusters, crisp details. NO smoothly shaded vector curves, glossy candy gradients, blur, neon bloom or enormous 8-bit blocks. Palette aged bronze, quiet slate, pale warm ivory and restrained teal light.
+Exact cell order:
+TOP ROW, left to right:
+1) SHARD: an angular silver-grey broken ancient rune-stone shard, tiny warm-gold engraved rune, no text/letters. Strong shard silhouette, NOT generic orange gem cluster.
+2) PEARL: round milky ivory pearl with cold pale-teal reflection, held by a small aged-bronze Celtic-knot mount. Recognizable pearl, no oyster shell, no crown.
+3) IMPROVEMENTS: branching skill-tree diagram made of four/five small square or faceted gold nodes connected by thin stepped bronze/gold lines. NOT logs, not a botanical tree.
+4) RECONNAISSANCE: small old bronze spyglass pointing diagonally upward/right, muted blue lens.
+BOTTOM ROW, left to right:
+5) CLOSE-UP: bronze magnifier with pixel-stepped pale-blue glass, small distinct handle.
+6) LENS: round/hexagonal pale-blue lighthouse optic in a bronze ring with a clear faceted center.
+7) ABILITY: restrained warm golden flash/sunburst rune with small stepped rays, no soft outer glow.
+8) DEVICES: compact grouping of a small left-facing bronze cannon, two low slate blocks and a tiny tool gear/chest; reads as armory/device catalogue, NOT a fourth currency.
+No numbers, plus signs, labels, text, words, panels, creatures, backgrounds, game scenes or lighthouse. Full atlas only. Preserve four-by-two layout exactly, every icon wholly within its cell.

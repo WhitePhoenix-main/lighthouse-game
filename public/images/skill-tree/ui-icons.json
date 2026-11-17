@@ -1,0 +1,59 @@
+{
+  "image": "ui-icons.png",
+  "size": [
+    1774,
+    887
+  ],
+  "alphaThreshold": 128,
+  "transparentPixels": 1179676,
+  "frames": {
+    "shard": {
+      "x": 123,
+      "y": 105,
+      "width": 213,
+      "height": 262
+    },
+    "pearl": {
+      "x": 534,
+      "y": 113,
+      "width": 262,
+      "height": 236
+    },
+    "upgrades": {
+      "x": 970,
+      "y": 115,
+      "width": 276,
+      "height": 236
+    },
+    "recon": {
+      "x": 1406,
+      "y": 131,
+      "width": 287,
+      "height": 192
+    },
+    "zoom": {
+      "x": 111,
+      "y": 560,
+      "width": 226,
+      "height": 218
+    },
+    "lens": {
+      "x": 528,
+      "y": 535,
+      "width": 256,
+      "height": 253
+    },
+    "flash": {
+      "x": 974,
+      "y": 533,
+      "width": 269,
+      "height": 264
+    },
+    "devices": {
+      "x": 1365,
+      "y": 562,
+      "width": 364,
+      "height": 228
+    }
+  }
+}
