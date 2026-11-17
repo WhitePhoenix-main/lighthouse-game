@@ -1,3 +1,4 @@
+import { landSpawnAngle } from '../content/terrain';
 import { damageLighthouse, healLighthouseAfterWave } from './lighthouse';
 import { finishingLightMultiplier } from './lightSupport';
 import type { BattleCommand, BattleState, DeviceDeployment, DevicePlacement, NightConfig, RandomSource } from '../contracts';
@@ -53,7 +54,9 @@ function spawnDue(state: BattleState, config: NightConfig): void {
       // Uniform permitted arc, with the full ground body on land; no rejection loop.
       const land = config.terrain && enemy.spawnSide === 'land';
       const edge = land ? Math.acos(Math.max(-1, Math.min(1, (config.terrain!.shoreX - enemy.radius) / config.spawnRadius))) : 0;
-      const angle = edge + sample * (Math.PI * 2 - edge * 2);
+      const angle = land && config.terrain?.shoreline
+        ? landSpawnAngle(config.terrain, config.spawnRadius, enemy.radius, sample)
+        : edge + sample * (Math.PI * 2 - edge * 2);
       state.enemies.push({ id: state.nextEnemyId++, kind, waveIndex,
         x: Math.cos(angle) * config.spawnRadius, y: Math.sin(angle) * config.spawnRadius,
         health: enemy.health, armor: enemy.armor, attackCooldown: 0, ...(enemy.charge ? { chargePhase: 'ready' as const } : {}) });

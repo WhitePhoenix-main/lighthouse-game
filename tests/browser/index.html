@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Маяк — визуальный стенд</title>
+<style>.fixture-toolbar{height:48px;display:flex;gap:6px;align-items:center;overflow:auto;background:#14252c;padding:2px 8px}.fixture-toolbar button{white-space:nowrap;padding:4px 10px;font:12px system-ui;min-height:40px}.fixture-toolbar span{font:11px system-ui;white-space:nowrap;color:#ddd}#app .lighthouse-app{height:calc(100dvh - 48px)}</style></head>
+<body><nav class="fixture-toolbar" aria-label="Визуальный стенд"><span>СТЕНД, без сохранений</span>
+<button data-scene="live">Живой бой / подготовка</button><button data-scene="live-commands">Живые команды</button>
+<button data-scene="campaign">Глава — новый профиль</button><button data-scene="campaign-open">Глава — все ночи</button>
+<button data-scene="campaign-boss">Ночь босса — подготовка</button><button data-scene="campaign-lenses">Линзы — покупки</button>
+<button data-scene="boss">Босс</button><button data-scene="boss-flash">Босс — вспышка</button><button data-scene="boss-blocked">Босс — перекрытие</button>
+<button data-scene="boss-loss">Босс убит — поражение</button><button data-scene="boss-victory">Босс — победа</button>
+<button data-scene="new-enemies">Новые враги</button><button data-scene="ship">Корабль</button>
+<button data-scene="shield">Щит</button><button data-scene="shield-down">Истощённый щит</button>
+<button data-scene="flash">Вспышка</button><button data-scene="trap">Ловушка</button><button data-scene="overview">Обзор</button>
+<button data-scene="armor">Скол брони</button><button data-scene="death">Гибель</button><button data-scene="defense">Защита</button>
+<button data-scene="crowd">Скопление</button><button data-scene="large">Крупный текст</button><button data-scene="normal">Обычный текст</button>
+</nav><div id="app"></div><script type="module" src="./fixture.ts"></script></body></html>

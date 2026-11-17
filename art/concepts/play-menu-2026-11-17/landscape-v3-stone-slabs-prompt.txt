@@ -1,0 +1,54 @@
+Generation mode: built-in image_gen (edit and landscape extension).
+Scope: improved desktop visual reference only; no executable interface or rules changed.
+Direction: preserve world-integrated stone slabs; reduce passive chapter metadata, improve padding, emphasize Continue with a restrained warm edge and keep secondary edges cool.
+Four actions: Continue, Trials, New Game, Back. Chapter and night 2 are illustrative sample saved-game information.
+References:
+- User-supplied codex-clipboard-af5eb2a7-eb10-4c20-9a06-b727b69d5ce7.png (primary stone-slab design)
+- art/concepts/play-menu-2026-11-17/landscape-v2-clean.png (supporting full landscape scenery only)
+- sprites/previews/landscape.png (original game pixel style)
+
+FINAL PROMPT
+
+Use case: ui-mockup / precise-object-edit.
+Create an IMPROVED DESKTOP REFERENCE for the Russian pixel-art lighthouse game, building on the user's preferred STONE-SLAB MENU.
+
+INPUT IMAGE ROLES:
+Image 1 is the PRIMARY DESIGN / EDIT TARGET: user's screenshot crop showing THREE physical, irregular dark slate tablets across the lower foreground. The left tablet contains saved chapter information and "ПРОДОЛЖИТЬ", the center has crossed swords and "ИСПЫТАНИЯ", the right has a rising-sun engraving and "НОВАЯ ИГРА". Retain this distinctive world-integrated stone-tablet concept and recognizable shapes.
+Image 2 is SUPPORTING SCENERY ONLY: a complete 16:9 view of the lighthouse coast. Use its full landscape composition, lighthouse, moon, arch, shore and ship to complete the upper scene missing from the cropped input. DO NOT copy its rectangular illustrated Continue card, menu column or copper frame buttons.
+Image 3 is the ORIGINAL ACTUAL GAME PIXEL STYLE reference: crisp square pixels, stepped letterforms and coast, cool navy/slate materials with warm amber light.
+
+DELIVERABLE:
+ONE complete polished 16:9 desktop game-selection reference, ideally 1920x1080.
+Not a before/after board, not a UI sprite sheet or screenshot crop. No phone/computer hardware frame.
+Use a single atmospheric full-screen moonlit coast: tall lighthouse in the center-right, warm windows and lantern, ruined arch, rocky stairs, dark sea, mist, distant small sailing ship and moon.
+The menu tablets sit physically in the LOW foreground, on subtle stone supports that belong to the shore. Above them, leave most of the scenic lighthouse visible.
+
+KEEP THE THREE STONE TABLETS, IMPROVE THEIR HIERARCHY:
+- Left "ПРОДОЛЖИТЬ" tablet is slightly wider and noticeably taller than the other two. Make it the clear main action through silhouette, larger action label and restrained warm amber rim light. The light should feel reflected from the lighthouse: thin subtle highlight, no neon outline.
+- Left tablet saved information is MUCH SMALLER and calmer than the main action. Three centered lines with generous top and side padding, exactly:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 2"
+The chapter name should be readable and comfortably inside the stone silhouette, never close to chipped edges.
+Below this passive information, leave breathing room and a very short quiet engraved separator if needed; then the larger "ПРОДОЛЖИТЬ" label in the lower part, with generous bottom padding. Do not add a diamond or ornate flourish.
+- Middle "ИСПЫТАНИЯ" and right "НОВАЯ ИГРА" tablets have equal visual weight, somewhat lower height. Their outside stone edges are COOL SLATE BLUE-GRAY and softer in contrast; avoid warm outlines on these secondary tablets.
+- Preserve the crossed-swords and rising-sun icons as shallow, small, muted carvings above the secondary labels. They must not dominate the labels.
+- Secondary labels are warm pale ivory, about 20% smaller and slightly less bright than "ПРОДОЛЖИТЬ", still very readable. Add generous padding and consistent alignment.
+- Give the three tablets enough separation that their irregular silhouettes and click areas remain clear. Align their lower bases and avoid crowding text against the bottom edge.
+
+FOURTH ACTION:
+Add one modest small slate return control in the upper-left safe margin: a left arrow with the exact text "НАЗАД". It is clearly tertiary, consistent with the pixel style, unobtrusive, and does not cover the lighthouse.
+Do not add a prominent heading; let the setting and foreground menu establish the screen.
+
+ART DIRECTION:
+Calm moonlit navy and blue-gray slate, warm lighthouse amber and ivory typography, grouped pixel colors, visibly square stepped pixels and crisp pixel-serif Cyrillic that belongs to the existing main menu. Tablet faces have restrained low-contrast stone fissures; mostly clean surfaces behind labels. Relate their material to the coast and original screenshot.
+Keep the worn asymmetrical slate shapes from Image 1; do NOT turn them into rectangular illustrated cards or generic rounded app buttons.
+The stone slabs are the only menu surfaces: NO encompassing panel, external masonry frame, large opaque background sheet or enclosing border.
+Use only subtle local dimming/contrast support around text as needed. Keep the scenery expressive and the center of the screen open.
+
+STRICT CONTENT AND AVOIDS:
+Exactly four actions: "ПРОДОЛЖИТЬ", "ИСПЫТАНИЯ", "НОВАЯ ИГРА", left arrow plus "НАЗАД".
+Saved chapter and "НОЧЬ 2" are passive sample progress information, not a level selector.
+No illustration inside the Continue tablet, no repeated miniature lighthouse on it.
+No line-and-diamond ornament, title logo, level picker, resource counters, extra controls, shop, settings, badges, monsters, characters, extra text, captions, English, watermark, bloom or glossy 3D/vector UI.
+Spell all Russian exactly as above. Show the full improved desktop game screen only.

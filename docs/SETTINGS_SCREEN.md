@@ -37,7 +37,7 @@
 ## Общий фон и появление панели
 
 Продолжение в ветке `settings-screen`: меню и настройки используют один
-постоянный DOM-слой `.menu-scene-layer`. Общий модуль `menuScenery.ts` задаёт
+постоянный DOM-слой `.menu-scene-layer`. Общий модуль `src/presentation/menu/menuScenery.ts` задаёт
 изображение, декор, туман и кадрирование. На десктопе и в обеих ориентациях
 телефона камера настроек совпадает с камерой меню. Луна, облака, трава, вода,
 корабль, ореол маяка и окна сохраняют свои элементы и текущие фазы при переходе,
@@ -107,9 +107,9 @@ TypeScript, 133 теста настроек и сборка прошли в са
 `.worktrees/settings-polish` с Vite на `http://127.0.0.1:5177`:
 
 ```powershell
-node tools/verify-settings-screen.cjs http://127.0.0.1:5177
-node tools/verify-settings-motion.cjs http://127.0.0.1:5177
-node tools/verify-settings-navigation.cjs http://127.0.0.1:5177
+node tools/browser/verify-settings-screen.cjs http://127.0.0.1:5177
+node tools/browser/verify-settings-motion.cjs http://127.0.0.1:5177
+node tools/browser/verify-settings-navigation.cjs http://127.0.0.1:5177
 ```
 
 Адрес сервера можно передать аргументом. Нужны Node.js 22+ и Chrome;

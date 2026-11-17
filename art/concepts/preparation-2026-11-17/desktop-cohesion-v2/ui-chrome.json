@@ -1,0 +1,15 @@
+{
+  "image": "ui-chrome.png",
+  "size": [
+    1672,
+    941
+  ],
+  "bitDepth": 8,
+  "colorType": 6,
+  "sampledAlpha": {
+    "center": 0,
+    "top": 253,
+    "bottom": 253,
+    "zoom": 253
+  }
+}

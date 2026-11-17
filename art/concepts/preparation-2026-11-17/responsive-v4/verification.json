@@ -1,0 +1,63 @@
+{
+  "sources": [
+    {
+      "path": "../world-v2/scene-data.js",
+      "sha256": "de63bbc5c8c0038fbec52a30a4a1345c8eed4f577860f4a8ca9d686f5b0a3d43"
+    },
+    {
+      "path": "../world-v2/camera-geometry.js",
+      "sha256": "56c2de605384d38623de48beaa2ef325afe973c8cd194de271df0efe634cf563"
+    },
+    {
+      "path": "../world-v2/terrain-coast-irregular-v1.png",
+      "sha256": "3683c7b0e4521a03345c2aba6ff589f3aa1672b43ed84020669f856ea2e0bac3"
+    },
+    {
+      "path": "../world-v2/lighthouse-main.png",
+      "sha256": "04fac5d318eff0d4c478684bbf5fd3beb16917c59fa410a8253086f2ae5a9e4f"
+    },
+    {
+      "path": "../world-v2/props-atlas.png",
+      "sha256": "3abe0a8b213f63d248c6c4fb612d50747ee15d17225ed88bbc6c9b6c0a7961bc"
+    },
+    {
+      "path": "../mobile-slate-v3/ui-chrome.png",
+      "sha256": "1029183fe3faec605d7d96a2bce8f13a2414abf3c68d0002034c336fb404585b"
+    },
+    {
+      "path": "../full-screen-v1/glyphs.json",
+      "sha256": "0ae9767e11edbe304ffeb85fe6daafe5dfc31f0bf7322a2c769dfa5f89af0ad8"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.json",
+      "sha256": "e74ca8ea0cdb8d19f95e5f20da4a3fb0c8aec8229cbdcaa32774d9dd919ecbeb"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.png",
+      "sha256": "244189d9b2729c68a3b1cb28e821a16b9a7cc8473597570b411b21c5a8e5a1f2"
+    }
+  ],
+  "checks": {
+    "sharedCoordinatesAndRules": true,
+    "spriteAspect": true,
+    "desktopSpriteDimensionsExactlyBaseline": true,
+    "terrainCoversActiveField": true,
+    "textBoundsAndNoTextOverlap": true,
+    "textIconNoOverlap": true,
+    "panelTextFits": true,
+    "mapToolsAvoidObjects": true,
+    "nineSliceCornerScale": 1,
+    "sourceSceneUnchanged": true,
+    "render": "passed",
+    "sourceHashesAfterRender": true,
+    "damagedObjectHealthbarsOnly": [
+      "lower"
+    ],
+    "wholeSkinStretch": false
+  },
+  "commands": [
+    "node art/concepts/preparation-2026-11-17/responsive-v4/prepare-layouts.mjs",
+    "powershell -NoProfile -File art/concepts/preparation-2026-11-17/responsive-v4/render.ps1",
+    "node --test art/concepts/preparation-2026-11-17/world-v2/camera-geometry.test.mjs"
+  ]
+}

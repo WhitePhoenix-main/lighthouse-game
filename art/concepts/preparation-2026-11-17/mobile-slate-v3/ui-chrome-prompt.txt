@@ -1,0 +1,35 @@
+Use case: precise-object-edit / ui-mockup.
+Asset type: transparent full-screen mobile game UI skin, native 887 x 1774 PNG.
+Input image 1 (the blank warm wooden UI skin) is the EDIT TARGET.
+Input image 2 (the implemented settings screen) is the PRIMARY MATERIAL, PALETTE AND PIXEL-STYLE reference.
+Input image 3 (the implemented game menu) is a secondary style reference for chipped slate and amber main-action edges.
+
+PRIMARY REQUEST: revise ONLY the materials and border treatment of image1 so this preparation UI belongs to the same game as images2 and3. The previous warm oak / olive variant became too different. Return to restrained desaturated blue-grey GRAPHITE SLATE, very dark ink-blue atmosphere, warm beige lettering to be added separately, and a single amber main action. The original all-blue design was too saturated; solve that with LOW SATURATION, darker surfaces, quieter textures and thinner borders, not by switching to wood. No readable text or icons in this skin.
+
+MATERIALS:
+- Remove ALL visible horizontal wood grain and ALL brown wood panels. Every button interior is fine-grained cool slate, quiet and dark. Do not make these flat vector shapes; preserve handcrafted pixel clusters, chipped corners and tactile subtle stone.
+- UI background #08131D to #101C27, near-black navy/charcoal, with sparse cool grey rock decoration. No green/olive cast, no brown fog, no warm brown overall backdrop.
+- Main panel faces graphite #202D39 / #2C3A46. Slight cool blue undertone, clearly less saturated than the ocean in the game. Edges steel-grey #526477 / #8090A0, restrained warm stone flecks. No vivid cobalt, no uniformly electric blue.
+- Make ordinary borders visually thinner, darker and less busy than the target. They should be compatible with the understated bevel of the settings controls, while preserving the target outer silhouette, exact dimensions and positions. No bright outline around every control.
+- Dark thin bronze divider on device panel, tiny brass details only.
+- Main action at bottom: dark cool-slate face with a distinct crisp amber/copper rim like the game's main Continue/Play action. Restrained warm edge light, not molten yellow fire, no large bloom. Gold is a main action cue.
+- Map rim is thin neutral cool slate. No bright white high-contrast blocks, no ornamental perimeter competing with the map.
+- Pixel art is crisp and deliberate, with coherent pixel size; no smooth painting, 3D glossy bevels or gradient airbrush.
+
+INVARIANTS: preserve canvas exactly887x1774; preserve all control placements and safe interiors; preserve genuine transparency of the map opening. No rearrangement, no resizing, no additional controls.
+Layout reference, same as image1:
+back x26 y22 w222 h67;
+resource capsules x318 y22 w244 h67 and x615 y22 w240 h67, empty square plus-button recess at right of each;
+empty chapter/night area y100..178;
+utility buttons x42 y197 w388 h86 and x456 y197 w388 h86;
+empty status area y318 on left;
+close-up button x552 y303 w316 h54;
+thin map frame x10 y370 w867 h804 with alpha-transparent viewport roughly x24 y385 through x861 y1158. ENTIRE map opening must be real alpha0, including all x34..833 y440..1099. No checkerboard, no map remnants, no black opaque fill in opening.
+empty counters row y1186..1220;
+device panel x20 y1233 w847 h140 with divider x370;
+lens panel x24 y1394 w408 h124;
+ability panel x456 y1394 w408 h124;
+main start x26 y1546 w835 h128;
+empty footer y1690..1735.
+No extra content from reference images2/3. Do not copy their title, lighthouse, buttons or scenery. They guide the MATERIALS only.
+ABSOLUTELY NO text, numerals, letters, icons, plus symbols, lighthouse, devices, waves, map or range circles. All text/icons/map will be composited from existing project assets. Keep empty labelled areas quiet, outside map opaque. Preserve alpha in output. No phone hardware, no side gutters, no watermark.

@@ -1,0 +1,12 @@
+{
+  "created": "2026-11-18",
+  "asset": "enemies.png",
+  "dimensions": [1254, 1254],
+  "sha256": "CAFE79DF1A61997B0D2D0EC67254FD8FBF5F16CDCEF831D8B21A2F531D36995E",
+  "generator": "built-in image_gen.imagegen",
+  "transparentBackground": true,
+  "reference": "art/concepts/battle-2026-11-18/desktop-v1.png",
+  "prompt": "art/concepts/battle-2026-11-18/runtime-assets/enemy-atlas-prompt.txt",
+  "frames": "frames.json",
+  "note": "Original generated PNG; render source rectangles without modifying the atlas. Single-frame project-owned creature concepts; no third-party images imported."
+}

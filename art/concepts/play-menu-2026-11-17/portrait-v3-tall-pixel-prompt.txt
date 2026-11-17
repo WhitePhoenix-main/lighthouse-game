@@ -1,0 +1,53 @@
+Generation mode: built-in image_gen (edit).
+Scope: taller mobile visual concept only; no executable interface or rules changed.
+Direction: vertically recompose for a tall phone, retaining square-pixel styling, translucent scenic dimming, no enclosing frame and the same four actions.
+Saved chapter and night remain illustrative sample data.
+References:
+- art/concepts/play-menu-2026-11-17/portrait-v2-dimmed.png
+- sprites/previews/portrait.png
+
+FINAL PROMPT
+
+Use case: ui-mockup / precise-object-edit.
+Create the next MOBILE PORTRAIT revision of this Russian game-selection concept.
+User direction: make the composition taller and spread it vertically across the phone, while adhering strictly to OUR EXISTING PIXEL-ART GAME DESIGN.
+
+INPUT ROLES:
+Image 1 is the EDIT TARGET: current mobile concept without an outer panel frame, showing Continue, Trials, New Game and Back. Preserve its menu functionality, card content, Russian text and borderless darkened-scenery concept.
+Image 2 is the PRIMARY PIXEL STYLE REFERENCE: the actual portrait main menu. Its coarse crisp pixel grid, square pixels, restrained navy palette, ivory pixel-serif lettering and simple copper-edged slate buttons are the standard to match. The new screen must look like a sibling of this actual main menu, not a smoother high-resolution fantasy painting.
+
+FORMAT / TALLER COMPOSITION:
+One single full-bleed tall smartphone screen, aspect ratio 9:20, ideally 1080 x 2400. Compose on a conceptual 360 x 800 pixel grid shown at integer scale. Preserve square pixels and normal letter proportions; RECOMPOSE VERTICALLY rather than distorting or stretching the image.
+Distribute the interface over almost the entire height with a clear rhythm and generous vertical spaces. Do not keep the controls clustered into a compact lower panel.
+Use roughly these vertical bands:
+- Modest centered heading "ВЫБОР ИГРЫ" near the upper 7-11%, with a thin copper divider below near 14%.
+- A large illustrated Continue card from around 29% to 64%, at about 8% side margins. Its upper thumbnail is taller than in the current version, followed by passive campaign metadata, then a strong full-width Continue action band.
+- Wide "ИСПЫТАНИЯ" button around 68-75%.
+- Wide "НОВАЯ ИГРА" button around 79-86%.
+- Separate slightly narrower left-arrow "НАЗАД" button around 90-96%, leaving a comfortable bottom safe margin.
+All four action bands must be visibly tall enough for a finger, roughly 50-58 logical pixels on a 360-pixel-wide phone. Keep every label and border fully on screen, with generous gaps.
+Let the lighthouse lantern remain visible through the space between the heading and the Continue card.
+
+BACKGROUND AND PANEL TREATMENT:
+Use a SINGLE continuous TALL PORTRAIT view of the familiar moonlit coast from Image 2: clouds, small moon, ruined arch, stone lighthouse, rocky steps, dark sea and distant little ship. Match the portrait camera feel instead of turning the top into a wide horizontal scenery banner.
+Apply translucent deep-navy dimming directly over the shared scenery, enough for legible labels. Faint square-pixel rocks and waves remain visible through gaps and along the margins.
+There is NO enclosing panel, no large masonry frame, no stone side rails, no opaque full-height slab, no separate header scene, and no foliage frame.
+The illustrated Continue card and the three other individual buttons keep their thin restrained copper edges.
+
+STRICT PIXEL STYLE:
+Crisp clearly visible low-resolution square pixels; stepped contours; limited-color clusters; minimal two- or three-tone stone shading. Match Image 2's actual game aesthetic for scenery, borders and lettering.
+Use warm ivory Cyrillic pixel-serif letters with consistent square-pixel edges and strong readable contrast. Buttons have dark blue flat pixel-art fills and a subtle one-pixel bevel. Replace Image 1's intense glowing Continue-card outline with a calm thin copper border and a small pixel highlight. Primary importance comes from size, spacing and a slightly warmer outline, not neon glow.
+No soft painterly micro-detail, glossy beveled UI, smooth vector outlines, anti-aliased typography, tiny high-resolution noise, ornamental gold, bloom or lens effects. Dimming can use transparent color but must preserve crisp pixel silhouettes.
+
+CONTENT, EXACT RUSSIAN TEXT:
+Heading: "ВЫБОР ИГРЫ".
+Continue card thumbnail: the misty coast and small lighthouse from the current card, simplified to the same coarse pixel style, no monsters.
+Passive metadata, on three lines:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 3"
+Card action: "ПРОДОЛЖИТЬ".
+Other actions: "ИСПЫТАНИЯ", "НОВАЯ ИГРА", left arrow plus "НАЗАД".
+Exactly four actions. Chapter and night are passive illustrative saved-game information.
+No new controls, no level selection, no chapter arrows, no resources, shop, settings, icons, monsters, logo, phone hardware frame, mockup board, explanatory text, watermarks or English.
+Deliver only the revised tall mobile UI concept.

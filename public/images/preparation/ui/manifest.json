@@ -1,0 +1,18 @@
+{
+  "license": "Project generated artwork; see art concept manifests",
+  "sources": [
+    {
+      "sha256": "1029183fe3faec605d7d96a2bce8f13a2414abf3c68d0002034c336fb404585b",
+      "path": "art/concepts/preparation-2026-11-17/mobile-slate-v3/ui-chrome.png"
+    },
+    {
+      "sha256": "244189d9b2729c68a3b1cb28e821a16b9a7cc8473597570b411b21c5a8e5a1f2",
+      "path": "art/concepts/preparation-2026-11-17/full-screen-v1/ui-icons.png"
+    },
+    {
+      "sha256": "0ae9767e11edbe304ffeb85fe6daafe5dfc31f0bf7322a2c769dfa5f89af0ad8",
+      "path": "art/concepts/preparation-2026-11-17/full-screen-v1/glyphs.json"
+    }
+  ],
+  "method": "Native crops; transparent chamfer outside panel; CSS border-image corners, contained icons"
+}

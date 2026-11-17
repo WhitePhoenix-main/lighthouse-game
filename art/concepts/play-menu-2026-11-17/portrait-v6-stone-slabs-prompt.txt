@@ -1,0 +1,52 @@
+Generation mode: built-in image_gen (mobile adaptation).
+Scope: mobile portrait visual reference only; no executable interface or rules changed.
+Direction: adapt the preferred desktop stone slabs into a tall single-column mobile layout, preserving the visible lighthouse, primary warm rim, cool secondary controls and thumb-accessible bottom Back control.
+Four actions: Continue, Trials, New Game, Back. Chapter and night 2 are illustrative saved-game data.
+References:
+- art/concepts/play-menu-2026-11-17/landscape-v3-stone-slabs.png (primary design)
+- sprites/previews/portrait.png (original portrait scenery and pixel style)
+
+FINAL PROMPT
+
+Use case: ui-mockup / style-preserving mobile adaptation.
+Create ONE MOBILE PORTRAIT version of the preferred STONE-SLAB game-selection screen for the Russian pixel-art lighthouse game.
+
+INPUT ROLES:
+Image 1 is the PRIMARY DESIGN / EDIT TARGET: updated desktop stone-slab reference. Preserve its physical dark blue slate material, irregular chipped silhouettes, simple engraved crossed-swords and rising-sun icons, warm highlighted Continue slab, cooler secondary slabs, typography and atmospheric coast.
+Image 2 is SUPPORTING PORTRAIT SCENERY / PIXEL STYLE ONLY: actual mobile main menu. Use the recognizable tall coastal framing, lighthouse, moon, ruined arch, waves, rocky foreground and coarse sharp pixel aesthetic. Do not copy its old logo or old Play/Settings buttons.
+
+FORMAT:
+One full-bleed tall mobile game screenshot concept, aspect ratio 9:20, ideally 1080x2400. Compose on a conceptual 360x800 square-pixel grid at integer scale. Recompose the desktop UI vertically; do not squeeze or distort the three desktop tablets.
+No hardware frame, presentation board or other views.
+
+COMPOSITION:
+The lighthouse, glowing lantern and windows, moonlit coast, ruined arch and little sailing ship are clearly visible across the upper approximately 38% of the screen.
+The lower area is a SINGLE centered vertical column of stone menu controls, integrated with rocky shore ledges. Use nearly the full width with comfortable 6-8% side margins.
+A subtle darkening of the scenic background supports legibility while the full scene remains continuous.
+Make room for all controls and safe top/bottom margins; everything must fit on the screen.
+
+CONTROL LAYOUT:
+1. Main Continue slab around 40-64% screen height. A broad irregular slate tablet, taller than the other buttons. Preserve the low, uneven arched top and chipped stone shape of the desktop primary slab. Thin restrained amber rim highlights, illuminated as if by lighthouse reflections; not a glowing neon outline.
+Its upper section has three SMALLER centered metadata lines, comfortably padded:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 2"
+The metadata is clearly subordinate to the main action, with good spacing between lines.
+The lower section reads "ПРОДОЛЖИТЬ" in a larger readable warm ivory pixel-serif font, with a generous margin above and below. A very quiet short engraved divider is optional, NO diamond.
+The WHOLE stone slab is one action; no nested rectangle or additional button drawn inside it.
+2. Below, around 68-77%: a wide shallower blue-gray irregular stone button labeled "ИСПЫТАНИЯ". A small muted engraved crossed-swords icon sits to the LEFT of the label on the same horizontal row, so this control stays compact yet comfortably tall.
+3. Below, around 80-89%: an equally wide and equally tall slate button labeled "НОВАЯ ИГРА", with a small muted engraved rising-sun icon to the LEFT of the label in the same row.
+Secondary stone edges are cool blue-gray, with no amber outline. Their labels are slightly smaller than Continue but very readable.
+4. Near the bottom, around 92-98%: a separate narrower slate return button with a left arrow and the exact label "НАЗАД". Comfortable bottom safe margin, easy thumb reach.
+Leave clear vertical gaps between all controls. On the conceptual 360px width, secondary controls should be around 56-68px tall, Back at least 44px tall, action labels around 21-25px, metadata around 14-16px. Preserve square pixels.
+
+STYLE:
+Faithful desktop sibling: worn uneven blue slate, subdued fissures, clear clean stone faces behind text, cool navy coastal palette, warm amber light and pale ivory labels. The buttons look physically grounded on the shore, not like a modern web form.
+Use crisp visible pixel clusters and stepped square contours matching the actual main menu. Pixel-serif Cyrillic, no smooth vector lettering, glossy 3D bevel, photorealism, painterly smoothing or micro-noise.
+Keep the background lighthouse visually prominent and separate from the controls. Do not add a little duplicate lighthouse or illustrated chapter thumbnail inside the main slab.
+
+STRICT CONTENT:
+Exactly FOUR actions: "ПРОДОЛЖИТЬ", "ИСПЫТАНИЯ", "НОВАЯ ИГРА", left arrow plus "НАЗАД".
+Saved chapter and "НОЧЬ 2" are passive sample progress only, not a selector.
+NO title heading or logo, NO divider-and-diamond ornament, NO enclosing panel or external stone frame, NO rectangular illustrated card, resources, chapter arrows, level picker, shop, settings, extra labels, badges, monsters, characters, phone frame, English or watermark.
+Deliver only the complete polished mobile stone-slab menu reference.

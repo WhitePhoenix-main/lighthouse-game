@@ -1,0 +1,28 @@
+Generation mode: built-in image_gen.
+Scope: visual concept only; no game interface or rules changed.
+Saved campaign chapter and night shown in the image are illustrative sample data.
+Four actions: Continue, Trials, New Game, Back. Chapter/night selection belongs to the next screen.
+References:
+- sprites/previews/landscape.png
+- public/images/settings-landscape.webp
+
+FINAL PROMPT
+
+Use case: ui-mockup.
+Create one polished 16:9 landscape visual concept for the Russian pixel-art game "Свет Авалона": the screen immediately after the player clicks "Играть".
+
+Input roles:
+Image 1 is the EDIT TARGET and primary scenery/style reference: the existing main menu. Replace its logo and two old menu buttons with the new interface described below. Preserve its recognizable moonlit blue coast, ruined arch, central-right stone lighthouse with amber-lit windows, sea and little distant boat. Keep the lighthouse prominently visible.
+Image 2 is a SUPPORTING UI STYLE REFERENCE only: the existing settings panel. Match its dark navy slate surfaces, restrained rough stone edging, fine copper-orange borders, warm ivory pixel serif Cyrillic lettering, and small worn details. Do not copy its settings controls.
+
+Composition: single full-screen game UI, no device frame, no presentation board or extra views. Put a compact coherent panel in the LEFT 47% of the image, with good margins. Keep the RIGHT half mostly unobstructed so the original lighthouse and sea remain the emotional focus. Preserve the sharp visible pixel grid and handcrafted painted pixel-art aesthetic; no smooth modern vector UI or photorealistic rendering.
+
+Panel:
+At top, a modest heading exactly "ВЫБОР ИГРЫ" and a thin copper divider with a small central diamond as in settings.
+The dominant element is ONE large clickable CONTINUE CARD: upper portion has a framed pixel-art thumbnail of a misty coast and lighthouse, no creatures; the lower portion contains readable sample saved-campaign metadata on two lines, exactly "ГЛАВА I · ТУМАННЫЙ БЕРЕГ" and "НОЧЬ 3". The card has one clear large action label exactly "ПРОДОЛЖИТЬ" in its bottom dark stone band. Copper outline and a restrained warm glow make this the primary action. The whole card is one click target, not multiple nested buttons.
+Immediately below the card, two equally sized smaller horizontal stone buttons side by side, labeled exactly "ИСПЫТАНИЯ" and "НОВАЯ ИГРА".
+Below them, a smaller but clearly readable return button with a left arrow and the exact label "НАЗАД".
+Give every button comfortable padding and a crisp believable pressed-stone edge. Keep all Cyrillic legible and spelled exactly; center labels within their own controls.
+The hierarchy must be obvious: Continue most prominent, Trials and New Game secondary, Back tertiary.
+
+Constraints: exactly these four actions; no chapter switcher, level tiles, night selection, carousel arrows, resource counters, shop, upgrades, settings button, battle HUD, monsters, character portraits, generic icons, badges, tooltips or explanatory paragraphs. Chapter and night are passive saved-game information only. No logo from the old main menu and no old "ИГРАТЬ" or "НАСТРОЙКИ" controls. No extra captions, watermarks or English text. Use the same cool blue and amber palette as the references. Leave scenery alive-looking but calm, text very readable, decorative detail restrained. This is a credible game screen, not a fantasy poster.

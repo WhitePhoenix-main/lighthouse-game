@@ -1,0 +1,18 @@
+Use case: ui-mockup.
+Asset type: transparent full-screen pixel-art MOBILE preparation UI skin for an Arthurian lighthouse defense game.
+Input image 1 is the exact layout and style reference, NOT an invitation to redesign the map. Create a new empty UI CHROME layer only, with a genuine alpha-transparent central map viewport. Exact canvas 887 x 1774, portrait 1:2. Maintain the reference's composition and silhouette of chipped stone controls. This is a targeted MATERIAL AND COLOR improvement, because the original is much too blue.
+
+ART DIRECTION: salt-worn charcoal stone, dark weathered oak, restrained antique brass. Surrounding non-map background near-black warm charcoal (#171C1A/#222720), quiet moss-grey stone edges (#555C50/#929483), dark smoked oak button interiors (#2B251F/#43382B), sparing antique bronze (#8C6D3C). Preserve crisp handcrafted pixel clusters and stair-step corners, no smooth 3D, no flat modern app cards, no blur. Fine pixel texture rather than noisy high-contrast diagonal scratches. Cold blue is reserved for the sea in the separate map, and a very small lens gem. Parchment-cream typography will be composited later. Gold illumination is reserved for the main start button and very small details, not every border. Do not turn the screen into orange/brown monochrome: neutral charcoal and grey-green stone are dominant, oak is subordinate.
+
+LAYOUT measured from top-left on 887x1774:
+- Header top row: back button x26 y22 w222 h67; two resource capsules x318 y22 w244 h67 and x615 y22 w240 h67. Each resource has blank space at its left for an icon, at center for a number, and an empty small square plus button at right. Aged stone/bronze not bright blue.
+- Chapter and night labels area between y100 and178: leave EMPTY quiet charcoal background. No stone plaque around the titles, no text.
+- Two equal utility buttons: x42 y197 w388 h86 and x456 y197 w388 h86, warm charcoal oak inset with common stone outer rim. Blank for separately added upgrade and telescope icons and labels.
+- Status at y318: leave empty space on left for a label. Small close-up button x552 y303 w316 h54, blank inside.
+- The central MAP opening: x20 y380 w847 h784 must be COMPLETELY TRANSPARENT, edge to edge inside opening, no checkerboard, no fog, no map, no image remnants, no symbols. Thin weathered neutral stone map rim around x10 y370 w867 h804, about8 pixels thick. Rounded chipped stepped corners. Do not put any decorations over the map opening. The map will be supplied separately unchanged.
+- Small counters line area y1186..1220 empty.
+- Lower equipment shelf as a coherent connected group rather than unrelated bright cards: devices button x20 y1233 w847 h140; lens button x24 y1394 w408 h124, ability x456 y1394 w408 h124. Keep these at reference positions. All blank. Devices has space for a wide illustration at left and two text lines at right. Shared stone edge and subtle horizontal warm oak inset, subdued bronze dividers.
+- Primary start button x26 y1546 w835 h128: dark bronze/charcoal interior, restrained crisp bright AMBER rim, a small warm glow close to rim only. Central blank safe area. It must be the strongest action, but less blazing and noisy than original.
+- Footer y1690..1735 blank for small text. Bottom quiet charcoal. Tiny moss at top corners is fine, no new thematic objects.
+
+CRITICAL: No text, NO letters, NO numerals, NO icons, NO plus signs, NO lighthouse, NO cannons, NO water/terrain, NO radii. Every label and icon in the input is to be removed from the output UI skin and replaced with blank material. Opaque UI outside the map, genuinely transparent alpha map viewport. Preserve all transparency as PNG. No phone hardware, no side gutters, no watermark.

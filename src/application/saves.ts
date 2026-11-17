@@ -2,7 +2,7 @@ import { isLateNight } from '../content/lateModes';
 import type { AttemptRecord, DeviceDeployment, DeviceKind, DevicePlacement, NightConfig, OwnedDevice, Profile, EnemyKind, NightId, LateNightMode, LensId, LensUpgradeId, SaveData, SaveStore, SettledAttempt, UpgradeId } from '../contracts';
 import { DEVICE_RULES } from '../content/devices';
 import { DEVICE_KINDS, deviceDeployments, rechargeCost, repairCost, remainingTrapCharges, trapChargeCapacity, unlockedDeviceKinds } from '../progression/devices';
-import { checkDraft } from './placement';
+import { checkDraft, checkPlacement } from './placement';
 import { UPGRADES } from '../content/upgrades';
 import { NIGHT_CATALOG, NIGHT_IDS } from '../content/nights';
 import { getBossRules } from '../content/boss';
@@ -293,7 +293,23 @@ export class SaveRepository {
                 throw new Error('Расстановка чужого устройства.');
         }
         const check = checkDraft(config, placements);
-        if (!check.valid) throw new Error(check.reason);
+        if (!check.valid) {
+            // A changed coast or loadout can invalidate more than one saved body.
+            // Preserve untouched positions and allow recovery one object at a time;
+            // every new/changed position still obeys the complete current rules.
+            const previous = deviceDeployments(next.profile);
+            if (checkDraft(config, previous).valid) throw new Error(check.reason);
+            const ids = new Set<number>();
+            for (const placement of placements) {
+                if (!Number.isSafeInteger(placement.id) || ids.has(placement.id)
+                    || !Number.isFinite(placement.x) || !Number.isFinite(placement.y)) throw new Error('Недопустимая расстановка.');
+                ids.add(placement.id);
+                const old = previous.find(item => item.id === placement.id);
+                if (old && old.kind === placement.kind && old.x === placement.x && old.y === placement.y) continue;
+                const changed = checkPlacement(config, placements.filter(item => item.id !== placement.id), placement.kind, placement.x, placement.y);
+                if (!changed.valid) throw new Error(changed.reason);
+            }
+        }
         for (const device of next.profile.devices) {
             const placement = placements.find(item => item.id === device.id);
             device.position = placement ? { x: placement.x, y: placement.y } : null;

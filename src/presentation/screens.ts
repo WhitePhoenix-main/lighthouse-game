@@ -1,9 +1,12 @@
 import type { ApplicationView, LateNightMode, UpgradeStat, UpgradeId, UpgradeNodeView } from '../contracts';
-import { preparationDevices } from './preparation';
-import { lensDevelopment, lensSelection, materialName } from './lenses';
-import { referenceSettings } from './referenceSettings';
-import { referenceMenu } from './referenceMenu';
-import { referenceGameMenu } from './gameMenu';
+import { preparationScreen } from './preparation/preparationScreen';
+import { createPreparationUiState, type PreparationUiState } from './preparation/preparationState';
+import { lensSelection, materialName } from './shared/lenses';
+import { referenceSettings } from './settings/referenceSettings';
+import { referenceMenu } from './menu/referenceMenu';
+import { referenceGameMenu } from './menu/gameMenu';
+import { createSkillTreeState, skillTree, skillCategories, type SkillTreeState } from './skill-tree/skillTree';
+import { buildSkillGraph } from './skill-tree/skillTreeModel';
 
 const escape = (text: string): string => text.replace(/[&<>"']/g, (letter) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[letter] ?? letter);
 export const upgradeValue = (stat: UpgradeStat, amount: number): string => {
@@ -115,38 +118,45 @@ function settings(view: ApplicationView): string {
   return referenceSettings(view);
 }
 
-function development(view: ApplicationView, selectedId: UpgradeId | undefined): string {
-  const selected = view.upgrades.find((node) => node.definition.id === selectedId) ?? view.upgrades[0];
-  const nodes = view.upgrades;
-  const branchNames = { power: 'Мощность', width: 'Ширина', range: 'Дальность', devices: 'Устройства', defense: 'Оборона', synergy: 'Связанный свет' } as const;
-  const tree = (Object.keys(branchNames) as (keyof typeof branchNames)[]).map((branch) => `<section class="tree-branch"><h2>${branchNames[branch]}</h2><ol>${nodes.filter((node) => node.definition.branch === branch).sort((a, b) => a.definition.tier - b.definition.tier).map((node) => {
-    const requires = node.definition.requires;
-    const hasLink = requires.some((id) => nodes.some((parent) => parent.definition.id === id && parent.definition.branch === branch));
-    return `<li class="tree-item ${hasLink ? 'has-parent' : ''}" ${requires.length ? `data-requires="${requires.join(' ')}"` : ''}><button class="tree-node ${node.status}" data-action="select-upgrade" data-upgrade="${node.definition.id}" aria-pressed="${node === selected}" aria-describedby="upgrade-details"><span class="node-tier">${node.definition.tier}</span><strong>${escape(node.definition.name)}</strong><small>${statuses[node.status]}</small></button></li>`;
-  }).join('')}</ol></section>`).join('');
-  return `<section class="panel development-panel">${button('back', '← Назад')}<div class="upgrade-heading"><div>${heading('ПОСТОЯННОЕ РАЗВИТИЕ', 'Искусство света')}</div><div class="upgrade-bank">Баланс<strong>${view.profile.resources} ◈</strong><span>${view.profile.bossMaterials} ${materialName}</span></div></div><p>${nodes.length} улучшений маяка · ${view.lenses.reduce((sum, lens) => sum + lens.upgrades.length, 0)} улучшений линз · ${view.lenses.filter(lens => lens.definition.materialCost > 0).length} открытия линз. Выбери знак, чтобы изучить его. Линии связывают улучшения с необходимыми предыдущими узлами.</p><div class="development-layout"><div class="node-tree" aria-label="Дерево улучшений">${tree}</div>${selected ? upgradeDetails(selected, nodes, !!view.error, view) : ''}</div>${lensDevelopment(view)}<small class="balance-note">Покупки сохраняются между ночами. Цены и эффекты предварительные.</small>${view.profile.legacyEquipment ? '<p class="notice">Устройства и вспышка сохранены из старого профиля. Повторно покупать прежнее оснащение не требуется.</p>' : ''}</section>`;
+function development(view: ApplicationView, selectedId: UpgradeId | undefined, state?: SkillTreeState): string {
+  const treeState = state ?? createSkillTreeState();
+  if (!state && selectedId) {
+    treeState.selectedId = selectedId;
+    treeState.inspectorOpen = true;
+    treeState.category = skillCategories.find(c => buildSkillGraph(view, c.id).nodes.some(n => n.id === selectedId))?.id ?? 'lighthouse';
+  }
+  return skillTree(view, treeState, node => upgradeDetails(node, view));
 }
 
-function upgradeDetails(node: UpgradeNodeView, nodes: readonly UpgradeNodeView[], blocked: boolean, view: ApplicationView): string {
+function upgradeDetails(node: UpgradeNodeView, view: ApplicationView): string {
   const { definition, status } = node;
-  const requires = definition.requires.map((id) => nodes.find((entry) => entry.definition.id === id)?.definition.name ?? id);
-  if (definition.requiresNight) requires.push('Победа: ' + (view.nights.find((night) => night.id === definition.requiresNight)?.name ?? definition.requiresNight));
-  const unlock = ['cannon', 'harpoon', 'mortar', 'bell', 'barrier', 'generator', 'light-trap', 'flash'].includes(definition.effect.stat);
-  return `<section class="node-details" id="upgrade-details" aria-live="polite" aria-atomic="true"><div class="eyebrow">ВЫБРАННОЕ УЛУЧШЕНИЕ</div><h2>${escape(definition.name)}</h2><span class="upgrade-status">${statuses[status]}</span><dl class="detail-values"><div><dt>Цена</dt><dd>${definition.cost} ◈</dd></div><div><dt>Эффект</dt><dd>${unlock ? 'закрыто → открыто' : (definition.effect.stat === 'bellDamageReduction' ? `−${Math.round(definition.effect.amount * 100)}% входящего урона` : definition.effect.stat === 'bellFirstPulseReduction' ? `−${Math.round(definition.effect.amount * 100)}% скорости первого импульса` : ['repairCostReduction', 'rechargeCostReduction'].includes(definition.effect.stat) ? '−' + Math.round(definition.effect.amount * 100) + ' п.п. коэффициента стоимости' : definition.effect.stat.endsWith('Reduction') && !["beamArmorBonus","beamExecuteBonus","litDeviceDamageBonus","lighthouseDamageReduction","lighthouseHeavyReduction","lighthouseEmergencyReduction","lighthouseWaveRepair","shieldRestoreReduction"].includes(definition.effect.stat) ? '−' + value(definition.effect.stat, definition.effect.amount) + ' к интервалу' : (['flashDamagedArmorBonus', 'deviceHealthBonus'].includes(definition.effect.stat) ? '' : '+') + value(definition.effect.stat, definition.effect.amount))}</dd></div><div><dt>${status === 'purchased' ? 'Текущее значение' : 'Сейчас → после покупки'}</dt><dd>${value(definition.effect.stat, node.currentValue)}${status === 'purchased' ? '' : ` → ${value(definition.effect.stat, node.nextValue)}`}</dd></div><div><dt>Требования</dt><dd>${requires.length ? requires.map(escape).join(', ') : 'Без требований'}</dd></div></dl><p>${escape(node.reason)}</p><p>${escape(upgradeExplanation(definition.effect.stat))}</p><button class="primary" data-action="upgrade" data-upgrade="${definition.id}" ${status !== 'available' || blocked ? 'disabled' : ''}>${status === 'purchased' ? '✓ Куплено' : `Купить · ${definition.cost} ◈`}</button></section>`;
+  const { stat, amount } = definition.effect;
+  const unlock = ['cannon', 'harpoon', 'mortar', 'bell', 'barrier', 'generator', 'light-trap', 'repair-lamp', 'flash'].includes(stat);
+  const requirements = definition.requires.map(id => {
+    const parent = view.upgrades.find(n => n.definition.id === id);
+    return `<li data-met="${parent?.status === 'purchased'}">${parent?.status === 'purchased' ? '✓' : '◇'} <button class="skill-requirement-link" data-tree-action="reveal" data-skill-target="${id}">${escape(parent?.definition.name ?? id)}</button></li>`;
+  });
+  if (definition.requiresNight) {
+    const night = view.nights.find(n => n.id === definition.requiresNight);
+    requirements.push(`<li data-met="${!!night?.completed}">${night?.completed ? '✓' : '◇'} Победа: ${escape(night?.name ?? definition.requiresNight)}</li>`);
+  }
+  const effect = unlock ? 'закрыто → открыто' : ['repairCostReduction', 'rechargeCostReduction'].includes(stat)
+    ? '−' + Math.round(amount * 100) + ' п.п. коэффициента стоимости'
+    : ['bellDamageReduction', 'bellFirstPulseReduction'].includes(stat) ? `−${Math.round(amount * 100)}% ${stat === 'bellDamageReduction' ? 'входящего урона' : 'скорости первого импульса'}`
+    : `${stat.endsWith('Reduction') && !['lighthouseDamageReduction', 'lighthouseHeavyReduction', 'lighthouseEmergencyReduction', 'shieldRestoreReduction'].includes(stat) ? '−' : ['deviceHealthBonus', 'flashDamagedArmorBonus'].includes(stat) ? '' : '+'}${value(stat, amount)}`;
+  return `<h2>${escape(definition.name)}</h2><span class="skill-state" data-status="${status}">${statuses[status]}</span><p class="skill-effect">${effect}</p><div class="skill-comparison"><span class="skill-before">${value(stat, node.currentValue)}</span>${status === 'purchased' ? '' : `<span aria-hidden="true">→</span><strong class="skill-after">${value(stat, node.nextValue)}</strong>`}</div><div class="skill-requirements"><h3>Требования</h3><ul>${requirements.join('') || '<li data-met="true">Без требований</li>'}</ul></div><p class="skill-reason">${escape(node.reason)}</p><p class="skill-reason">${escape(upgradeExplanation(stat))}</p>${view.profile.legacyEquipment && unlock ? '<p class="skill-reason">Повторно покупать прежнее оснащение не требуется</p>' : ''}<button class="skill-purchase-button" data-action="upgrade" data-upgrade="${definition.id}" ${status !== 'available' || view.error ? 'disabled' : ''}>${status === 'purchased' ? '✓ Куплено' : `Изучить · ${definition.cost} ◈`}</button><small class="skill-permanent-note">Постоянное улучшение · сохранится между ночами</small>`;
 }
 
-export function screenContent(view: ApplicationView, selectedId: UpgradeId | undefined, confirmAbandon: boolean, confirmNewGame = false): string {
-  const { config } = view;
+export function screenContent(view: ApplicationView, selectedId: UpgradeId | undefined, confirmAbandon: boolean, confirmNewGame = false, treeState?: SkillTreeState, preparationState?: PreparationUiState): string {
   if (view.screen === 'menu') return mainMenu(view);
   if (view.screen === 'game-menu') return referenceGameMenu(view, confirmNewGame);
   if (view.screen === 'trials') return `<section class="panel trials-panel">${button('back', '← Назад', !!view.error)}${heading('ОТДЕЛЬНЫЕ НОЧИ', 'Испытания')}<p>Необязательные ночи. Условия открытия сохраняются.</p><div class="night-options">${view.nights.filter(night => night.optional).map(night => `<button class="night-option" data-action="select-night" data-night="${night.id}" ${!night.available || view.error ? 'disabled' : ''}><strong>${escape(night.name)}</strong><small>${escape(night.description)}</small><small>${night.available ? night.completed ? 'Пройдена · можно повторить' : 'Доступна' : escape(night.reason)}</small></button>`).join('')}</div></section>`;
-  if (view.screen === 'development') return development(view, selectedId);
+  if (view.screen === 'development') return development(view, selectedId, treeState);
   if (view.screen === 'settings') return settings(view);
-  if (view.screen === 'preparation') {
-    const waves = waveIntelligence(view);
-    const night = view.nights.find((entry) => entry.id === view.selectedNightId);
-    return `<section class="panel preparation-panel"><div class="briefing">${nav(!!view.error)}${heading(escape(nightLabel(view) || night?.name || 'НОЧЬ') + ' / ПОДГОТОВКА', 'Не дай свету <em>погаснуть.</em>')}<p>Удерживай свет на угрозе и решай, кого остановить первым.</p><p class="notice victory-reward">За каждую победу: +${config.victoryReward} ◈ · включая повторное прохождение.</p>${config.ship ? `<p class="notice">Сигнал бедствия: держи корабль в свете ${config.ship.rescueSeconds} с до ${config.ship.deadline} с. Он занимает одну цель луча. Корабль и существа перекрывают друг друга по общим правилам луча. Награда +${config.ship.reward} ◈, спасение не требуется для победы.</p>` : ''}${lateModeSelector(view)}${nightSelector(view, !!view.error)}${lensSelection(view)}${config.boss ? `<p class="notice">${escape(config.boss.name)} · уровень ${config.boss.level}. Все щупальца имеют общее здоровье ${config.boss.health}. Свет замедляет щупальце и останавливает его атаку. Урон по освещённым щупальцам суммируется. Награда ${config.boss.materialReward} ${materialName} и открытие следующей главы — только за победу во всей ночи.</p>` : ''}<details class="night-briefing"><summary>Разведка: состав волн</summary><ul class="wave-preview">${waves}</ul></details><div class="briefing-tip">Каждая из ${config.beam.maxTargets} целей получает полный урон. Полностью закрытые существом цели не получают свет.</div><dl class="beam-stats"><div><dt>Мощность</dt><dd>${value('damagePerSecond', config.beam.damagePerSecond)}</dd></div><div><dt>Полная ширина</dt><dd>${value('halfAngle', config.beam.halfAngle)}</dd></div><div><dt>Дальность</dt><dd>${value('range', config.beam.range)}</dd></div></dl><p>Постоянные улучшения доступны на отдельном экране развития. Устройства и расстановка сохраняются между ночами и перезагрузками.</p></div>${preparationDevices(view)}</section>`;
-  }
+  if (view.screen === 'preparation') return preparationScreen(view, preparationState ?? createPreparationUiState(), {
+    nights: nightSelector(view, !!view.error), lenses: lensSelection(view),
+    lateModes: lateModeSelector(view), waves: waveIntelligence(view),
+  });
   if (view.screen === 'result' && view.result) {
     const result = view.result;
     const blocked = !result.saved || !!view.error;

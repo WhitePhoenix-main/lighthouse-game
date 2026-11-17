@@ -1,0 +1,24 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-11-17",
+  "revisions": [
+    {
+      "output": "desktop-v2.png",
+      "input": "desktop-v1.png",
+      "prompt": "Use case: precise-object-edit. Input: finished wide Russian pixel-art lighthouse preparation UI. Make ONE tiny affordance correction to the TOP chapter/night block only: add a small pale-gold downward chevron at the right end of the existing line \"НОЧЬ 2 · РАЗБИТЫЙ БЕРЕГ\" so it clearly reads as a selectable night dropdown. Fit it within the existing block without changing the wording or overlapping the resource chip. Keep the current canvas dimensions, every other pixel-art object, coastline, lighthouse, all counters and labels, toolbar, bottom dock, entire field, colors and lighting unchanged. No other redesign. Full landscape image output, no crop."
+    },
+    {
+      "output": "portrait-split-v2.png",
+      "input": "portrait-split-v1.png",
+      "prompt": "Use case: precise-object-edit. Edit the supplied portrait UI mockup with ONE tightly scoped correction. The LEFT button under the chapter is labeled \"ДЕРЕВО\" and mistakenly shows three wooden LOGS. Remove only those logs and replace them with a finely crafted flat embossed GOLD BRANCHING UPGRADE-TREE DIAGRAM: one central small node at bottom branching to three small circular nodes at top, connected by thin elegant angular gold lines, a recognizable skill-tree / progression-tree symbol, NOT a botanical tree and absolutely NOT lumber/logs. Match the fine pixel art and warm carved metal style. Preserve the exact existing \"ДЕРЕВО\" lettering, button size, position, stone material, all other artwork, both map views, every object placement, all counters, all other text, colors, margins and the complete portrait canvas unchanged. No other redesign. No changes to the spyglass. Output the full corrected portrait screen."
+    },
+    {
+      "output": "portrait-split-v3.png",
+      "input": "portrait-split-v2.png"
+    },
+    {
+      "output": "portrait-expanded-v1.png",
+      "input": "portrait-split-v2.png"
+    }
+  ]
+}

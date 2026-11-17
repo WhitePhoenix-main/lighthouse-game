@@ -1,0 +1,58 @@
+Generation mode: built-in image_gen (desktop adaptation).
+Scope: game-selection visual reference only; no executable interface or rules changed.
+Direction: desktop sibling of the user-supplied mobile stone menu, with three foreground stones, warm Continue emphasis, flatter secondary slabs with inline icons and text-only Back.
+Four actions: Continue, Trials, New Game, Back. Chapter and night 2 are illustrative sample saved-game information.
+References:
+- User-supplied codex-clipboard-36b05c34-1bf8-4acb-9419-472b821ec6b1.png (primary mobile reference; matches portrait-v7-back-without-arrow.png)
+- art/concepts/play-menu-2026-11-17/landscape-v3-stone-slabs.png (supporting desktop layout and scenery)
+
+FINAL PROMPT
+
+Use case: ui-mockup / style-preserving desktop adaptation.
+Create a DESKTOP LANDSCAPE version closely matching the attached preferred MOBILE STONE MENU.
+
+INPUT ROLES:
+Image 1 is the PRIMARY VISUAL REFERENCE / adaptation target: user's mobile game-selection screen. Preserve its stone materials and shapes, large warm-highlighted Continue tablet, blue-gray secondary stone buttons with icons at the left, warm ivory pixel-serif type, and Back button WITHOUT an arrow.
+Image 2 is a SUPPORTING DESKTOP LAYOUT AND SCENERY reference only. Use its full wide coastal view and the idea of three main stones across the low foreground. Update its older details to match Image 1, especially the secondary button silhouettes, inline icons and the text-only Back control.
+
+DELIVERABLE:
+ONE complete full-bleed 16:9 desktop game-selection screenshot concept, ideally 1920x1080.
+This is the Continue / Trials / New Game screen, NOT a settings screen.
+No device frame, no comparison board, no additional views.
+
+SCENERY:
+The same recognizable moonlit navy coast with ruined arch, glowing stone lighthouse, rocky stairs and shore ledges, distant small ship, moon and clouds. The lighthouse stays clearly visible in the center-right with warm amber lantern and windows.
+Keep most of the upper and middle screen open to the landscape. Preserve the crisp pixel-art atmosphere from Image 1.
+
+DESKTOP COMPOSITION:
+Arrange the THREE MAIN STONE CONTROLS IN A SINGLE LOW HORIZONTAL ROW, physically resting on rocky foreground ledges. They are separate controls with distinct silhouettes and generous gaps, not one enclosing panel.
+- Left: one visibly larger and taller Continue stone, about 36% of screen width, from roughly 59% to 94% of the screen height. Use the broad irregular uneven peaked silhouette and subtle warm amber rim light of the mobile primary stone.
+- Center: a wide shallower "ИСПЫТАНИЯ" stone at roughly 76-94% screen height, around 27% screen width.
+- Right: matching "НОВАЯ ИГРА" stone with the same dimensions and baseline.
+The two secondary stones resemble the mobile's broad horizontal chipped slate slabs: low and flatter, angular worn corners, subtle fissures, COOL blue-gray stone edges. Do not make them tall domed boulders.
+- A separate small text-only "НАЗАД" slate button sits unobtrusively in the top-left safe margin. Its label is centered, with NO arrow or other icon.
+
+CONTINUE STONE CONTENT:
+Centered passive sample progress on three lines, smaller than the main action:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 2"
+Comfortable top and side padding. Leave breathing room below, then a short quiet engraved stone separator like the mobile reference.
+The lower part has a larger clear label "ПРОДОЛЖИТЬ", comfortably centered and padded.
+The entire slab is ONE action. No nested rectangular button, no image thumbnail, no duplicate lighthouse inside the slab.
+
+SECONDARY CONTENT:
+On the middle stone, a small muted crossed-swords engraving to the LEFT of "ИСПЫТАНИЯ", in the SAME horizontal row, as in the mobile reference.
+On the right stone, a small muted rising-sun engraving to the LEFT of "НОВАЯ ИГРА", likewise in the same row.
+Keep the icons smaller than the labels. Labels are slightly smaller than Continue, readable, centered as icon-and-text groups with generous interior margins.
+Secondary edges remain cold and quieter; the Continue stone is the only strongly warm-highlighted control.
+
+PIXEL ART:
+Match Image 1 faithfully: clearly visible square pixels, stepped contours, grouped slate-blue tones, restrained natural cracks, low-relief stone edges, pale warm ivory Cyrillic pixel-serif letters and warm amber accents. Fine detail must not become painterly or photorealistic.
+Preserve the mobile menu's material and lettering identity while recomposing for the desktop width. Do not horizontally stretch pixels or letters.
+
+STRICT CONSTRAINTS:
+Exactly four actions, correctly spelled: "ПРОДОЛЖИТЬ", "ИСПЫТАНИЯ", "НОВАЯ ИГРА", "НАЗАД".
+No arrow beside Back anywhere. Chapter/night text is passive illustrative information, not a level selector.
+NO settings, volume sliders, language controls, title heading, logo, long line-and-diamond ornament, outer masonry frame, encompassing panel, resources, extra controls, level picker, badges, monsters, English, watermark or hardware frame.
+Return only the complete polished desktop reference.

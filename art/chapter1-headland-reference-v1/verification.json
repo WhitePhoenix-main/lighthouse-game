@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "command": "pwsh -File tools/prepare-headland-reference.ps1",
+  "command": "pwsh -File tools/assets/prepare-headland-reference.ps1",
   "composition": "separate source-derived raster sprites over source-derived tiled materials with geometric shore and relief masks",
   "shore": "x = 60 - 110 * (y / 400)^2",
   "projectionY": 0.84,

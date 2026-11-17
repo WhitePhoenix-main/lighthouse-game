@@ -1,0 +1,37 @@
+Generation mode: built-in image_gen (edit).
+Scope: local visual revision of the mobile concept only; no executable interface or rules changed.
+Change: continue the illustrated coastline behind chapter information, replacing the empty solid information band with darkened scenery.
+Preserved: tall composition, all four actions and labels, translucent full-screen dimming, absence of an enclosing frame.
+Saved chapter and night are illustrative sample data.
+Edit source: art/concepts/play-menu-2026-11-17/portrait-v3-tall-pixel.png
+User feedback reference (not used as imagegen input): codex-clipboard-d3967caa-4918-41fe-bf15-f994a8a547e7.png
+
+FINAL PROMPT
+
+Use case: ui-mockup / precise-object-edit.
+Edit the attached tall 9:20 mobile game-selection concept with ONE LOCAL DESIGN IMPROVEMENT.
+
+USER FEEDBACK:
+The chapter information ("ГЛАВА I / ТУМАННЫЙ БЕРЕГ / НОЧЬ 3") looks unattractive sitting on a large empty plain navy background. Integrate that text into the illustrated coast.
+
+EDIT REGION:
+Only the INTERIOR of the large Continue card, from the top edge of its small coastal illustration down to the top of the "ПРОДОЛЖИТЬ" button. The empty information band is the main area to change.
+
+REQUIRED CHANGE:
+Make the Continue card's picture and metadata ONE unified illustrated chapter card.
+Continue the same pixel-art coastline, moonlit water, waves, rocks and mist naturally down behind the three lines of chapter text. The upper thumbnail must no longer abruptly stop above a blank rectangular info block.
+Use a coherent foreground of dark pixelated shoreline rocks, subtle surf and water reflections under the existing chapter labels; retain visible scenic texture in this area. Do not replace the empty band with another empty panel or a generic noisy stone texture.
+Lay a LOCAL transparent deep-navy shadow / vignette over the illustration behind the letters for readability. The image remains visible beneath the shadow, particularly around and between the text lines. Preserve sharp square-pixel scenery details and no smooth glossy rendering.
+The metadata appears to belong to the picture, not to a separate form. Keep warm ivory pixel-serif lettering and a subtle one-pixel dark text shadow. Keep labels readable at phone size.
+Preserve the existing three-line centered text, approximately the same position and size, spelled EXACTLY:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 3"
+Keep the illustrated small lighthouse at the right of the card. No creatures or new story objects.
+
+STRICT INVARIANTS:
+Keep the tall 9:20 image, entire composition, overall shared scenic background, upper lighthouse scene, "ВЫБОР ИГРЫ" heading, divider, card size and thin copper border, "ПРОДОЛЖИТЬ" button, "ИСПЫТАНИЯ", "НОВАЯ ИГРА" and left-arrow "НАЗАД" unchanged. Preserve their exact positions, proportions, wording and generous vertical spacing.
+Keep the full-screen translucent dimming and NO enclosing stone panel or outer masonry frame.
+Exactly four actions. Do not add controls, badges, icons, banners, ribbons, decorative plaques, currencies, progress bars, chapter selectors or extra text.
+Maintain the project's crisp visible square-pixel aesthetic, restrained blue palette, warm ivory pixel type and copper edging. Do not introduce photorealism, painterly smoothing, bloom, neon, anti-aliased vector UI, phone hardware, mockup borders or watermarks.
+Output only the complete revised mobile screen, not a crop or a before/after board.

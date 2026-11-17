@@ -39,6 +39,7 @@ export class LighthouseApplication implements GameApplication {
     private developmentOrigin: 'menu' | 'preparation' | 'result' = 'menu';
     private settingsOrigin: Exclude<ApplicationScreen, 'settings'> = 'menu';
     private pendingPreparation = false;
+    private placementPreviewDeviceId: number | undefined;
     private pendingNewGame: object | null = null;
     private pendingAbandon: 'menu' | 'preparation' | null = null;
 
@@ -92,7 +93,7 @@ export class LighthouseApplication implements GameApplication {
         draft.canStart = check.valid;
         if (draft.preview && draft.selectedType) {
             const { x, y } = draft.preview;
-            draft.preview = { x, y, ...this.placementCheck(draft.selectedType, x, y) };
+            draft.preview = { x, y, ...this.placementCheck(draft.selectedType, x, y, this.placementPreviewDeviceId) };
         }
     }
 
@@ -127,23 +128,26 @@ export class LighthouseApplication implements GameApplication {
     selectDevice(kind: DeviceKind | null): void {
         if (!this.canEditPreparation() || (kind !== null && (!this.view.config.devices.definitions[kind] || (this.view.config.availableDevices !== undefined && !this.view.config.availableDevices.includes(kind))))) return;
         this.view.preparation.selectedType = kind;
+        this.placementPreviewDeviceId = undefined;
         this.view.preparation.preview = null;
     }
 
-    previewPlacement(x: number, y: number): PlacementCheck {
+    previewPlacement(x: number, y: number, deviceId?: number): PlacementCheck {
         const kind = this.view.preparation.selectedType;
         if (!this.canEditPreparation() || !kind) return { valid: false, reason: 'Выберите тип устройства.' };
-        const check = this.placementCheck(kind, x, y);
+        this.placementPreviewDeviceId = deviceId;
+        const check = this.placementCheck(kind, x, y, deviceId);
         this.view.preparation.preview = { x, y, ...check };
         return check;
     }
 
-    placeDevice(x: number, y: number): void {
+    placeDevice(x: number, y: number, deviceId?: number): void {
         const kind = this.view.preparation.selectedType;
-        if (!kind || !this.previewPlacement(x, y).valid) return;
-        const device = this.availableDevice(kind)!;
-        this.savePlacements([...this.view.preparation.placements, { id: device.id, kind, x, y }]);
+        if (!kind || !this.previewPlacement(x, y, deviceId).valid) return;
+        const device = deviceId === undefined ? this.availableDevice(kind)! : this.view.profile.devices.find(device => device.id === deviceId)!;
+        this.savePlacements([...this.view.preparation.placements.filter(placement => placement.id !== device.id), { id: device.id, kind, x, y }]);
         this.view.preparation.preview = null;
+        this.placementPreviewDeviceId = undefined;
     }
 
     removeDevice(id: number): void {
@@ -161,10 +165,14 @@ export class LighthouseApplication implements GameApplication {
         return this.view.profile.devices.find(device => device.kind === kind && !device.position && device.health > 0 && !device.consumed);
     }
 
-    private placementCheck(kind: DeviceKind, x: number, y: number): PlacementCheck {
-        const check = checkPlacement(this.view.config, this.view.preparation.placements, kind, x, y);
+    private placementCheck(kind: DeviceKind, x: number, y: number, deviceId?: number): PlacementCheck {
+        const owned = deviceId === undefined ? this.availableDevice(kind) : this.view.profile.devices.find(device => device.id === deviceId);
+        if (deviceId !== undefined && (!owned || owned.kind !== kind || owned.health <= 0 || owned.consumed))
+            return { valid: false, reason: 'Выбранный экземпляр недоступен. Восстановите его или выберите другое устройство.' };
+        const placements = deviceId === undefined ? this.view.preparation.placements : this.view.preparation.placements.filter(placement => placement.id !== deviceId);
+        const check = checkPlacement(this.view.config, placements, kind, x, y);
         if (!check.valid) return check;
-        return this.availableDevice(kind) ? check : { valid: false, reason: 'Нет готового экземпляра в запасе. Купите, восстановите или уберите устройство с поля.' };
+        return owned ? check : { valid: false, reason: 'Нет готового экземпляра в запасе. Купите, восстановите или уберите устройство с поля.' };
     }
 
     private savePlacements(placements: readonly DevicePlacement[]): void {

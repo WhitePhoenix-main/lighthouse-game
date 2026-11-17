@@ -200,8 +200,8 @@ export interface NightConfig {
     devices: DeviceRules;
     shield: { radius: number; capacityPerGenerator: number; regenerationDelay: number; regenerationPerSecond: number; stabilization?: ShieldStabilizationRules };
     flash: { radius: number; damage: number; stunDuration: number; cooldown: number; enabled?: boolean; reloadAssist?: number; damagedArmorBonus?: number };
-    /** Absent only in legacy/synthetic combat configurations. Land is x <= shoreX. */
-    terrain?: { shoreX: number; landOnlyPlacement: boolean };
+    /** Without a shoreline, preserves the legacy straight coast x <= shoreX. */
+    terrain?: { shoreX: number; landOnlyPlacement: boolean; /** Increasing y; land lies left of this line. */ shoreline?: readonly { x: number; y: number }[] };
     /** Absent means unrestricted equipment for legacy combat fixtures. */
     availableDevices?: readonly DeviceKind[];
     ship?: { x: number; y: number; radius: number; rescueSeconds: number; deadline: number; reward: number };
@@ -510,8 +510,8 @@ export interface GameApplication {
     selectLens(id: LensId): void;
     purchaseLens(id: LensId): void;
     purchaseLensUpgrade(id: LensUpgradeId): void;
-    previewPlacement(x: number, y: number): PlacementCheck;
-    placeDevice(x: number, y: number): void;
+    previewPlacement(x: number, y: number, deviceId?: number): PlacementCheck;
+    placeDevice(x: number, y: number, deviceId?: number): void;
     removeDevice(id: number): void;
     clearPlacements(): void;
 

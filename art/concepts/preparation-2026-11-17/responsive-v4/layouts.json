@@ -1,0 +1,1968 @@
+[
+  {
+    "id": "mobile",
+    "file": "mobile.png",
+    "width": 780,
+    "height": 1688,
+    "field": "field-mobile.png",
+    "colors": {
+      "ink": "#DFC7A2",
+      "muted": "#AAB7BE",
+      "background": "#08131D",
+      "amber": "#E6AC63",
+      "light": "#E9C77D",
+      "fog": "#9BBCCB",
+      "copper": "#A8754C"
+    },
+    "fieldTop": 300,
+    "fieldBottom": 1290,
+    "areaStrokeWidth": 3,
+    "panels": [
+      {
+        "name": "back",
+        "source": {
+          "x": 26,
+          "y": 19,
+          "width": 243,
+          "height": 64
+        },
+        "target": {
+          "x": 16,
+          "y": 16,
+          "width": 162,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 1
+      },
+      {
+        "name": "shard",
+        "source": {
+          "x": 325,
+          "y": 19,
+          "width": 283,
+          "height": 64
+        },
+        "target": {
+          "x": 194,
+          "y": 16,
+          "width": 300,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 64,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 1
+      },
+      {
+        "name": "pearl",
+        "source": {
+          "x": 652,
+          "y": 19,
+          "width": 282,
+          "height": 64
+        },
+        "target": {
+          "x": 510,
+          "y": 16,
+          "width": 254,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 64,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 1
+      },
+      {
+        "name": "utilities",
+        "source": {
+          "x": 20,
+          "y": 1293,
+          "width": 450,
+          "height": 119
+        },
+        "target": {
+          "x": 16,
+          "y": 211,
+          "width": 748,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.92
+      },
+      {
+        "name": "zoom",
+        "source": {
+          "x": 591,
+          "y": 283,
+          "width": 344,
+          "height": 50
+        },
+        "target": {
+          "x": 382,
+          "y": 314,
+          "width": 382,
+          "height": 88
+        },
+        "insets": {
+          "left": 16,
+          "right": 16,
+          "top": 16,
+          "bottom": 16
+        },
+        "borderOnly": false,
+        "opacity": 0.9
+      },
+      {
+        "name": "devices",
+        "source": {
+          "x": 20,
+          "y": 1293,
+          "width": 450,
+          "height": 119
+        },
+        "target": {
+          "x": 16,
+          "y": 1344,
+          "width": 748,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.92
+      },
+      {
+        "name": "equipment",
+        "source": {
+          "x": 20,
+          "y": 1293,
+          "width": 450,
+          "height": 119
+        },
+        "target": {
+          "x": 16,
+          "y": 1444,
+          "width": 748,
+          "height": 88
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 1
+      },
+      {
+        "name": "start",
+        "source": {
+          "x": 20,
+          "y": 1439,
+          "width": 914,
+          "height": 119
+        },
+        "target": {
+          "x": 16,
+          "y": 1544,
+          "width": 748,
+          "height": 88
+        },
+        "insets": {
+          "left": 32,
+          "right": 32,
+          "top": 32,
+          "bottom": 32
+        },
+        "borderOnly": false,
+        "opacity": 1
+      }
+    ],
+    "bands": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 780,
+        "height": 300,
+        "alpha": 205,
+        "textureOpacity": 0.32,
+        "edge": "bottom"
+      },
+      {
+        "x": 0,
+        "y": 1290,
+        "width": 780,
+        "height": 398,
+        "alpha": 212,
+        "textureOpacity": 0.32,
+        "edge": "top"
+      }
+    ],
+    "quiet": [
+      {
+        "x": 16,
+        "y": 314,
+        "width": 748,
+        "height": 178,
+        "alpha": 142,
+        "color": "#08131D"
+      }
+    ],
+    "texts": [
+      {
+        "value": "НАЗАД",
+        "x": 97,
+        "y": 45,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 143,
+        "bounds": {
+          "x": 26,
+          "y": 45,
+          "width": 144,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "136",
+        "x": 282,
+        "y": 44,
+        "scale": 3.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 91,
+        "bounds": {
+          "x": 282,
+          "y": 44,
+          "width": 92,
+          "height": 33.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "+",
+        "x": 456,
+        "y": 44,
+        "scale": 3.5,
+        "color": "#E6AC63",
+        "align": "center",
+        "measuredWidth": 28,
+        "bounds": {
+          "x": 442,
+          "y": 44,
+          "width": 29,
+          "height": 33.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "3",
+        "x": 606,
+        "y": 44,
+        "scale": 3.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 28,
+        "bounds": {
+          "x": 606,
+          "y": 44,
+          "width": 29,
+          "height": 33.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "+",
+        "x": 726,
+        "y": 44,
+        "scale": 3.5,
+        "color": "#E6AC63",
+        "align": "center",
+        "measuredWidth": 28,
+        "bounds": {
+          "x": 712,
+          "y": 44,
+          "width": 29,
+          "height": 33.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ГЛАВА I · ТУМАННЫЙ БЕРЕГ",
+        "x": 390,
+        "y": 130,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 698.75,
+        "bounds": {
+          "x": 41,
+          "y": 120.25,
+          "width": 699.75,
+          "height": 41
+        },
+        "role": "primary"
+      },
+      {
+        "value": "НОЧЬ 2 · РАЗБИТЫЙ БЕРЕГ",
+        "x": 366,
+        "y": 176,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 669.5,
+        "bounds": {
+          "x": 31,
+          "y": 166.25,
+          "width": 670.5,
+          "height": 41
+        },
+        "role": "primary"
+      },
+      {
+        "value": "УЛУЧШЕНИЯ",
+        "x": 106,
+        "y": 240,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 260,
+        "bounds": {
+          "x": 106,
+          "y": 240,
+          "width": 261,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "РАЗВЕДКА",
+        "x": 490,
+        "y": 240,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 230.75,
+        "bounds": {
+          "x": 490,
+          "y": 240,
+          "width": 231.75,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "4 ВОЛНЫ",
+        "x": 32,
+        "y": 336,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 201.5,
+        "bounds": {
+          "x": 32,
+          "y": 336,
+          "width": 202.5,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "КРУПНЫЙ",
+        "x": 478,
+        "y": 332,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 201.5,
+        "bounds": {
+          "x": 478,
+          "y": 322.25,
+          "width": 202.5,
+          "height": 41
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ПЛАН",
+        "x": 478,
+        "y": 365,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 113.75,
+        "bounds": {
+          "x": 478,
+          "y": 365,
+          "width": 114.75,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "СВЕТ МАЯКА",
+        "x": 84,
+        "y": 407,
+        "scale": 3.25,
+        "color": "#E9C77D",
+        "align": "left",
+        "measuredWidth": 289.25,
+        "bounds": {
+          "x": 84,
+          "y": 407,
+          "width": 290.25,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ВЫХОД ИЗ ТУМАНА",
+        "x": 84,
+        "y": 451,
+        "scale": 3.25,
+        "color": "#9BBCCB",
+        "align": "left",
+        "measuredWidth": 435.5,
+        "bounds": {
+          "x": 84,
+          "y": 451,
+          "width": 436.5,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ОБЪЕКТЫ 3/4",
+        "x": 24,
+        "y": 1301,
+        "scale": 3.25,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 318.5,
+        "bounds": {
+          "x": 24,
+          "y": 1301,
+          "width": 319.5,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ТИПЫ 2/2",
+        "x": 482,
+        "y": 1301,
+        "scale": 3.25,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 230.75,
+        "bounds": {
+          "x": 482,
+          "y": 1301,
+          "width": 231.75,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "УСТРОЙСТВА",
+        "x": 130,
+        "y": 1373,
+        "scale": 3.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 311.5,
+        "bounds": {
+          "x": 130,
+          "y": 1362.5,
+          "width": 312.5,
+          "height": 44
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ЛИНЗА",
+        "x": 112,
+        "y": 1455,
+        "scale": 2.5,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 110,
+        "bounds": {
+          "x": 112,
+          "y": 1455,
+          "width": 111,
+          "height": 24.5
+        },
+        "role": "secondary"
+      },
+      {
+        "value": "БАЗОВАЯ",
+        "x": 112,
+        "y": 1490,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 201.5,
+        "bounds": {
+          "x": 112,
+          "y": 1490,
+          "width": 202.5,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "СПОСОБНОСТЬ",
+        "x": 486,
+        "y": 1455,
+        "scale": 2.25,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 220.5,
+        "bounds": {
+          "x": 486,
+          "y": 1455,
+          "width": 221.5,
+          "height": 22.25
+        },
+        "role": "secondary"
+      },
+      {
+        "value": "ВСПЫШКА",
+        "x": 486,
+        "y": 1490,
+        "scale": 3.25,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 201.5,
+        "bounds": {
+          "x": 486,
+          "y": 1490,
+          "width": 202.5,
+          "height": 31.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "НАЧАТЬ НОЧЬ",
+        "x": 390,
+        "y": 1569,
+        "scale": 4,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 392,
+        "bounds": {
+          "x": 194,
+          "y": 1569,
+          "width": 393,
+          "height": 38
+        },
+        "role": "primary"
+      },
+      {
+        "value": "РАССТАНОВКА И СТАРТ БЕСПЛАТНЫ",
+        "x": 390,
+        "y": 1645,
+        "scale": 2.75,
+        "color": "#AAB7BE",
+        "align": "center",
+        "measuredWidth": 715,
+        "bounds": {
+          "x": 33,
+          "y": 1645,
+          "width": 716,
+          "height": 26.75
+        },
+        "role": "secondary"
+      }
+    ],
+    "icons": [
+      {
+        "name": "shard",
+        "x": 210,
+        "y": 31,
+        "width": 56,
+        "height": 56,
+        "containScale": 0.21374045801526717,
+        "aspect": 0.8129770992366412
+      },
+      {
+        "name": "pearl",
+        "x": 526,
+        "y": 31,
+        "width": 56,
+        "height": 56,
+        "containScale": 0.21374045801526717,
+        "aspect": 1.1101694915254237
+      },
+      {
+        "name": "upgrades",
+        "x": 30,
+        "y": 225,
+        "width": 60,
+        "height": 60,
+        "containScale": 0.21739130434782608,
+        "aspect": 1.1694915254237288
+      },
+      {
+        "name": "recon",
+        "x": 412,
+        "y": 225,
+        "width": 60,
+        "height": 60,
+        "containScale": 0.20905923344947736,
+        "aspect": 1.4947916666666667
+      },
+      {
+        "name": "zoom",
+        "x": 398,
+        "y": 334,
+        "width": 48,
+        "height": 48,
+        "containScale": 0.21238938053097345,
+        "aspect": 1.036697247706422
+      },
+      {
+        "name": "devices",
+        "x": 32,
+        "y": 1356,
+        "width": 76,
+        "height": 64,
+        "containScale": 0.2087912087912088,
+        "aspect": 1.5964912280701755
+      },
+      {
+        "name": "lens",
+        "x": 36,
+        "y": 1459,
+        "width": 56,
+        "height": 56,
+        "containScale": 0.21875,
+        "aspect": 1.0118577075098814
+      },
+      {
+        "name": "flash",
+        "x": 410,
+        "y": 1459,
+        "width": 56,
+        "height": 56,
+        "containScale": 0.20817843866171004,
+        "aspect": 1.018939393939394
+      }
+    ],
+    "chevrons": [
+      {
+        "x": 728,
+        "y": 181,
+        "size": 10,
+        "color": "#E6AC63"
+      },
+      {
+        "x": 724,
+        "y": 1375,
+        "size": 10,
+        "color": "#E6AC63"
+      }
+    ],
+    "strokes": [
+      {
+        "x": 389,
+        "y": 225,
+        "width": 2,
+        "height": 60,
+        "color": "#A8754C"
+      },
+      {
+        "x": 34,
+        "y": 422,
+        "width": 32,
+        "height": 3,
+        "color": "#E9C77D"
+      },
+      {
+        "x": 34,
+        "y": 466,
+        "width": 32,
+        "height": 3,
+        "color": "#9BBCCB"
+      },
+      {
+        "x": 24,
+        "y": 1434,
+        "width": 732,
+        "height": 2,
+        "color": "#455461"
+      },
+      {
+        "x": 389,
+        "y": 1456,
+        "width": 2,
+        "height": 64,
+        "color": "#A8754C"
+      }
+    ],
+    "controls": [
+      {
+        "name": "back",
+        "x": 16,
+        "y": 16,
+        "width": 162,
+        "height": 88
+      },
+      {
+        "name": "shard",
+        "x": 194,
+        "y": 16,
+        "width": 300,
+        "height": 88
+      },
+      {
+        "name": "shard-plus",
+        "x": 406,
+        "y": 16,
+        "width": 88,
+        "height": 88
+      },
+      {
+        "name": "pearl",
+        "x": 510,
+        "y": 16,
+        "width": 254,
+        "height": 88
+      },
+      {
+        "name": "pearl-plus",
+        "x": 676,
+        "y": 16,
+        "width": 88,
+        "height": 88
+      },
+      {
+        "name": "night-selector",
+        "x": 16,
+        "y": 116,
+        "width": 748,
+        "height": 90
+      },
+      {
+        "name": "utilities",
+        "x": 16,
+        "y": 211,
+        "width": 748,
+        "height": 88
+      },
+      {
+        "name": "upgrades",
+        "x": 16,
+        "y": 211,
+        "width": 366,
+        "height": 88
+      },
+      {
+        "name": "recon",
+        "x": 398,
+        "y": 211,
+        "width": 366,
+        "height": 88
+      },
+      {
+        "name": "zoom",
+        "x": 382,
+        "y": 314,
+        "width": 382,
+        "height": 88
+      },
+      {
+        "name": "devices",
+        "x": 16,
+        "y": 1344,
+        "width": 748,
+        "height": 88
+      },
+      {
+        "name": "equipment",
+        "x": 16,
+        "y": 1444,
+        "width": 748,
+        "height": 88
+      },
+      {
+        "name": "lens",
+        "x": 16,
+        "y": 1444,
+        "width": 374,
+        "height": 88
+      },
+      {
+        "name": "ability",
+        "x": 390,
+        "y": 1444,
+        "width": 374,
+        "height": 88
+      },
+      {
+        "name": "start",
+        "x": 16,
+        "y": 1544,
+        "width": 748,
+        "height": 88
+      }
+    ],
+    "fontSizes": [
+      {
+        "value": "НАЗАД",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "136",
+        "role": "primary",
+        "glyphPixels": 31.5,
+        "cssPixels": 15.75,
+        "scale": 3.5
+      },
+      {
+        "value": "+",
+        "role": "primary",
+        "glyphPixels": 31.5,
+        "cssPixels": 15.75,
+        "scale": 3.5
+      },
+      {
+        "value": "3",
+        "role": "primary",
+        "glyphPixels": 31.5,
+        "cssPixels": 15.75,
+        "scale": 3.5
+      },
+      {
+        "value": "+",
+        "role": "primary",
+        "glyphPixels": 31.5,
+        "cssPixels": 15.75,
+        "scale": 3.5
+      },
+      {
+        "value": "ГЛАВА I · ТУМАННЫЙ БЕРЕГ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "НОЧЬ 2 · РАЗБИТЫЙ БЕРЕГ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "УЛУЧШЕНИЯ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "РАЗВЕДКА",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "4 ВОЛНЫ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "КРУПНЫЙ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "ПЛАН",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "СВЕТ МАЯКА",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "ВЫХОД ИЗ ТУМАНА",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "ОБЪЕКТЫ 3/4",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "ТИПЫ 2/2",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "УСТРОЙСТВА",
+        "role": "primary",
+        "glyphPixels": 31.5,
+        "cssPixels": 15.75,
+        "scale": 3.5
+      },
+      {
+        "value": "ЛИНЗА",
+        "role": "secondary",
+        "glyphPixels": 22.5,
+        "cssPixels": 11.25,
+        "scale": 2.5
+      },
+      {
+        "value": "БАЗОВАЯ",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "СПОСОБНОСТЬ",
+        "role": "secondary",
+        "glyphPixels": 20.25,
+        "cssPixels": 10.125,
+        "scale": 2.25
+      },
+      {
+        "value": "ВСПЫШКА",
+        "role": "primary",
+        "glyphPixels": 29.25,
+        "cssPixels": 14.625,
+        "scale": 3.25
+      },
+      {
+        "value": "НАЧАТЬ НОЧЬ",
+        "role": "primary",
+        "glyphPixels": 36,
+        "cssPixels": 18,
+        "scale": 4
+      },
+      {
+        "value": "РАССТАНОВКА И СТАРТ БЕСПЛАТНЫ",
+        "role": "secondary",
+        "glyphPixels": 24.75,
+        "cssPixels": 12.375,
+        "scale": 2.75
+      }
+    ],
+    "source": {
+      "nightId": "broken-shore",
+      "chapter": "Туманный берег",
+      "nightName": "Разбитый берег",
+      "rulesVersion": "prototype-22-late-modes",
+      "profileUpgrades": [],
+      "note": "Actual base night configuration; example placements and presentation scales only."
+    }
+  },
+  {
+    "id": "desktop",
+    "file": "desktop.png",
+    "width": 1672,
+    "height": 941,
+    "field": "field-desktop.png",
+    "colors": {
+      "ink": "#DFC7A2",
+      "muted": "#AAB7BE",
+      "background": "#08131D",
+      "amber": "#E6AC63",
+      "light": "#E9C77D",
+      "fog": "#9BBCCB",
+      "copper": "#A8754C"
+    },
+    "fieldTop": 96,
+    "fieldBottom": 770,
+    "areaStrokeWidth": 2,
+    "panels": [
+      {
+        "name": "back",
+        "source": {
+          "x": 26,
+          "y": 19,
+          "width": 243,
+          "height": 64
+        },
+        "target": {
+          "x": 18,
+          "y": 14,
+          "width": 172,
+          "height": 64
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.92
+      },
+      {
+        "name": "shard",
+        "source": {
+          "x": 325,
+          "y": 19,
+          "width": 283,
+          "height": 64
+        },
+        "target": {
+          "x": 638,
+          "y": 14,
+          "width": 246,
+          "height": 64
+        },
+        "insets": {
+          "left": 20,
+          "right": 64,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.94
+      },
+      {
+        "name": "pearl",
+        "source": {
+          "x": 652,
+          "y": 19,
+          "width": 282,
+          "height": 64
+        },
+        "target": {
+          "x": 897,
+          "y": 14,
+          "width": 217,
+          "height": 64
+        },
+        "insets": {
+          "left": 20,
+          "right": 64,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.94
+      },
+      {
+        "name": "upgrades",
+        "source": {
+          "x": 34,
+          "y": 180,
+          "width": 435,
+          "height": 91
+        },
+        "target": {
+          "x": 1126,
+          "y": 14,
+          "width": 272,
+          "height": 64
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.88
+      },
+      {
+        "name": "recon",
+        "source": {
+          "x": 485,
+          "y": 180,
+          "width": 435,
+          "height": 91
+        },
+        "target": {
+          "x": 1420,
+          "y": 14,
+          "width": 234,
+          "height": 64
+        },
+        "insets": {
+          "left": 20,
+          "right": 20,
+          "top": 20,
+          "bottom": 20
+        },
+        "borderOnly": false,
+        "opacity": 0.88
+      },
+      {
+        "name": "zoom",
+        "source": {
+          "x": 591,
+          "y": 283,
+          "width": 344,
+          "height": 50
+        },
+        "target": {
+          "x": 1334,
+          "y": 116,
+          "width": 316,
+          "height": 68
+        },
+        "insets": {
+          "left": 16,
+          "right": 16,
+          "top": 16,
+          "bottom": 16
+        },
+        "borderOnly": false,
+        "opacity": 0.9
+      },
+      {
+        "name": "start",
+        "source": {
+          "x": 20,
+          "y": 1439,
+          "width": 914,
+          "height": 119
+        },
+        "target": {
+          "x": 1286,
+          "y": 790,
+          "width": 366,
+          "height": 100
+        },
+        "insets": {
+          "left": 32,
+          "right": 32,
+          "top": 32,
+          "bottom": 32
+        },
+        "borderOnly": false,
+        "opacity": 1
+      }
+    ],
+    "bands": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 1672,
+        "height": 96,
+        "alpha": 205,
+        "textureOpacity": 0.32,
+        "edge": "bottom"
+      },
+      {
+        "x": 0,
+        "y": 770,
+        "width": 1672,
+        "height": 171,
+        "alpha": 212,
+        "textureOpacity": 0.32,
+        "edge": "top"
+      }
+    ],
+    "quiet": [
+      {
+        "x": 22,
+        "y": 114,
+        "width": 386,
+        "height": 112,
+        "alpha": 150,
+        "color": "#08131D"
+      }
+    ],
+    "texts": [
+      {
+        "value": "НАЗАД",
+        "x": 104,
+        "y": 37,
+        "scale": 2.25,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 99,
+        "bounds": {
+          "x": 55,
+          "y": 37,
+          "width": 100,
+          "height": 22.25
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ГЛАВА I · ТУМАННЫЙ БЕРЕГ",
+        "x": 218,
+        "y": 25,
+        "scale": 1.75,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 376.25,
+        "bounds": {
+          "x": 218,
+          "y": 19.75,
+          "width": 377.25,
+          "height": 23
+        },
+        "role": "primary"
+      },
+      {
+        "value": "НОЧЬ 2 · РАЗБИТЫЙ БЕРЕГ",
+        "x": 218,
+        "y": 55,
+        "scale": 1.75,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 360.5,
+        "bounds": {
+          "x": 218,
+          "y": 49.75,
+          "width": 361.5,
+          "height": 23
+        },
+        "role": "primary"
+      },
+      {
+        "value": "136",
+        "x": 714,
+        "y": 37,
+        "scale": 2.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 65,
+        "bounds": {
+          "x": 714,
+          "y": 37,
+          "width": 66,
+          "height": 24.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "+",
+        "x": 848,
+        "y": 37,
+        "scale": 2.5,
+        "color": "#E6AC63",
+        "align": "center",
+        "measuredWidth": 20,
+        "bounds": {
+          "x": 838,
+          "y": 37,
+          "width": 21,
+          "height": 24.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "3",
+        "x": 977,
+        "y": 37,
+        "scale": 2.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 20,
+        "bounds": {
+          "x": 977,
+          "y": 37,
+          "width": 21,
+          "height": 24.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "+",
+        "x": 1078,
+        "y": 37,
+        "scale": 2.5,
+        "color": "#E6AC63",
+        "align": "center",
+        "measuredWidth": 20,
+        "bounds": {
+          "x": 1068,
+          "y": 37,
+          "width": 21,
+          "height": 24.5
+        },
+        "role": "primary"
+      },
+      {
+        "value": "УЛУЧШЕНИЯ",
+        "x": 1200,
+        "y": 37,
+        "scale": 2,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 160,
+        "bounds": {
+          "x": 1200,
+          "y": 37,
+          "width": 161,
+          "height": 20
+        },
+        "role": "primary"
+      },
+      {
+        "value": "РАЗВЕДКА",
+        "x": 1490,
+        "y": 37,
+        "scale": 2,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 142,
+        "bounds": {
+          "x": 1490,
+          "y": 37,
+          "width": 143,
+          "height": 20
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ПОДГОТОВКА · 4 ВОЛНЫ",
+        "x": 38,
+        "y": 130,
+        "scale": 1.75,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 313.25,
+        "bounds": {
+          "x": 38,
+          "y": 130,
+          "width": 314.25,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "СВЕТ МАЯКА",
+        "x": 76,
+        "y": 168,
+        "scale": 1.75,
+        "color": "#E9C77D",
+        "align": "left",
+        "measuredWidth": 155.75,
+        "bounds": {
+          "x": 76,
+          "y": 168,
+          "width": 156.75,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ВЫХОД ИЗ ТУМАНА",
+        "x": 76,
+        "y": 201,
+        "scale": 1.75,
+        "color": "#9BBCCB",
+        "align": "left",
+        "measuredWidth": 234.5,
+        "bounds": {
+          "x": 76,
+          "y": 201,
+          "width": 235.5,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "КРУПНЫЙ ПЛАН",
+        "x": 1410,
+        "y": 143,
+        "scale": 1.75,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 187.25,
+        "bounds": {
+          "x": 1410,
+          "y": 137.75,
+          "width": 188.25,
+          "height": 23
+        },
+        "role": "primary"
+      },
+      {
+        "value": "УСТРОЙСТВА",
+        "x": 142,
+        "y": 810,
+        "scale": 2.5,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 222.5,
+        "bounds": {
+          "x": 142,
+          "y": 802.5,
+          "width": 223.5,
+          "height": 32
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ВЫБРАТЬ И РАССТАВИТЬ",
+        "x": 142,
+        "y": 857,
+        "scale": 1.5,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 268.5,
+        "bounds": {
+          "x": 142,
+          "y": 857,
+          "width": 269.5,
+          "height": 15.5
+        },
+        "role": "secondary"
+      },
+      {
+        "value": "ЛИНЗА",
+        "x": 542,
+        "y": 808,
+        "scale": 1.75,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 77,
+        "bounds": {
+          "x": 542,
+          "y": 808,
+          "width": 78,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "БАЗОВАЯ",
+        "x": 542,
+        "y": 855,
+        "scale": 2,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 124,
+        "bounds": {
+          "x": 542,
+          "y": 855,
+          "width": 125,
+          "height": 20
+        },
+        "role": "primary"
+      },
+      {
+        "value": "СПОСОБНОСТЬ",
+        "x": 778,
+        "y": 808,
+        "scale": 1.75,
+        "color": "#AAB7BE",
+        "align": "left",
+        "measuredWidth": 171.5,
+        "bounds": {
+          "x": 778,
+          "y": 808,
+          "width": 172.5,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ВСПЫШКА",
+        "x": 778,
+        "y": 855,
+        "scale": 2,
+        "color": "#DFC7A2",
+        "align": "left",
+        "measuredWidth": 124,
+        "bounds": {
+          "x": 778,
+          "y": 855,
+          "width": 125,
+          "height": 20
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ОБЪЕКТЫ 3/4",
+        "x": 1144,
+        "y": 815,
+        "scale": 1.75,
+        "color": "#AAB7BE",
+        "align": "center",
+        "measuredWidth": 171.5,
+        "bounds": {
+          "x": 1058,
+          "y": 815,
+          "width": 172.5,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "ТИПЫ 2/2",
+        "x": 1144,
+        "y": 855,
+        "scale": 1.75,
+        "color": "#AAB7BE",
+        "align": "center",
+        "measuredWidth": 124.25,
+        "bounds": {
+          "x": 1082,
+          "y": 855,
+          "width": 125.25,
+          "height": 17.75
+        },
+        "role": "primary"
+      },
+      {
+        "value": "НАЧАТЬ НОЧЬ",
+        "x": 1469,
+        "y": 828,
+        "scale": 3,
+        "color": "#DFC7A2",
+        "align": "center",
+        "measuredWidth": 294,
+        "bounds": {
+          "x": 1322,
+          "y": 828,
+          "width": 295,
+          "height": 29
+        },
+        "role": "primary"
+      },
+      {
+        "value": "РАССТАНОВКА И СТАРТ БЕСПЛАТНЫ",
+        "x": 1469,
+        "y": 909,
+        "scale": 1.25,
+        "color": "#AAB7BE",
+        "align": "center",
+        "measuredWidth": 325,
+        "bounds": {
+          "x": 1307,
+          "y": 909,
+          "width": 326,
+          "height": 13.25
+        },
+        "role": "secondary"
+      }
+    ],
+    "icons": [
+      {
+        "name": "shard",
+        "x": 654,
+        "y": 25,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.16793893129770993,
+        "aspect": 0.8129770992366412
+      },
+      {
+        "name": "pearl",
+        "x": 913,
+        "y": 25,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.16793893129770993,
+        "aspect": 1.1101694915254237
+      },
+      {
+        "name": "upgrades",
+        "x": 1138,
+        "y": 25,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.15942028985507245,
+        "aspect": 1.1694915254237288
+      },
+      {
+        "name": "recon",
+        "x": 1432,
+        "y": 25,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.15331010452961671,
+        "aspect": 1.4947916666666667
+      },
+      {
+        "name": "zoom",
+        "x": 1348,
+        "y": 128,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.19469026548672566,
+        "aspect": 1.036697247706422
+      },
+      {
+        "name": "devices",
+        "x": 40,
+        "y": 812,
+        "width": 80,
+        "height": 64,
+        "containScale": 0.21978021978021978,
+        "aspect": 1.5964912280701755
+      },
+      {
+        "name": "lens",
+        "x": 482,
+        "y": 824,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.171875,
+        "aspect": 1.0118577075098814
+      },
+      {
+        "name": "flash",
+        "x": 718,
+        "y": 824,
+        "width": 44,
+        "height": 44,
+        "containScale": 0.16356877323420074,
+        "aspect": 1.018939393939394
+      }
+    ],
+    "chevrons": [
+      {
+        "x": 614,
+        "y": 58,
+        "size": 6,
+        "color": "#E6AC63"
+      }
+    ],
+    "strokes": [
+      {
+        "x": 38,
+        "y": 177,
+        "width": 24,
+        "height": 2,
+        "color": "#E9C77D"
+      },
+      {
+        "x": 38,
+        "y": 210,
+        "width": 24,
+        "height": 2,
+        "color": "#9BBCCB"
+      },
+      {
+        "x": 456,
+        "y": 798,
+        "width": 2,
+        "height": 98,
+        "color": "#A8754C"
+      },
+      {
+        "x": 1000,
+        "y": 798,
+        "width": 2,
+        "height": 98,
+        "color": "#A8754C"
+      }
+    ],
+    "controls": [
+      {
+        "name": "back",
+        "x": 18,
+        "y": 14,
+        "width": 172,
+        "height": 64
+      },
+      {
+        "name": "night-selector",
+        "x": 202,
+        "y": 10,
+        "width": 430,
+        "height": 76
+      },
+      {
+        "name": "shard",
+        "x": 638,
+        "y": 14,
+        "width": 246,
+        "height": 64
+      },
+      {
+        "name": "shard-plus",
+        "x": 818,
+        "y": 14,
+        "width": 60,
+        "height": 64
+      },
+      {
+        "name": "pearl",
+        "x": 897,
+        "y": 14,
+        "width": 217,
+        "height": 64
+      },
+      {
+        "name": "pearl-plus",
+        "x": 1048,
+        "y": 14,
+        "width": 60,
+        "height": 64
+      },
+      {
+        "name": "upgrades",
+        "x": 1126,
+        "y": 14,
+        "width": 272,
+        "height": 64
+      },
+      {
+        "name": "recon",
+        "x": 1420,
+        "y": 14,
+        "width": 234,
+        "height": 64
+      },
+      {
+        "name": "zoom",
+        "x": 1334,
+        "y": 116,
+        "width": 316,
+        "height": 68
+      },
+      {
+        "name": "devices",
+        "x": 24,
+        "y": 790,
+        "width": 424,
+        "height": 116
+      },
+      {
+        "name": "lens",
+        "x": 474,
+        "y": 800,
+        "width": 212,
+        "height": 100
+      },
+      {
+        "name": "ability",
+        "x": 710,
+        "y": 800,
+        "width": 276,
+        "height": 100
+      },
+      {
+        "name": "start",
+        "x": 1286,
+        "y": 790,
+        "width": 366,
+        "height": 100
+      }
+    ],
+    "fontSizes": [
+      {
+        "value": "НАЗАД",
+        "role": "primary",
+        "glyphPixels": 20.25,
+        "cssPixels": 20.25,
+        "scale": 2.25
+      },
+      {
+        "value": "ГЛАВА I · ТУМАННЫЙ БЕРЕГ",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "НОЧЬ 2 · РАЗБИТЫЙ БЕРЕГ",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "136",
+        "role": "primary",
+        "glyphPixels": 22.5,
+        "cssPixels": 22.5,
+        "scale": 2.5
+      },
+      {
+        "value": "+",
+        "role": "primary",
+        "glyphPixels": 22.5,
+        "cssPixels": 22.5,
+        "scale": 2.5
+      },
+      {
+        "value": "3",
+        "role": "primary",
+        "glyphPixels": 22.5,
+        "cssPixels": 22.5,
+        "scale": 2.5
+      },
+      {
+        "value": "+",
+        "role": "primary",
+        "glyphPixels": 22.5,
+        "cssPixels": 22.5,
+        "scale": 2.5
+      },
+      {
+        "value": "УЛУЧШЕНИЯ",
+        "role": "primary",
+        "glyphPixels": 18,
+        "cssPixels": 18,
+        "scale": 2
+      },
+      {
+        "value": "РАЗВЕДКА",
+        "role": "primary",
+        "glyphPixels": 18,
+        "cssPixels": 18,
+        "scale": 2
+      },
+      {
+        "value": "ПОДГОТОВКА · 4 ВОЛНЫ",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "СВЕТ МАЯКА",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "ВЫХОД ИЗ ТУМАНА",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "КРУПНЫЙ ПЛАН",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "УСТРОЙСТВА",
+        "role": "primary",
+        "glyphPixels": 22.5,
+        "cssPixels": 22.5,
+        "scale": 2.5
+      },
+      {
+        "value": "ВЫБРАТЬ И РАССТАВИТЬ",
+        "role": "secondary",
+        "glyphPixels": 13.5,
+        "cssPixels": 13.5,
+        "scale": 1.5
+      },
+      {
+        "value": "ЛИНЗА",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "БАЗОВАЯ",
+        "role": "primary",
+        "glyphPixels": 18,
+        "cssPixels": 18,
+        "scale": 2
+      },
+      {
+        "value": "СПОСОБНОСТЬ",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "ВСПЫШКА",
+        "role": "primary",
+        "glyphPixels": 18,
+        "cssPixels": 18,
+        "scale": 2
+      },
+      {
+        "value": "ОБЪЕКТЫ 3/4",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "ТИПЫ 2/2",
+        "role": "primary",
+        "glyphPixels": 15.75,
+        "cssPixels": 15.75,
+        "scale": 1.75
+      },
+      {
+        "value": "НАЧАТЬ НОЧЬ",
+        "role": "primary",
+        "glyphPixels": 27,
+        "cssPixels": 27,
+        "scale": 3
+      },
+      {
+        "value": "РАССТАНОВКА И СТАРТ БЕСПЛАТНЫ",
+        "role": "secondary",
+        "glyphPixels": 11.25,
+        "cssPixels": 11.25,
+        "scale": 1.25
+      }
+    ],
+    "source": {
+      "nightId": "broken-shore",
+      "chapter": "Туманный берег",
+      "nightName": "Разбитый берег",
+      "rulesVersion": "prototype-22-late-modes",
+      "profileUpgrades": [],
+      "note": "Actual base night configuration; example placements and presentation scales only."
+    }
+  }
+]

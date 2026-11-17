@@ -1,0 +1,31 @@
+{
+  "cornerAlpha": 0,
+  "height": 1254,
+  "width": 1254,
+  "frames": {
+    "minotaur": {
+      "y": 88,
+      "x": 717,
+      "height": 476,
+      "width": 479
+    },
+    "ghost": {
+      "y": 117,
+      "x": 111,
+      "height": 440,
+      "width": 407
+    },
+    "turtle": {
+      "y": 767,
+      "x": 33,
+      "height": 388,
+      "width": 577
+    },
+    "bat": {
+      "y": 783,
+      "x": 670,
+      "height": 278,
+      "width": 546
+    }
+  }
+}

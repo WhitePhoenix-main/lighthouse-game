@@ -1,3 +1,4 @@
+import { isLandPoint as terrainIsLandPoint } from '../content/terrain';
 import type { BarrageAbilityRules } from '../abilityRules';
 import type { BattleState, DeviceState, NightConfig } from '../contracts';
 import { bossIntersects, damageBoss } from './boss';
@@ -50,8 +51,8 @@ export function updateMortars(state: BattleState, config: NightConfig): void {
   }
 }
 
-export function isLandPoint(config: NightConfig, point: { x: number }): boolean {
-  return !config.terrain || point.x <= config.terrain.shoreX + EPSILON;
+export function isLandPoint(config: NightConfig, point: { x: number; y: number }): boolean {
+  return terrainIsLandPoint(config.terrain, point);
 }
 
 /** A projectile freezes launch stats, while illumination is evaluated at impact. */

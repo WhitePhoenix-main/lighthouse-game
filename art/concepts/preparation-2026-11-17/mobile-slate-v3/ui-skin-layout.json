@@ -1,0 +1,254 @@
+{
+  "image": "ui-chrome.png",
+  "size": [
+    953,
+    1651
+  ],
+  "cornerScale": 1,
+  "fullAtlasStretch": false,
+  "panels": [
+    {
+      "name": "back",
+      "source": {
+        "x": 26,
+        "y": 19,
+        "width": 243,
+        "height": 64
+      },
+      "target": {
+        "x": 26,
+        "y": 22,
+        "width": 222,
+        "height": 67
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "shard",
+      "source": {
+        "x": 325,
+        "y": 19,
+        "width": 283,
+        "height": 64
+      },
+      "target": {
+        "x": 318,
+        "y": 22,
+        "width": 244,
+        "height": 67
+      },
+      "insets": {
+        "left": 20,
+        "right": 64,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "pearl",
+      "source": {
+        "x": 652,
+        "y": 19,
+        "width": 282,
+        "height": 64
+      },
+      "target": {
+        "x": 615,
+        "y": 22,
+        "width": 240,
+        "height": 67
+      },
+      "insets": {
+        "left": 20,
+        "right": 64,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "upgrades",
+      "source": {
+        "x": 34,
+        "y": 180,
+        "width": 435,
+        "height": 91
+      },
+      "target": {
+        "x": 42,
+        "y": 197,
+        "width": 388,
+        "height": 86
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "recon",
+      "source": {
+        "x": 485,
+        "y": 180,
+        "width": 435,
+        "height": 91
+      },
+      "target": {
+        "x": 456,
+        "y": 197,
+        "width": 388,
+        "height": 86
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "zoom",
+      "source": {
+        "x": 591,
+        "y": 283,
+        "width": 344,
+        "height": 50
+      },
+      "target": {
+        "x": 552,
+        "y": 303,
+        "width": 316,
+        "height": 54
+      },
+      "insets": {
+        "left": 16,
+        "right": 16,
+        "top": 16,
+        "bottom": 16
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "map",
+      "source": {
+        "x": 14,
+        "y": 346,
+        "width": 927,
+        "height": 747
+      },
+      "target": {
+        "x": 10,
+        "y": 370,
+        "width": 867,
+        "height": 804
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": true
+    },
+    {
+      "name": "devices",
+      "source": {
+        "x": 20,
+        "y": 1146,
+        "width": 914,
+        "height": 130
+      },
+      "target": {
+        "x": 20,
+        "y": 1233,
+        "width": 847,
+        "height": 140
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "lens",
+      "source": {
+        "x": 20,
+        "y": 1293,
+        "width": 450,
+        "height": 119
+      },
+      "target": {
+        "x": 24,
+        "y": 1394,
+        "width": 408,
+        "height": 124
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "ability",
+      "source": {
+        "x": 485,
+        "y": 1293,
+        "width": 450,
+        "height": 119
+      },
+      "target": {
+        "x": 456,
+        "y": 1394,
+        "width": 408,
+        "height": 124
+      },
+      "insets": {
+        "left": 20,
+        "right": 20,
+        "top": 20,
+        "bottom": 20
+      },
+      "borderOnly": false
+    },
+    {
+      "name": "start",
+      "source": {
+        "x": 20,
+        "y": 1439,
+        "width": 914,
+        "height": 119
+      },
+      "target": {
+        "x": 26,
+        "y": 1546,
+        "width": 835,
+        "height": 128
+      },
+      "insets": {
+        "left": 32,
+        "right": 32,
+        "top": 32,
+        "bottom": 32
+      },
+      "borderOnly": false
+    }
+  ],
+  "decorations": []
+}

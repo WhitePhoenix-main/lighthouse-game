@@ -1,0 +1,56 @@
+Generation mode: built-in image_gen (edit).
+Scope: desktop landscape visual concept only; no executable interface or rules changed.
+Direction: adapt the latest mobile styling to desktop, with no enclosing frame or heading divider, translucent scenic dimming and chapter text over the illustrated coast.
+Four actions: Continue, Trials, New Game, Back. Chapter and night shown are illustrative sample data.
+References:
+- art/concepts/play-menu-2026-11-17/landscape-v1.png (desktop edit target)
+- art/concepts/play-menu-2026-11-17/portrait-v5-clean-heading.png (current visual direction)
+- sprites/previews/landscape.png (original pixel style)
+
+FINAL PROMPT
+
+Use case: ui-mockup / precise-object-edit.
+Create the DESKTOP LANDSCAPE adaptation of the latest Russian pixel-art game-selection screen.
+
+INPUT ROLES:
+Image 1 is the EDIT TARGET / desktop layout reference: the older 16:9 desktop concept. Keep its useful desktop arrangement: menu controls on the left and the large scenic lighthouse clearly visible on the right. Update its outdated panel styling as specified below.
+Image 2 is the CURRENT APPROVED VISUAL DIRECTION: latest tall mobile concept. Its unframed scenic backdrop, clean heading without divider, integrated illustrated chapter card, copper-edged buttons and crisp pixel style are authoritative. Carry these exact visual decisions to desktop.
+Image 3 is the ORIGINAL GAME PIXEL-ART STYLE REFERENCE: actual landscape main menu. Maintain its visible square-pixel edges, dark blue coast, warm ivory pixel-serif Cyrillic and simple copper/slate controls.
+
+OUTPUT:
+One polished full-bleed 16:9 desktop game screenshot concept, ideally 1920x1080. No phone mockup, no comparison board, no other views.
+
+DESKTOP COMPOSITION:
+The left approximately 46% contains the interface, with comfortable screen margins.
+- Near the upper left, centered over the menu column, heading exactly "ВЫБОР ИГРЫ".
+- Below it, one large illustrated Continue card around 42% screen width, visually dominant.
+- Below that card, two smaller equal-width buttons side by side: "ИСПЫТАНИЯ" and "НОВАЯ ИГРА".
+- Below them, a slightly narrower centered return button with a left arrow and "НАЗАД".
+All controls fit comfortably with clear vertical spacing.
+Keep most of the right half unobstructed: the recognizable main scenic lighthouse, amber lantern and windows, rocky stairs, ruined arch, little distant ship and moon. Preserve the desktop scene's lighthouse scale and spatial character.
+
+MANDATORY STYLE UPDATES:
+1. NO large outer stone frame, enclosing masonry rails, stone panel corners, foliage frame or opaque menu slab.
+Use ONE continuous full-screen coastal scene. Add a translucent deep-navy dimming gradient behind the left menu, becoming lighter toward the scenic right half. Clouds, rocks and water remain subtly visible around the controls. Match the current mobile version's borderless overlay feel.
+2. NO copper horizontal line, central diamond, underline or ornamental divider below the heading. The heading floats directly over the darkened sky. Do not replace the removed divider with another ornament.
+3. Continue card: extend its coastal illustration across the FULL interior down to the Continue button. Like the latest mobile version, the metadata is printed directly OVER the illustrated water, mist and rocky foreground, with subtle local darkening and pixel text shadow. There must be NO blank solid navy metadata band or abrupt cutoff between the picture and chapter text.
+Keep a small glowing lighthouse at the card's upper right and readable coastal details behind and around the text.
+4. KEEP the fine copper outline on the individual Continue card and individual buttons. Only the outer enclosing frame is absent. Copper is restrained; no neon glow or ornate gold.
+
+EXACT CONTENT:
+Heading "ВЫБОР ИГРЫ".
+Continue card passive chapter text on three centered lines, in warm ivory pixel-serif type:
+"ГЛАВА I"
+"ТУМАННЫЙ БЕРЕГ"
+"НОЧЬ 3"
+The card's lower action band reads exactly "ПРОДОЛЖИТЬ".
+Secondary buttons exactly "ИСПЫТАНИЯ", "НОВАЯ ИГРА".
+Return button left arrow plus "НАЗАД".
+Exactly four actions. Chapter/night text is sample saved-game information, not a selector.
+
+PIXEL DESIGN:
+Match Image 2 and the actual main menu: crisp stepped square pixels, limited blue palette and grouped color shading, readable pixel-serif Cyrillic, simple dark slate button fills, warm amber light and restrained copper edges. No painterly smoothing, glossy 3D UI, vector curves, micro-noise, bloom or distorted pixels.
+The result should feel like the exact desktop sibling of the latest mobile version.
+
+No logo, level picker, chapter arrows, carousel, resources, shop, settings controls, monsters, portraits, badges, progress bars, extra text, captions, English, watermarks or hardware frame.
+Deliver only the complete revised desktop screen.

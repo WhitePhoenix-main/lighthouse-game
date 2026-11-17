@@ -1,0 +1,18 @@
+Generation mode: built-in image_gen (edit).
+Scope: mobile visual reference only; no executable interface or rules changed.
+Change: remove the arrow from the bottom Back slab and center the label.
+Edit source: art/concepts/play-menu-2026-11-17/portrait-v6-stone-slabs.png
+
+FINAL PROMPT
+
+Use case: precise-object-edit.
+Make one minimal edit to the attached mobile pixel-art menu reference.
+On the small BOTTOM stone button labeled with a left arrow and "НАЗАД":
+- Remove the left arrow completely, restoring matching blue slate texture where it was.
+- Recenter the word "НАЗАД" horizontally within this same stone button.
+Keep the exact existing pixel-serif lettering style, text size, ivory color, and vertical alignment.
+The button now contains ONLY the word "НАЗАД", without any icon or arrow.
+
+Preserve everything else: exact tall portrait composition, pixel-art scenery and lighthouse, all stone shapes and their positions/sizes, Continue and chapter text, other labels and their icons, materials, colors and lighting.
+Do not change the crossed swords or rising-sun icons. Do not add anything or resize the bottom button.
+Return the complete edited mobile reference image only.

@@ -1,0 +1,81 @@
+{
+  "scope": "Static mobile color/material study of selected historical illustration; not current world geometry",
+  "size": [
+    887,
+    1774
+  ],
+  "mapROI": {
+    "x": 34,
+    "y": 440,
+    "width": 800,
+    "height": 660
+  },
+  "sources": [
+    {
+      "path": "../mobile-materials-v2/user-mobile-reference.png",
+      "sha256": "bcc0b94272d0e84455f0f6f2a44ccaa43a40fea149752864ed49798cba75eef7"
+    },
+    {
+      "path": "ui-chrome.png",
+      "sha256": "1029183fe3faec605d7d96a2bce8f13a2414abf3c68d0002034c336fb404585b"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.png",
+      "sha256": "244189d9b2729c68a3b1cb28e821a16b9a7cc8473597570b411b21c5a8e5a1f2"
+    },
+    {
+      "path": "../full-screen-v1/ui-icons.json",
+      "sha256": "e74ca8ea0cdb8d19f95e5f20da4a3fb0c8aec8229cbdcaa32774d9dd919ecbeb"
+    },
+    {
+      "path": "../full-screen-v1/glyphs.json",
+      "sha256": "0ae9767e11edbe304ffeb85fe6daafe5dfc31f0bf7322a2c769dfa5f89af0ad8"
+    }
+  ],
+  "transforms": {
+    "background": "Opaque code-native #08131D covers all old UI",
+    "chrome": "Panel atlas, nine-slice with 1:1 corners; full source never stretched",
+    "map": "Native crop at identical source/destination coordinates, no recolor or scaling; border-only panel above"
+  },
+  "atlas": {
+    "size": [
+      953,
+      1651
+    ],
+    "fullAtlasStretch": false,
+    "cornerScale": 1,
+    "framesChecked": 11,
+    "mapBorderOnly": true,
+    "draftUsed": false
+  },
+  "checks": {
+    "nativeCanvas": true,
+    "allTextBoundsValid": true,
+    "labelFrameFits": true,
+    "nineSliceFrameFits": true,
+    "sourceIconAspectPreserved": true,
+    "renderAndPixelParity": "passed",
+    "sourceHashesUnchanged": true,
+    "cornerBlitsValidated": 44
+  },
+  "iconRounding": "Uniform source scale followed by nearest whole pixel destination; less than 1px quantization per axis",
+  "pixelParity": {
+    "roi": {
+      "x": 34,
+      "y": 440,
+      "width": 800,
+      "height": 660
+    },
+    "roiPixelsChecked": 528000,
+    "roiPixelsChanged": 0,
+    "mapInterior": {
+      "x": 30,
+      "y": 390,
+      "width": 827,
+      "height": 764
+    },
+    "mapInteriorPixelsChecked": 631828,
+    "mapInteriorPixelsChanged": 0,
+    "boundaryPolicy": "Entire guaranteed ROI and nine-slice frame interior checked without exclusions. New stone edges outside the interior are intentional."
+  }
+}

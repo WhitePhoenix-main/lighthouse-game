@@ -1,0 +1,73 @@
+Generation mode: built-in image_gen (edit).
+Scope: updated mobile settings visual reference only; no executable interface, settings behavior or game rules changed.
+Direction: compact stone choices, restrained warm selected state, thin sliders with visible round thumbs and a text-only stone Back control, over continuous darkened scenery without an enclosing frame.
+Illustrative settings: sound on, music 70%, effects 40%, Russian selected, normal text selected. Automatic and English language options are retained.
+References:
+- public/images/settings-portrait.webp (settings content)
+- art/concepts/play-menu-2026-11-17/portrait-v7-back-without-arrow.png (stone material and pixel style)
+
+FINAL PROMPT
+
+Use case: ui-mockup / style-preserving edit.
+Create an updated MOBILE SETTINGS REFERENCE for the Russian pixel-art lighthouse game.
+
+INPUT IMAGE ROLES:
+Image 1 is the EDIT TARGET / settings content reference: existing mobile settings. Preserve its actual settings and their logical order.
+Image 2 is the MATERIAL AND PIXEL STYLE reference: latest mobile game-selection screen with blue stone buttons and a text-only Back button. Carry the same slate, warm ivory pixel-serif type and crisp coastal aesthetic into settings, using a LIGHTER, more compact treatment.
+
+DELIVERABLE:
+ONE complete tall 9:20 portrait mobile settings screenshot concept, ideally 1080x2400, composed for a conceptual 360x800 square-pixel phone viewport.
+No phone frame, comparison board or extra views.
+This is a settings screen, NOT the game-selection menu.
+
+SCENE:
+The familiar moonlit coast, lighthouse with amber windows, ruined arch, clouds and little sailing ship form ONE continuous full-screen portrait background.
+Apply a translucent deep navy dimming overlay like the existing settings screen. Keep the scenery faintly recognizable through gaps and margins. The background supports the controls rather than competing with them.
+COMPLETELY REMOVE Image 1's enclosing stone border and opaque panel, including its side rails and corners. No outer frame, no large slab behind all settings, no separate scenic top banner.
+No decorative line-and-diamond or long horizontal copper divider ornaments. Use clean grouping and spacing.
+
+CONTROL DESIGN:
+Use compact, shallow BLUE SLATE CHOICE BUTTONS: modest chipped square-pixel edges, low relief, subtle stone texture and mostly clear faces behind text. These are smaller, flatter siblings of the game-selection stone slabs, not huge boulders for every setting.
+Selected values have a thin restrained warm amber edge and slightly warmer face. Unselected values have cool blue-gray edges with readable pale lettering. Avoid neon glow or gold everywhere.
+The Back control is a somewhat larger stone button with ONLY "НАЗАД" centered, NO arrow or icon.
+For volume sliders, use a thin horizontal groove with a subtle slate rim, warm copper filled portion and a bright ROUND stepped-pixel amber thumb, matching the existing settings. No bulky stone slider panels.
+
+LAYOUT AND EXACT RUSSIAN CONTENT:
+Keep the full page comfortably readable on a 360px-wide phone and fit all controls with safe margins. Typography remains normal proportions, square-pixel serif Cyrillic. Do not shrink labels to make room.
+Top centered heading: "НАСТРОЙКИ", around 4-8% screen height, directly on dimmed scenery.
+
+1. Master sound row around 15-22%:
+Left label "ЗВУК", to its right two compact choice stones "ВКЛ" and "ВЫКЛ".
+"ВКЛ" is selected, "ВЫКЛ" unselected. Their sizes and spacing make both choices distinct.
+
+2. Music around 28-36%:
+Label "МУЗЫКА" left, passive value "70%" right. A nearly full-width thin slider underneath, thumb at 70%.
+
+3. Effects around 40-48%:
+Label "ЗВУКИ" left, passive value "40%" right. Matching thin slider underneath, thumb at 40%.
+
+4. Language around 53-66%:
+First row: label "ЯЗЫК" left, compact "АВТО" stone at right, unselected.
+Next row: two equal width stone choices "РУССКИЙ" and "ENGLISH", with good gap. "РУССКИЙ" selected, "ENGLISH" unselected.
+Exactly these three language modes; no extra dropdowns.
+
+5. Text size around 71-81%:
+Label "ТЕКСТ", then two equal width stone choices "ОБЫЧНЫЙ" and "КРУПНЫЙ". "ОБЫЧНЫЙ" selected.
+All choice stones should have comfortable visual finger-sized targets around 44-48 logical pixels high and labels at least around 15-17 logical pixels. Use enough width for the longer words with side padding.
+
+6. Quiet footer around 85-89%, two readable modest lines:
+"СОХРАНЯЕТСЯ"
+"АВТОМАТИЧЕСКИ"
+
+7. Bottom around 92-98%:
+A separate stone "НАЗАД" button, at least 44 logical pixels tall, comfortable bottom safe margin, label centered with no arrow.
+Adjust section spacing slightly if needed for a balanced screen; do not omit or duplicate any control.
+
+PIXEL STYLE:
+Sharp visible square pixels, stepped silhouettes, low-noise grouped shades, restrained navy/slate blue, warm amber accents and ivory pixel-serif lettering. The controls look related to Image 2 but are simpler and calmer because this screen has many values.
+No smooth vector UI, rounded modern app switches, glossy photorealistic stone, painterly smoothing, tiny unreadable text, bloom, ornate gold, long decorative divider lines or outer framing.
+
+STRICT AVOIDS:
+Do not copy "ПРОДОЛЖИТЬ", chapter/night information, "ИСПЫТАНИЯ", "НОВАЯ ИГРА", crossed swords or sunrise icons from Image 2.
+No shop, resources, gameplay HUD, level selection, extra settings, login, Apply or Save button, monsters, portraits, extra captions, watermark or hardware frame.
+The values and selections are illustrative settings state. Deliver only the complete updated mobile settings reference.

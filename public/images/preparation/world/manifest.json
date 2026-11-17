@@ -1,0 +1,10 @@
+{
+  "sourceDirectory": "art/concepts/preparation-2026-11-17/world-v2",
+  "assets": ["terrain-coast-irregular-v1.png", "lighthouse-main.png", "props-atlas.png"],
+  "processing": "Unmodified byte-for-byte copies of approved concept PNGs; runtime frames from scene-data.json.",
+  "provenance": "AI-generated project concept assets, prompts and inspection retained in sourceDirectory; terrain guided by user reference. No external stock assets.",
+  "license": "Project-generated assets; no third-party license asserted.",
+  "terrainGeometry": "src/content/terrain.ts: manually traced walkable upper cliff edge in source pixel coordinates; shared placement/spawn/mortar geometry. Raster walls and foam do not count as buildable land.",
+  "projectionY": 0.7,
+  "terrainBounds": { "minX": -1125, "maxX": 1125, "minY": -1071.4285714285716, "maxY": 1071.4285714285716 }
+}
