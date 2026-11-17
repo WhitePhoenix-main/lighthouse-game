@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import type { LensId, NightId, SaveStore, UpgradeId } from '../src/contracts';
+import { beforeAll, describe, expect, it } from 'vitest';
+import type { LensId, NightId, SaveData, SaveStore, UpgradeId } from '../src/contracts';
 import { emptySave, SaveRepository } from '../src/application/saves';
 import { NIGHT_CATALOG } from '../src/content/nights';
 import { deviceDeployments, repairCost } from '../src/progression/devices';
@@ -8,11 +8,11 @@ import { measureBattle } from './helpers/balancePolicy';
 
 const positions = { cannon: { x: -90, y: -60 }, barrier: { x: -220, y: 0 }, mortar: { x: -80, y: 80 } };
 const night = (id: NightId) => NIGHT_CATALOG.find(item => item.id === id)!;
-function repository() {
-  const store: SaveStore & { value: string | null } = { value: null,
+function repository(snapshot?: SaveData) {
+  const store: SaveStore & { value: string | null } = { value: snapshot ? JSON.stringify(snapshot) : null,
     read() { return this.value; }, write(value) { this.value = value; } };
   const repo = new SaveRepository(store); repo.load();
-  expect(repo.current).toEqual(emptySave());
+  expect(repo.current).toEqual(snapshot ?? emptySave());
   return { repo, store };
 }
 function buy(repo: SaveRepository, ids: readonly UpgradeId[]) {
@@ -93,25 +93,33 @@ describe('second expansion economy and affordable combat characterization', () =
     expect(repo.current.profile.resources).toBe(127);
   });
 
-  it('compares affordable basic and smoldering equipment across seeds and normal/early waves', () => {
-    const { repo } = route(false);
-    const before = repo.current;
-    const rows = (['winged-tide', 'far-shore'] as const).flatMap(id => [3, 42, 81].flatMap(seed =>
-      [false, true].flatMap(earlyCalls => (['basic', 'smoldering'] as const).map(lensId => {
+  describe('affordable basic and smoldering equipment comparisons', () => {
+    let snapshot: SaveData;
+    beforeAll(() => {
+      // Earn the equipment once, then reload an independent save for each scenario.
+      snapshot = route(false).repo.current;
+    });
+    const scenarios = (['winged-tide', 'far-shore'] as const).flatMap(id => [3, 42, 81].flatMap(seed =>
+      [false, true].map(earlyCalls => ({ id, seed, earlyCalls }))));
+    it.each(scenarios)('compares lenses for $id, seed $seed, early calls: $earlyCalls', ({ id, seed, earlyCalls }) => {
+      const repo = repository(snapshot).repo;
+      const before = repo.current;
+      const rows = (['basic', 'smoldering'] as const).map(lensId => {
         const config = prepare(repo, id, lensId);
         const result = measureBattle(config, seed, deviceDeployments(repo.current.profile), { earlyCalls });
         expect(result.outcome, `${id}/${seed}/${lensId}/${earlyCalls}`).not.toBe('playing');
         const repair = result.devices.reduce((sum, device) => sum + repairCost({ ...device, position: null }), 0);
         return { id, seed, lensId, earlyCalls, outcome: result.outcome, health: result.health,
           seconds: result.seconds, reward: result.reward, repair, net: result.reward - repair };
-      }))));
-    console.table(rows);
-    expect(rows).toHaveLength(24);
-    expect(rows.filter(row => !row.earlyCalls).every(row => row.outcome === 'victory')).toBe(true);
-    // Characterize early calls rather than demanding universal lens superiority.
-    expect(repo.current.profile.resources).toBe(before.profile.resources);
-    expect(repo.current.profile.bossMaterials).toBe(before.profile.bossMaterials);
-    expect(repo.current.profile.devices).toEqual(before.profile.devices);
+      });
+      console.table(rows);
+      expect(rows).toHaveLength(2);
+      if (!earlyCalls) expect(rows.every(row => row.outcome === 'victory')).toBe(true);
+      // Characterize early calls rather than demanding universal lens superiority.
+      expect(repo.current.profile.resources).toBe(before.profile.resources);
+      expect(repo.current.profile.bossMaterials).toBe(before.profile.bossMaterials);
+      expect(repo.current.profile.devices).toEqual(before.profile.devices);
+    });
   });
 
   it('loads an existing v5 profile without retroactive grants or duplicate settlement rewards', () => {
