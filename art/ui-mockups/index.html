@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Свет Авалона · Макеты интерфейса</title>
+  <link rel="stylesheet" href="design.css">
+  <style>
+    :root { color-scheme: dark; background: #0c171e; color: #f4dfc0; }
+    body { margin: 0; }
+    .gallery { min-height: 100svh; display: grid; grid-template: auto minmax(0, 1fr) / minmax(0, 1fr); font: 14px/1.4 system-ui, sans-serif; }
+    .gallery-toolbar, .gallery-preview, .gallery-scroll { box-sizing: border-box; }
+    .gallery-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 1.5rem; padding: .75rem max(.75rem, env(safe-area-inset-right)) .75rem max(.75rem, env(safe-area-inset-left)); border-bottom: 1px solid #52606a; background: #14252e; }
+    .gallery-title { margin: 0 auto 0 0; font-size: 1rem; }
+    .gallery-field { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; min-width: 0; max-width: 100%; }
+    .gallery-field label { color: #c9d4dd; }
+    .gallery-field select { min-width: 0; max-width: min(100%, 24rem); min-height: 44px; padding: .25rem .5rem; border: 1px solid #637784; border-radius: 3px; background: #0d1c24; color: #f4dfc0; font: inherit; }
+    .gallery-field select:focus-visible, .gallery-size input:focus-visible { outline: 2px solid #edb66b; outline-offset: 2px; }
+    .gallery-size { min-height: 44px; display: flex; align-items: center; gap: .4rem; color: #c9d4dd; white-space: nowrap; }
+    .gallery-size input { accent-color: #edb66b; }
+    .gallery-preview { padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; align-self: start; }
+    .gallery-scroll { width: 100%; min-height: 0; overflow: auto; padding: 1px; }
+    .gallery-frame { position: relative; margin-inline: auto; overflow: hidden; outline: 1px solid #627783; background: #0f2029; }
+    #mockup { position: relative; overflow: hidden; width: var(--mock-width); height: var(--mock-height); transform-origin: top left; }
+    .gallery-error { color: #ffd0c0; padding: 1rem; }
+    .capture .gallery-toolbar, .capture .gallery-error { display: none; }
+    .capture .gallery, .capture .gallery-preview, .capture .gallery-scroll { display: block; min-height: 0; margin: 0; padding: 0; overflow: visible; }
+    .capture .gallery-frame { margin: 0; outline: none; }
+  </style>
+</head>
+<body>
+  <main class="gallery">
+    <header class="gallery-toolbar">
+      <h1 class="gallery-title">Свет Авалона · Макеты интерфейса</h1>
+      <div class="gallery-field">
+        <label for="gallery-screen">Экран</label>
+        <select id="gallery-screen"></select>
+      </div>
+      <div class="gallery-field">
+        <label for="gallery-layout">Формат</label>
+        <select id="gallery-layout">
+          <option value="desktop">ПК · 1440 × 900</option>
+          <option value="portrait">Телефон · 390 × 844</option>
+          <option value="landscape">Телефон · 844 × 390</option>
+        </select>
+      </div>
+      <label class="gallery-size"><input type="checkbox" id="gallery-native"> Масштаб 100%</label>
+    </header>
+    <div class="gallery-preview">
+      <div class="gallery-scroll">
+        <p class="gallery-error" role="alert" hidden></p>
+        <div class="gallery-frame"><div id="mockup"></div></div>
+      </div>
+    </div>
+  </main>
+  <script src="screens.js"></script>
+  <script>
+    (() => {
+      const layouts = {
+        desktop: [1440, 900],
+        portrait: [390, 844],
+        landscape: [844, 390]
+      };
+      const capture = new URLSearchParams(location.search).get('capture') === '1';
+      const mockup = document.getElementById('mockup');
+      const frame = document.querySelector('.gallery-frame');
+      const scroll = document.querySelector('.gallery-scroll');
+      const screen = document.getElementById('gallery-screen');
+      const layout = document.getElementById('gallery-layout');
+      const nativeScale = document.getElementById('gallery-native');
+      const designs = window.avalonMockups ?? [];
+      const byId = new Map(designs.map(design => [design.id, design]));
+      if (!designs.length) {
+        const error = document.querySelector('.gallery-error');
+        error.textContent = 'Не удалось загрузить макеты. Откройте index.html из папки макетов.';
+        error.hidden = false;
+        return;
+      }
+      document.documentElement.classList.toggle('capture', capture);
+      const groups = new Map();
+      for (const design of designs) {
+        if (!groups.has(design.group)) {
+          const group = document.createElement('optgroup');
+          group.label = design.group;
+          groups.set(design.group, group);
+          screen.append(group);
+        }
+        groups.get(design.group).append(new Option(design.label, design.id));
+      }
+
+      function fit() {
+        const [width, height] = layouts[layout.value];
+        const scale = capture || nativeScale.checked ? 1 : Math.min(1, Math.max(1, scroll.clientWidth - 2) / width);
+        frame.style.width = (width * scale) + 'px';
+        frame.style.height = (height * scale) + 'px';
+        mockup.style.transform = scale === 1 ? '' : 'scale(' + scale + ')';
+      }
+
+      function show(id, orientation) {
+        screen.value = byId.has(id) ? id : byId.has('menu') ? 'menu' : designs[0].id;
+        layout.value = Object.hasOwn(layouts, orientation) ? orientation : 'desktop';
+        const design = byId.get(screen.value);
+        const [width, height] = layouts[layout.value];
+        mockup.style.setProperty('--mock-width', width + 'px');
+        mockup.style.setProperty('--mock-height', height + 'px');
+        mockup.dataset.screen = design.id;
+        mockup.dataset.orientation = layout.value;
+        mockup.setAttribute('aria-label', design.label);
+        mockup.innerHTML = design.render(layout.value);
+        fit();
+      }
+
+      function readHash() {
+        const route = new URLSearchParams(location.hash.slice(1));
+        show(route.get('screen'), route.get('layout'));
+      }
+
+      function select() {
+        const route = new URLSearchParams({ screen: screen.value, layout: layout.value });
+        if (location.hash.slice(1) !== route.toString()) location.hash = route.toString();
+      }
+
+      window.avalonGallery = { show, layouts };
+      screen.addEventListener('change', select);
+      layout.addEventListener('change', select);
+      nativeScale.addEventListener('change', fit);
+      window.addEventListener('hashchange', readHash);
+      const observer = new ResizeObserver(fit);
+      observer.observe(scroll);
+      readHash();
+    })();
+  </script>
+</body>
+</html>

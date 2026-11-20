@@ -5,6 +5,14 @@ import { shoreAtY } from '../../content/terrain';
 /** Geometric fallback follows the same shoreline when raster artwork is unavailable. */
 export function drawCoast(g: Phaser.GameObjects.Graphics, width: number, height: number, cx: number, cy: number, unit: number, terrain?: NightConfig['terrain'], projectionY = .7): void {
   g.fillStyle(0x0a202c); g.fillRect(0, 0, width, height);
+  if (terrain?.landRegions) {
+    for (const region of terrain.landRegions) {
+      const points = region.map(point => ({ x: cx + point.x * unit, y: cy + point.y * unit * projectionY }));
+      g.fillStyle(0x233a35); g.fillPoints(points, true);
+      g.lineStyle(2, 0x91a69a, .55); g.strokePoints(points, true);
+    }
+    return;
+  }
   const shore: { x: number; y: number }[] = [];
   for (let i = 0; i <= 40; i++) {
     const y = height * i / 40;

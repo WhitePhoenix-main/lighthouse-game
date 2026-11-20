@@ -1,7 +1,8 @@
-import type { EnemyDefinition, EnemyKind } from '../contracts';
+import type { EnemyDefinition, EnemyKind, PrototypeEnemyKind } from '../contracts';
+import { CAMPAIGN_ENEMIES } from './campaignEnemies';
 
 /** Preliminary playtest values; shards follow the revised night budgets. */
-export const ENEMIES: Readonly<Record<EnemyKind, EnemyDefinition>> = {
+const PROTOTYPE_ENEMIES: Readonly<Record<PrototypeEnemyKind, EnemyDefinition>> = {
   ghost: { id: 'ghost', name: 'Призрак', description: 'Проходит сквозь барьеры. Медленно приближается, слабые удары.', radius: 12,
     health: 34, armor: 0, speed: 12, attackDamage: 5, attackInterval: 1.8, reward: 1, movement: 'ethereal', spawnSide: 'both' },
   turtle: { id: 'turtle', name: 'Искажённая черепаха', description: 'Крепкая броня. Повреждения брони сохраняются при смене цели.', radius: 20,
@@ -15,3 +16,5 @@ export const ENEMIES: Readonly<Record<EnemyKind, EnemyDefinition>> = {
   bat: { id: 'bat', name: 'Искажённая летучая мышь', description: 'Летит к ближайшему устройству, игнорирует барьеры и пушки.', radius: 10,
     health: 25, armor: 0, speed: 26, attackDamage: 9, attackInterval: 1.2, reward: 2, movement: 'flying', spawnSide: 'both' },
 };
+
+export const ENEMIES: Readonly<Record<EnemyKind, EnemyDefinition>> = { ...PROTOTYPE_ENEMIES, ...CAMPAIGN_ENEMIES };

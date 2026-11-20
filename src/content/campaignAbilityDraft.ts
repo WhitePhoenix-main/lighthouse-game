@@ -1,8 +1,5 @@
-/** Stage A design candidates only. This catalog does not change live purchases or saves.
- * Qualitative effects follow GAME_DESIGN. Candidate numbers and prices are in
- * campaignAbilityBalance/campaignAbilityEconomy; pending fields here describe
- * the unapproved live purchase policy, not the absence of candidate tuning.
- * Dependencies are a minimal provisional graph, not an approved purchase policy.
+/** Active campaign ability ids, dependencies and qualitative effects.
+ * The provisional amounts and prices live in campaignAbilityBalance and campaignAbilityEconomy.
  */
 export type CampaignAbilityDraftId = 'overload' | 'seal' | 'barrage' | 'bastion';
 type RankedSuffix = `${'power' | 'recovery'}-${1 | 2}`;

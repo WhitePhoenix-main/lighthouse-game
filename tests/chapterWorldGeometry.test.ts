@@ -59,6 +59,50 @@ describe('authoritative irregular coastline',()=>{
  });
 });
 describe('shared projected world camera',()=>{
+ it.each([[1280,720],[720,360],[360,640]])('keeps the same framing and visible combat extent between headland preparation and battle at %i×%i',(width,height)=>{
+  const c: NightConfig = {...config(),campaignMapId:'headland'};
+  const preparation = createWorldCamera(c,width,height);
+  const battle = createWorldCamera(c,width,height,{mode:'battle'});
+  expect(preparation).toEqual(battle);
+  expect(battle.y).toBeCloseTo(height * (height > width ? .52 : .585));
+  const topLeft = worldToScreen(battle,-c.worldRadius,-c.worldRadius);
+  const bottomRight = worldToScreen(battle,c.worldRadius,c.worldRadius);
+  expect(topLeft.x).toBeGreaterThan(0);
+  expect(topLeft.y).toBeGreaterThan(0);
+  expect(bottomRight.x).toBeLessThan(width);
+  expect(bottomRight.y).toBeLessThan(height);
+ });
+ it.each([[1280,720,.78],[844,390,.48],[390,844,.4275]])('keeps the Rift Coast world extent in a common camera at %i×%i',(width,height,expectedZoom)=>{
+  const c: NightConfig = {...config(),campaignMapId:'rift-coast'};
+  const device = {id:1,kind:'cannon' as const,x:-230,y:95};
+  const preparation = createWorldCamera(c,width,height,{mode:'overview',devices:[device],selected:device});
+  const battle = createWorldCamera(c,width,height,{mode:'battle',devices:[device]});
+  expect(preparation).toEqual(battle);
+  expect(battle.zoom).toBeCloseTo(expectedZoom,2);
+  const northwest = worldToScreen(battle,-c.worldRadius,-c.worldRadius);
+  const southeast = worldToScreen(battle,c.worldRadius,c.worldRadius);
+  expect(northwest.x).toBeGreaterThanOrEqual(24-1e-7);
+  expect(southeast.x).toBeLessThanOrEqual(width-24+1e-7);
+  expect(northwest.y).toBeGreaterThanOrEqual(height*.14-1e-7);
+  expect(southeast.y).toBeLessThanOrEqual(height*.83+1e-7);
+  const source = worldToScreen(battle,128,-184);
+  const target = worldToScreen(battle,239,-158);
+  expect(source.y).toBeGreaterThan(height*.14);
+  expect(target.x).toBeLessThan(southeast.x);
+  const point = screenToWorld(battle,target.x,target.y);
+  expect(point.x).toBeCloseTo(239,9);
+  expect(point.y).toBeCloseTo(-158,9);
+ });
+ it('keeps Rift Coast close and placement framing within the preparation field',()=>{
+  const viewport = {x:0,y:100,width:844,height:217};
+  const c = config();
+  const rift: NightConfig = {...c,campaignMapId:'rift-coast'};
+  const otherCoast: NightConfig = {...c,campaignMapId:'ashen-plateau'};
+  for(const mode of ['close','overview'] as const) {
+   const options = {mode,viewport,padding:16};
+   expect(createWorldCamera(rift,844,390,options)).toEqual(createWorldCamera(otherCoast,844,390,options));
+  }
+ });
  for(const [width,height] of [[360,390],[390,700],[844,390],[1280,720],[1920,1080]] as const)it(`${width}x${height}: roundtrip and complete overview/battle areas inside active viewport`,()=>{
   const c=config(),device={id:1,kind:'cannon' as const,x:-210,y:-210},viewport={x:20,y:40,width:width-40,height:height-80};
   const options={viewport,devices:[device],selected:device};const overview=createWorldCamera(c,width,height,options);

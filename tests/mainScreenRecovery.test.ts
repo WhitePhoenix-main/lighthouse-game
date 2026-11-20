@@ -44,8 +44,11 @@ describe('main screen registration after the partial merge', () => {
     const app = application(); app.openGameMenu(); app.openTrials();
     const html = screenContent(app.view, undefined, false);
     expect(html).toContain('trials-panel');
-    expect(html).toContain('data-night="rescue-trial" disabled');
-    expect(html).not.toContain('data-night="first-light"');
+    expect(html).toContain('data-chronicle-kind="trials"');
+    expect(html).toContain('data-chronicle-night="rescue-trial"');
+    expect(html).toContain('Требуется победа: Первый свет');
+    expect(html).toMatch(/data-prep-action="confirm-night"\s+disabled/);
+    expect(html).not.toContain('data-chronicle-night="first-light"');
     expect(html).not.toContain('preparation-panel');
   });
   it('fully translates game menu, reset and error states', () => {

@@ -1,0 +1,85 @@
+.lighthouse-app:is(.is-result,.is-collection) { width:100%; max-width:none; height:100dvh; min-height:0; padding:0; }
+:is(.is-result,.is-collection) :is(.masthead,.battle-rail,.ocean) { display:none; }
+:is(.is-result,.is-collection) .play-area { flex:1; min-height:0; margin:0; border:0; border-radius:0; }
+:is(.is-result,.is-collection) .overlay { display:block; padding:0; overflow:auto; background:#112639; }
+.is-result .watch-result { display:grid; height:100%; grid-template-columns:minmax(0,1fr) minmax(0,calc(50% + 16 * var(--watch-px))); grid-template-rows:minmax(0,1fr) auto; gap:0; align-content:start; background:var(--watch-slate); image-rendering:pixelated; min-height:100%; width:100%; max-width:none; margin:0; padding:0; font:400 var(--watch-body)/1.26 var(--watch-font); color:var(--watch-ink); }
+.outcome-story,.outcome-main { min-width:0; }
+.outcome-art {display:block;width:100%;height:calc(169 * var(--watch-px));object-fit:cover;image-rendering:pixelated;}
+.outcome-art-rail {margin:0 calc(7 * var(--watch-px));}
+.outcome-copy {padding:calc(10 * var(--watch-px)) calc(15 * var(--watch-px));}
+
+.outcome-copy .eyebrow,.outcome-ledger {--ledger-text:max(12px,calc(12 * var(--watch-px)));}
+html[data-text-size="large"] :is(.outcome-copy .eyebrow,.outcome-ledger) {--ledger-text:max(14px,calc(14 * var(--watch-px)));}
+.outcome-copy .eyebrow {font-size:var(--ledger-text);}
+.outcome-copy .eyebrow {color:var(--watch-gold);letter-spacing:0;}
+.is-result .outcome-copy h1 {margin:.3em 0;font:400 var(--watch-title)/1.12 var(--watch-font);}
+.outcome-ledger p {margin:.5em 0;font:inherit;}
+.outcome-copy p {margin:.45em 0;color:var(--watch-muted);font:400 max(12px,calc(12 * var(--watch-px)))/1.3 var(--watch-font);}
+html[data-text-size="large"] .outcome-copy p {font-size:max(14px,calc(14 * var(--watch-px)));}
+.outcome-main {grid-column:2;grid-row:1/3;min-height:0;overflow:auto;padding:calc(8 * var(--watch-px)) calc(8 * var(--watch-px)) calc(5 * var(--watch-px)) calc(6 * var(--watch-px));scrollbar-color:#866547 #122738;}
+.outcome-story {min-height:0;overflow:auto;}
+.outcome-ledger {padding:calc(4 * var(--watch-px)) calc(7 * var(--watch-px));font-size:var(--ledger-text);}
+.outcome-ledger dl>div:not(.result-total) dt {color:var(--watch-muted);}
+.outcome-ledger dl,.outcome-ledger dd {margin:0;}
+.outcome-ledger dl>div {display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:calc(2 * var(--watch-px)) 0;min-height:calc(20 * var(--watch-px));}
+.outcome-ledger dd {display:flex;align-items:center;gap:.35em;color:var(--watch-gold);font-variant-numeric:tabular-nums;}
+.outcome-ledger .result-total {color:var(--watch-ink);margin-top:calc(4 * var(--watch-px));padding-top:calc(5 * var(--watch-px));border-top:calc(2 * var(--watch-px)) solid #89593f;font-size:max(18px,calc(19 * var(--watch-px)));}
+.outcome-ledger .result-total dd {gap:calc(9 * var(--watch-px));}
+.outcome-ledger .save-state {font-size:max(12px,calc(12 * var(--watch-px)));display:flex;align-items:center;gap:.4em;color:var(--watch-muted);}
+.outcome-ledger .save-state[data-saved="true"] {display:block;}
+.outcome-ledger .save-state[data-saved="true"]::first-letter {color:transparent;font-size:1.35em;background:url('/images/avalon-watch/ui/icon-check.png') center / contain no-repeat;}
+.outcome-actions,.is-result .page-nav,.pause-panel .menu-actions {display:grid;gap:calc(3 * var(--watch-px));margin:0;}
+.outcome-actions {margin-top:calc(6 * var(--watch-px));}
+.is-result .page-nav {align-self:end;padding:calc(8 * var(--watch-px));grid-template-columns:repeat(auto-fit,minmax(min(100%,7.4em),1fr));}
+.is-battle .overlay.screen-battle:not([hidden]) {display:grid;place-items:safe center;overflow:auto;background:#061222ad;padding:max(8px,2dvh);z-index:10;}
+.pause-panel.watch-panel {width:min(100%,calc(300 * var(--watch-px)));max-height:100%;overflow:auto;padding:calc(9 * var(--watch-px));font:400 var(--watch-body)/1.25 var(--watch-font);}
+.pause-panel .watch-title {display:flex;gap:.45em;align-items:center;}
+.pause-panel .abandon-confirm h2.watch-title {margin:0;font:400 var(--watch-title)/1.14 var(--watch-font);color:var(--watch-gold);}
+.pause-panel:has(.abandon-confirm) {width:min(100%,calc(386 * var(--watch-px)));}
+.pause-panel p {margin:.65em 0;}
+.pause-panel .abandon-confirm {display:grid;gap:calc(3 * var(--watch-px));border:0;padding:0;background:transparent;}
+@media(orientation:portrait) {
+ .is-result .watch-result {grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100%;}
+ .outcome-main {grid-area:2 / 1;overflow:auto;}
+ .outcome-story {max-height:44dvh;overflow:auto;}
+ .outcome-art {height:calc(144 * var(--watch-px));object-position:center 20%;}
+ .outcome-art.campaign-epilogue {height:calc(144 * var(--watch-px));}
+ .outcome-art-rail {display:none;}
+ .outcome-main {padding-inline:calc(10 * var(--watch-px));}
+ .outcome-copy {padding-inline:calc(17 * var(--watch-px));}
+ .is-result .page-nav {width:100%;margin:0;}
+ .pause-panel.watch-panel {width:min(100%,calc(320 * var(--watch-px)));}
+}
+
+
+.is-result .outcome-actions {grid-template-columns:repeat(2,minmax(0,1fr));}
+.outcome-actions button:first-child,.outcome-actions button:last-child:nth-child(2) {grid-column:1/-1;}
+.is-result .page-nav {grid-template-columns:repeat(3,minmax(0,1fr));}
+.outcome-actions button,.is-result .page-nav button {border-width:0;border-image-width:calc(9 * var(--watch-px));padding:calc(3 * var(--watch-px)) calc(6 * var(--watch-px));font-size:max(12px,calc(14 * var(--watch-px)));}
+html[data-text-size="large"] :is(.outcome-actions,.is-result .page-nav) button {font-size:max(14px,calc(16 * var(--watch-px)));}
+.outcome-actions button:first-child {min-height:max(44px,calc(44 * var(--watch-px)));}
+.outcome-actions button.watch-primary:first-child {font-size:max(16px,calc(18 * var(--watch-px)));}
+.outcome-actions button.watch-primary[data-action="select-night"] {font-size:max(14px,calc(15 * var(--watch-px)));}
+@media (orientation:portrait) {.outcome-actions button.watch-primary[data-action="select-night"] {font-size:max(14px,calc(14 * var(--watch-px)));}}
+html[data-text-size="large"] .outcome-actions button[data-action="select-night"] {font-size:max(16px,calc(17 * var(--watch-px)));}
+.outcome-art.campaign-epilogue {max-height:none;border:0;border-radius:0;}
+.lighthouse-app.is-result .save-error[role="alertdialog"] {inset:50% auto auto 50%;transform:translate(-50%,-50%);display:flex;align-items:stretch;gap:.6em;flex-wrap:wrap;width:min(calc(100% - 32 * var(--watch-px)),calc(438 * var(--watch-px)));max-height:90dvh;padding:calc(11 * var(--watch-px));margin:0;border:calc(9 * var(--watch-px)) solid transparent;border-image:url('/images/avalon-watch/ui/gold.png') 9 fill / 1 / 0 repeat;box-shadow:0 0 0 100vmax #061222b8;image-rendering:pixelated;}
+.save-error-intro {flex-basis:100%;}
+.save-error-intro h2 {margin:0 0 .55em;font:400 max(19px,calc(19 * var(--watch-px)))/1.2 var(--watch-font);}
+.save-error-intro p {margin:.8em 0 0;}
+.is-result .save-error [data-error] {flex-basis:100%;font-size:max(11px,calc(12 * var(--watch-px)));color:var(--watch-muted);}
+@media(orientation:portrait) {.is-result .save-error button {min-width:100%;}}
+.save-error-details {flex-basis:100%;color:var(--watch-muted);font-size:max(11px,calc(12 * var(--watch-px)));}
+.save-error-details summary {cursor:pointer;}
+.is-result .save-error button {flex:1;border-width:0;border-image-width:calc(9 * var(--watch-px));min-height:max(44px,calc(44 * var(--watch-px)));padding:.2em .6em;font-size:var(--watch-label);}
+
+.outcome-ledger .result-total dd {flex-direction:row-reverse;}
+html[data-text-size="large"] .outcome-ledger .save-state {font-size:var(--watch-body);}
+
+.watch-result .night-option {display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:.25em;padding:.4em;}
+
+@media(orientation:portrait) {
+  html[data-text-size="large"] .is-result .outcome-actions {
+    position:sticky; bottom:0; z-index:1; background:var(--watch-slate);
+  }
+}

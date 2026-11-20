@@ -210,12 +210,10 @@ export function mountGameMenuTransition(overlay: HTMLElement): {
       ghostAnimation = ghost.board.animate(phase === 'entry'
         ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: incomingOpacity }, { opacity: 1 }], options);
     }
-    // Use a shared timeline origin, also for animations recreated after a repaint.
-    const start = current.timeline?.currentTime;
+    // Both layers start at the next paint. A busy frame can leave the document
+    // timeline several hundred milliseconds behind the button activation.
     for (const motion of [current, ghostAnimation]) {
-      if (!motion) continue;
-      motion.currentTime = elapsed;
-      if (typeof start === 'number') motion.startTime = start - elapsed;
+      if (motion && elapsed > 0) motion.currentTime = elapsed;
     }
     current.onfinish = () => {
       if (!destroyed && animation === current) finish();

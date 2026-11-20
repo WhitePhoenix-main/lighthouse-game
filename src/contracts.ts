@@ -1,16 +1,21 @@
 /** Shared contracts. Only the lead edits this file. All balance is provisional. */
 import type { CampaignAbilityRules } from './abilityRules';
+import type { CampaignGameView, RewardPreviewDecision } from './application/campaignView';
+import type { CampaignBossRules, CampaignBossState, CampaignEnemyEventData, CampaignEnemyRules, CampaignEnemyState } from './campaignCombatTypes';
+import type { EnemyKind } from './campaignEnemyKinds';
+
+export type { EnemyKind, PrototypeEnemyKind } from './campaignEnemyKinds';
 export interface SealMark { castId: number; untilTick: number; entryUntilTick: number }
 export interface SelectedAbilityState {
     id: CampaignAbilityRules['abilityId']; readyTick: number; activeUntilTick: number;
     fadeUntilTick: number; nextCastId: number;
     seal?: { castId: number; x: number; y: number; untilTick: number; enteredIds: number[] };
 }
-export type EnemyKind = 'ghost' | 'turtle' | 'minotaur' | 'bat';
-export type NightId = 'first-light' | 'broken-shore' | 'winged-tide' | 'rescue-trial' | 'abyss-warden' | 'far-shore' | 'armored-front' | 'sky-siege' | 'cross-current';
+export type PrototypeNightId = 'first-light' | 'broken-shore' | 'winged-tide' | 'rescue-trial' | 'abyss-warden' | 'far-shore' | 'armored-front' | 'sky-siege' | 'cross-current';
+export type NightId = PrototypeNightId | import('./content/campaignFoundationDraft').CampaignStoryDraftNightId;
 export type LateNightMode = 'transition' | 'assault';
 export interface LateNightModeOption { id: LateNightMode; name: string; description: string; totalReward: number }
-export type BossId = 'abyss-warden';
+export type BossId = (typeof import('./content/campaignFoundationDraft').CAMPAIGN_CHAPTER_DRAFT)[number]['bossId'];
 export type LensId = 'basic' | 'expanded' | 'slowing' | 'armor-breaker' | 'focused' | 'smoldering' | 'resonant' | 'long-range';
 export type LensUpgradeId = 'expanded-width' | 'expanded-targets' | 'slowing-control' | 'slowing-power' | 'armor-breaker-armor' | 'armor-breaker-power'
     | 'basic-power-1' | 'basic-power-2' | 'basic-width' | 'basic-range' | 'basic-paired'
@@ -26,15 +31,18 @@ export interface BossRules {
     id: BossId; name: string; level: number; health: number; materialReward: number;
     tentacleCount: number; spawnRadius: number; radius: number; speed: number;
     attackDamage: number; attackInterval: number; litSpeedMultiplier: number;
+    campaign?: CampaignBossRules;
 }
 export interface TentacleState {
     id: number; x: number; y: number; attackCooldown: number;
+    telegraphedPreparationUntilTick?: number;
     bellSlows?: BellSlow[];
     sealMark?: SealMark;
 }
 export interface BossState {
     id: BossId; health: number; stunnedUntilTick: number; tentacles: TentacleState[];
     burn?: BurnState;
+    campaign?: CampaignBossState;
 }
 export interface LensDefinition {
     id: LensId; name: string; description: string; materialCost: number;
@@ -91,10 +99,12 @@ export interface MortarProjectile {
     launchTick: number; impactTick: number; damage: number; blastRadius: number; armorMultiplier: number;
     barrage?: { damageBonus: number; armorDamageBonus: number; litDamageBonus: number; damageBonusCap: number };
 }
-export interface DevicePlacement { id: number; kind: DeviceKind; x: number; y: number }
+export type DeviceVariantId = import('./content/campaignVariants').DeviceVariantId;
+export interface DevicePlacement { id: number; kind: DeviceKind; x: number; y: number; variantId?: DeviceVariantId }
 /** Persistent v6 ownership: health uses base-max HP units; a null position means reserve. */
 export interface OwnedDevice {
     id: number; kind: DeviceKind; health: number; consumed: boolean;
+    variantId?: DeviceVariantId;
     /** Required for traps in v6 saves; absent on other device kinds. */
     trapCharges?: number;
     position: { x: number; y: number } | null;
@@ -152,12 +162,18 @@ export interface EnemyDefinition {
     movement?: 'ground' | 'flying' | 'ethereal';
     spawnSide?: 'land' | 'both';
     charge?: { windup: number; speed: number; damageMultiplier: number; triggerDistance: number };
+    campaignAttack?: { impactArea?: { radius: number; damageMultiplier: number }; suppressionSeconds?: number };
+    campaign?: CampaignEnemyRules;
 }
 
 export interface WaveDefinition {
     id: string;
     enemies: readonly EnemyKind[];
     spawnInterval: number;
+    /** Optional authored times, in seconds since the wave started. */
+    spawnOffsets?: readonly number[];
+    /** Authored campaign approach for each scheduled enemy. */
+    fronts?: readonly import('./content/terrain').GroundFront[];
 }
 
 export type CombatUpgradeStat = 'beamArmorBonus' | 'beamExecuteBonus' | 'litDeviceDamageBonus' | 'lighthouseDamageReduction' | 'lighthouseHeavyReduction' | 'lighthouseEmergencyReduction' | 'lighthouseWaveRepair' | 'shieldRestoreReduction';
@@ -177,6 +193,9 @@ export interface ShieldStabilizationRules {
     durationSeconds: number;
 }
 export interface NightConfig {
+    campaignMapId?: import('./content/campaignFoundationDraft').CampaignMapDraftId;
+    campaignAppearance?: { beacon?: 'dawn-beacon'; devices?: 'bronze-devices'; beam?: 'moonbeam' };
+    campaignGeneral?: Partial<Record<import('./content/campaignGeneralDraft').CampaignGeneralFamily, import('./content/campaignGeneralDraft').CampaignGeneralEffect>>;
     /** Explicit Stage A control selection; absent preserves legacy flash-only rules. */
     ability?: CampaignAbilityRules;
     lateMode?: LateNightMode;
@@ -200,8 +219,7 @@ export interface NightConfig {
     devices: DeviceRules;
     shield: { radius: number; capacityPerGenerator: number; regenerationDelay: number; regenerationPerSecond: number; stabilization?: ShieldStabilizationRules };
     flash: { radius: number; damage: number; stunDuration: number; cooldown: number; enabled?: boolean; reloadAssist?: number; damagedArmorBonus?: number };
-    /** Without a shoreline, preserves the legacy straight coast x <= shoreX. */
-    terrain?: { shoreX: number; landOnlyPlacement: boolean; /** Increasing y; land lies left of this line. */ shoreline?: readonly { x: number; y: number }[] };
+    terrain?: import('./content/terrain').Terrain;
     /** Absent means unrestricted equipment for legacy combat fixtures. */
     availableDevices?: readonly DeviceKind[];
     ship?: { x: number; y: number; radius: number; rescueSeconds: number; deadline: number; reward: number };
@@ -231,6 +249,11 @@ export interface EnemyState {
     id: number;
     kind: EnemyKind;
     waveIndex: number;
+    /** Off-schedule summons are worth no shards and don't advance the scheduled spawn cursor. */
+    reinforcement?: boolean;
+    groundWaypoints?: readonly import('./content/terrain').TerrainPoint[];
+    groundWaypointIndex?: number;
+    campaign?: CampaignEnemyState;
     x: number;
     y: number;
     health: number;
@@ -240,6 +263,7 @@ export interface EnemyState {
     stunnedUntilTick?: number;
     chargePhase?: 'ready' | 'windup' | 'charging' | 'spent';
     chargeRemaining?: number;
+    suppressionUsed?: boolean;
     targetDeviceId?: number | null;
     burn?: BurnState;
     bellSlows?: BellSlow[];
@@ -251,13 +275,14 @@ export interface WaveState {
     startedEarly: boolean;
     spawned: number;
     defeated: number;
+    reinforcements?: number;
     completed: boolean;
     nextSpawnAt: number;
     earlyBonus: number;
 }
 
 /** Facts emitted after actual state changes, never inferred from beam decoration. */
-export type CombatEventData = { x: number; y: number } & (
+export type CombatEventData = CampaignEnemyEventData | { x: number; y: number } & (
     | { type: 'enemy-hit'; enemyId: number; enemyKind: EnemyKind; healthDamage: number; armorDamage: number }
     | { type: 'armor-broken' | 'enemy-died'; enemyId: number; enemyKind: EnemyKind }
     | { type: 'device-hit' | 'device-destroyed'; deviceId: number; deviceKind: DeviceKind; damage: number }
@@ -293,6 +318,7 @@ export interface BattleState {
     lighthouseHealth: number;
     emergencyUsed?: boolean;
     emergencyUntilTick?: number;
+    onslaughtUntilTick?: number;
     beamAngle: number;
     /** Desired direction; actual beamAngle moves toward it at beam.turnSpeed radians/s. */
     desiredBeamAngle: number;
@@ -432,6 +458,7 @@ export interface SaveStore {
 }
 
 export interface NightResult {
+    firstWinShards?: number;
     lateMode?: LateNightMode;
     attemptId: string;
     outcome: 'victory' | 'defeat';
@@ -448,13 +475,14 @@ export interface NightResult {
     bossDefeated: boolean;
 }
 
-export type ApplicationScreen = 'menu' | 'game-menu' | 'trials' | 'development' | 'settings' | 'preparation' | 'battle' | 'result';
+export type ApplicationScreen = 'menu' | 'game-menu' | 'trials' | 'development' | 'collection' | 'settings' | 'preparation' | 'battle' | 'result';
 export type TextSize = 'normal' | 'large';
 export type LanguagePreference = 'auto' | 'ru' | 'en';
 export interface AudioSettings { soundEnabled: boolean; musicVolume: number; effectsVolume: number }
 export interface UserSettings extends AudioSettings { textSize: TextSize; language: LanguagePreference }
 
 export interface ApplicationView {
+    campaign?: CampaignGameView;
     lateNightModes?: readonly LateNightModeOption[];
     screen: ApplicationScreen;
     hasProgress: boolean;
@@ -500,9 +528,18 @@ export interface GameApplication {
     cancelSettingsChange(): void;
 
     purchaseUpgrade(id: UpgradeId): void;
+    purchaseCampaignNode?(id: string): void;
+    selectAbility?(id: import('./application/campaignProfileTypes').CampaignAbilityId | null): void;
+    acknowledgeIntro?(): void;
+    openCollection?(): void;
+    claimCampaignReward?(id: import('./content/campaignRewards').CampaignRewardId): void;
+    equipCampaignCosmetic?(slot: import('./content/campaignRewards').CampaignCosmeticSlot, id: import('./content/campaignRewards').CampaignCosmeticId | null): void;
+    beginRewardPreview?(request: import('./application/campaignProfileTypes').CampaignRewardRequest): void;
+    finishRewardPreview?(id: string, decision: RewardPreviewDecision): void;
+    refreshCampaignRewards?(): void;
 
     selectDevice(kind: DeviceKind | null): void;
-    purchaseDevice(kind: DeviceKind): void;
+    purchaseDevice(kind: DeviceKind, variantId?: DeviceVariantId): void;
     repairDevice(id: number): void;
     rechargeDevice(id: number): void;
     selectNight(id: NightId): void;

@@ -1,7 +1,8 @@
 import type { BattleState, NightConfig } from '../contracts';
 import { delayShieldRecovery } from './shield';
 import { emitCombatEvent } from './events';
-import { bastionDamage } from './abilityEffects';
+import { abilityTicks, bastionDamage } from './abilityEffects';
+import { damageWithCappedReduction } from './campaignGeneralEffects';
 
 /** One damage path for creatures and boss zones; emergency protection is not resurrection. */
 export function damageLighthouse(state: BattleState, config: NightConfig, amount: number, heavy = false): void {
@@ -9,17 +10,27 @@ export function damageLighthouse(state: BattleState, config: NightConfig, amount
   const rules = config.progression;
   const existing = amount * (1 - (rules?.lighthouseDamageReduction ?? 0))
     * (heavy ? 1 - (rules?.lighthouseHeavyReduction ?? 0) : 1);
-  let damage = bastionDamage(state, config, amount, existing, 'lighthouse', heavy);
-  if (!state.emergencyUsed && (rules?.lighthouseEmergencyReduction ?? 0) > 0
+  const onslaught = config.campaignGeneral?.onslaughtResilience;
+  const activeOnslaught = onslaught?.kind === 'onslaughtResilience' && state.tick < (state.onslaughtUntilTick ?? 0)
+    ? onslaught : undefined;
+  const resolveDamage = (previous: number): number => {
+    const damage = bastionDamage(state, config, amount, previous, 'lighthouse', heavy);
+    return activeOnslaught ? damageWithCappedReduction(amount, damage, activeOnslaught.reduction, activeOnslaught.totalHullReductionCap) : damage;
+  };
+  let damage = resolveDamage(existing);
+  const emergencyReduction = rules?.lighthouseEmergencyReduction ?? 0;
+  if (!state.emergencyUsed && emergencyReduction > 0
     && state.lighthouseHealth - damage <= config.lighthouseHealth * .25) {
+    const window = config.campaignGeneral?.emergencyWindow;
+    const extension = window?.kind === 'emergencyWindow' ? window.additionalSeconds : 0;
     state.emergencyUsed = true;
-    state.emergencyUntilTick = state.tick + Math.ceil(2 / config.stepSeconds - 1e-9);
+    state.emergencyUntilTick = state.tick + abilityTicks(2 + extension, config);
   }
-  if (state.tick < (state.emergencyUntilTick ?? 0)) damage = bastionDamage(state, config, amount,
-    existing * (1 - (rules?.lighthouseEmergencyReduction ?? 0)), 'lighthouse', heavy);
+  if (state.tick < (state.emergencyUntilTick ?? 0)) damage = resolveDamage(existing * (1 - emergencyReduction));
   const before = state.lighthouseHealth;
   state.lighthouseHealth = Math.max(0, before - damage);
   if (before > state.lighthouseHealth) {
+    if (onslaught?.kind === 'onslaughtResilience') state.onslaughtUntilTick = state.tick + abilityTicks(onslaught.durationSeconds, config);
     delayShieldRecovery(state, config);
     emitCombatEvent(state, { type: 'lighthouse-hit', damage: before - state.lighthouseHealth, x: 0, y: 0 });
   }

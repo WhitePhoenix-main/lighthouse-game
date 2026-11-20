@@ -206,12 +206,11 @@ export function mountSettingsTransition(overlay: HTMLElement): {
       ghostAnimation = ghost.board.animate(phase === 'entry'
         ? [{ opacity: 1 }, { opacity: 0 }] : [{ opacity: incomingOpacity }, { opacity: 1 }], options);
     }
-    // Use a shared timeline origin, also for animations recreated after a repaint.
-    const start = current.timeline?.currentTime;
+    // All three play operations are pending in the same rendering update. Let the
+    // browser assign their visual start there: the last document timeline tick can
+    // predate the click by a whole transition during initial loading.
     for (const motion of [current, scrimAnimation, ghostAnimation]) {
-      if (!motion) continue;
-      motion.currentTime = elapsed;
-      if (typeof start === 'number') motion.startTime = start - elapsed;
+      if (motion && elapsed > 0) motion.currentTime = elapsed;
     }
     current.onfinish = () => {
       if (!destroyed && animation === current) finish();

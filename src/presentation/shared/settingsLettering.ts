@@ -67,13 +67,16 @@ Object.assign(settingsGlyphs, {
 export function settingsTextWidth(text: string, scale: number): number {
   return Math.max(0, text.length * 9 - 1) * scale;
 }
+export function supportsSettingsPixelText(text: string): boolean {
+  return [...text].every(character => character === ' ' || Object.hasOwn(settingsGlyphs, character));
+}
 export function drawSettingsPixelText(
   context: CanvasRenderingContext2D, text: string, x: number, y: number,
-  scale: number, color: string, align: CanvasTextAlign = 'left'
+  scale: number, color: string | CanvasGradient, align: CanvasTextAlign = 'left'
 ): void {
   const advance = 9 * scale, width = settingsTextWidth(text, scale);
   const left = Math.round(x - (align === 'center' ? width / 2 : align === 'right' ? width : 0));
-  const passes: readonly [number, number, string][] = [[1, 2, '#04101c'], [0, 0, color]];
+  const passes: readonly [number, number, string | CanvasGradient][] = [[1, 2, '#04101c'], [0, 0, color]];
   const transform = context.getTransform();
   const axisAligned = transform.b === 0 && transform.c === 0;
   context.save();

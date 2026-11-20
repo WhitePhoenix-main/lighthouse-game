@@ -121,26 +121,117 @@ let ws, captureFailure;
   const panel=name=>`${action('panel')}[data-panel="${name}"]`;
   const snapshot=()=>evaluate(`(()=>{const f=window.preparationFixture;return{resources:f.app.view.profile.resources,devices:f.app.view.profile.devices,writes:f.writes(),error:f.app.view.error,screen:f.app.view.screen,paused:f.app.view.paused,raw:JSON.parse(f.raw()||'null'),preview:f.app.view.preparation.preview}})()`);
   const navigate=async(query='')=>{await cdp('Page.navigate',{url:`${base}/tests/browser/preparation-frame.html${query}`});await ready();};
+  const intersects=(a,b)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.5&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.5;
+  const fitsInside = (inner, outer) => inner.x >= outer.x - .5 && inner.y >= outer.y - .5 &&
+    inner.x + inner.w <= outer.x + outer.w + .5 && inner.y + inner.h <= outer.y + outer.h + .5;
+  const checkDeviceCounts = async label => {
+    const result = await evaluate(`(() => {
+      const {settings, preparation, config} = window.preparationFixture.app.view;
+      const devices = document.querySelector('.prep-devices');
+      const counts = document.querySelector('#prep-counts');
+      const title = devices.querySelector('.prep-device-title');
+      const box = ({x, y, width: w, height: h}) => ({x, y, w, h});
+      const measure = element => box(element.getBoundingClientRect());
+      const artwork = label => {
+        const range = document.createRange();
+        range.selectNodeContents(label.firstElementChild);
+        return [...range.getClientRects()].map(box);
+      };
+      return {
+        copies: document.querySelectorAll('[id="prep-counts"], .prep-counts').length,
+        described: devices.getAttribute('aria-describedby'),
+        dock: measure(devices.closest('.prep-dock')),
+        portrait: innerHeight > innerWidth,
+
+        english: settings.language === 'en',
+        values: [
+          preparation.placements.length + '/' + config.devices.maxObjects,
+          new Set(preparation.placements.map(placement => placement.kind)).size + '/' + config.devices.typeSlots,
+        ],
+        screen: {x: 0, y: 0, w: innerWidth, h: innerHeight},
+        card: measure(devices),
+        title: title && measure(title),
+        counters: counts && measure(counts),
+        rows: counts ? [...counts.querySelectorAll(':scope > .prep-count')].map(row => ({
+          box: measure(row),
+          labels: [...row.querySelectorAll('[data-prep-label]')].map(label => ({
+            text: label.textContent.trim(),
+            ink: artwork(label),
+          })),
+        })) : [],
+      };
+    })()`);
+    const {copies, described, dock, portrait, english, values, screen, card, title, counters, rows} = result;
+    assert.equal(copies, 1, `${label}: expected one copy of device counters`);
+    assert.equal(described, 'prep-counts', `${label}: device button description`);
+    assert(title && counters, `${label}: missing device title or counters`);
+    assert(fitsInside(counters, screen), `${label}: device counters outside viewport`);
+    assert(fitsInside(counters, dock), `${label}: counters outside the stone dock`);
+    if (portrait) {
+      assert(counters.y >= card.y + card.h - .5, `${label}: portrait counters should sit below the device button`);
+    } else {
+      assert(fitsInside(counters, card), `${label}: landscape counters should sit inside the device row`);
+    }
+    assert(!intersects(counters, title), `${label}: device counters overlap title or icon`);
+    const names = english ? ['Objects', 'Types'] : ['Объекты', 'Типы'];
+    assert.deepEqual(rows.map(row => row.labels.map(item => item.text)), names.map((name, i) => [name, values[i]]),
+      `${label}: wrong localized device counts`);
+    for (const row of rows) {
+      assert(fitsInside(row.box, counters), `${label}: counter row outside its container`);
+      // A DOM text range can extend slightly above its CSS line box.
+      const inset = row.box.h * .3;
+      const line = {...row.box, y: row.box.y - inset, h: row.box.h + inset * 2};
+      for (const item of row.labels) {
+        assert(item.ink.length === 1 && item.ink.every(box => box.w > 0 && box.h > 0 &&
+          fitsInside(box, line) && fitsInside(box, dock) && !intersects(box, title)),
+          `${label}: hidden or clipped device count ${JSON.stringify({item, row: row.box})}`);
+      }
+      assert(!row.labels[0].ink.some(a => row.labels[1].ink.some(b => intersects(a,b))),
+        `${label}: counter label and value overlap`);
+    }
+    const [objects, types] = rows.map(row => row.box);
+    assert(!intersects(objects,types), `${label}: device counters overlap one another`);
+    return {counters, rows};
+  };
   const geometry=async(label)=>{
    const g=await evaluate(`(()=>{const root=document.querySelector('.preparation-screen'),box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,action:e.dataset.prepAction||e.dataset.action}};return{width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,header:box(root.querySelector('.prep-header')),dock:box(root.querySelector('.prep-dock')),field:box(root.querySelector('[data-prep-field]')),controls:[...root.querySelectorAll('button')].filter(e=>e.getClientRects().length).map(box),attempt:JSON.parse(window.preparationFixture.raw()||'null')?.activeAttempt}})()`);
    if(g.scrollWidth>g.width)issues.push(`${label}: document overflow ${g.scrollWidth}/${g.width}`);
    for(const r of g.controls)if(r.w<43.9||r.h<43.9||r.x<-.5||r.x+r.w>g.width+.5||r.y<-.5||r.y+r.h>g.height+.5)issues.push(`${label}: clipped/undersize ${JSON.stringify(r)}`);
    assert(!g.attempt,`${label}: resize/orientation created attempt`);
    assert(g.field.h>100,`${label}: field lost usable height`);
-   const visual=await evaluate(`(()=>{const b=document.querySelector('.prep-legend').getBoundingClientRect(),legend={x:b.x,y:b.y,w:b.width,h:b.height};return {legend,objects:window.preparationFixture.sceneBoxes(),footer:document.querySelector('.prep-free').textContent,scout:[...document.querySelectorAll('[data-prep-action="panel"][data-panel="recon"] [data-prep-label]>span')].map(e=>({text:e.textContent,w:e.getBoundingClientRect().width,parent:e.closest('button').getBoundingClientRect().width}))}})()`);
-   for(const object of visual.objects){const a=visual.legend,b=object;if(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.5&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.5)issues.push(`${label}: legend overlaps sprite ${object.id} ${JSON.stringify({legend:a,object:b})}`);}
-   if(label.includes('en-large')){assert(!/[а-яё]/i.test(visual.footer),`${label}: Russian footer`);assert(visual.scout.every(s=>s.text==='Scout'&&s.w<=s.parent),`${label}: Scout label clipped or untranslated ${JSON.stringify(visual.scout)}`);}
-   const detail=await evaluate(`(()=>{const root=document.querySelector('.preparation-screen'),box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,name:e.className}};return{headerItems:[...root.querySelector('.prep-header').children].map(box),currencyItems:[...root.querySelectorAll('.prep-currency')].map(e=>[...e.children].map(box)),legendRows:[...root.querySelectorAll('.prep-legend-row')].map(e=>getComputedStyle(e).display),compactTitle:getComputedStyle(root.querySelector('.prep-night-compact')).display,titleText:root.querySelector('.prep-night-compact').textContent,footer:[...root.querySelectorAll('.prep-free>span')].filter(e=>getComputedStyle(e).display!=='none').map(e=>e.textContent),legend:box(root.querySelector('.prep-legend')),zoom:box(root.querySelector('[data-prep-action="zoom"]'))}})()`);
-   const intersects=(a,b)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.5&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.5;
-   for(let i=0;i<detail.headerItems.length;i++)for(let j=i+1;j<detail.headerItems.length;j++)if(intersects(detail.headerItems[i],detail.headerItems[j]))issues.push(`${label}: header items overlap ${JSON.stringify([detail.headerItems[i],detail.headerItems[j]])}`);
+   const detail=await evaluate(`(()=>{const root=document.querySelector('.preparation-screen'),box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,name:e.className}};return{
+     headerItems:[...root.querySelectorAll('.prep-header button')].map(box),
+     currencyItems:[...root.querySelectorAll('.prep-currency')].map(e=>[...e.children].map(box)),
+     compactTitle:getComputedStyle(root.querySelector('.prep-night-compact')).display,
+     zoom:box(root.querySelector('[data-prep-action="zoom"]')),
+     objects:window.preparationFixture.sceneBoxes(),
+     scout:root.querySelector('[data-panel="recon"]').textContent.trim(),
+   }})()`);
+   for(let i=0;i<detail.headerItems.length;i++)for(let j=i+1;j<detail.headerItems.length;j++)if(intersects(detail.headerItems[i],detail.headerItems[j]))issues.push(`${label}: header buttons overlap ${JSON.stringify([detail.headerItems[i],detail.headerItems[j]])}`);
    for(const row of detail.currencyItems)for(let i=0;i<row.length;i++)for(let j=i+1;j<row.length;j++)if(intersects(row[i],row[j]))issues.push(`${label}: currency content overlaps ${JSON.stringify([row[i],row[j]])}`);
-   const compact=g.height>=g.width&&g.height<=650;
-   assert(detail.legendRows.every(value=>compact?value==='none':value!=='none'),`${label}: wrong legend row visibility`);
-   assert.equal(detail.compactTitle!=='none',compact,`${label}: wrong compact title visibility`);
-   if(label.includes('en-large'))assert(detail.footer.every(text=>!/[а-яё]/i.test(text)),`${label}: untranslated visible footer`);
-   const towerPixelHeight=visual.objects.find(object=>object.id==='lighthouse').h;
-   if(compact){assert(towerPixelHeight>=45,`${label}: compact lighthouse remains too small ${towerPixelHeight} CSS px`);assert(Math.abs(detail.zoom.h-44)<.5,`${label}: compact Zoom is not 44 CSS px`);}
-   layouts.push({label,...g,...detail,towerPixelHeight});
+   assert.equal(detail.compactTitle!=='none',g.height>g.width,`${label}: wrong compact title visibility`);
+   if(label.includes('en-large'))assert.equal(detail.scout,'Scout',`${label}: scout label not localized`);
+   for(const object of detail.objects)for(const control of detail.headerItems) {
+     if(intersects(control,object)) issues.push(`${label}: upper HUD overlaps sprite ${object.id} ${JSON.stringify({control,object})}`);
+   }
+   const headerOverflow=await evaluate(`Array.from(document.querySelectorAll('.prep-header [data-prep-label]>span')).filter(span=>{
+     if(!span.getClientRects().length)return false;
+     const control=span.closest('button,.prep-currency').getBoundingClientRect();
+     const ink=span.getBoundingClientRect();
+     return ink.top<control.top-.5||ink.bottom>control.bottom+.5;
+   }).map(span=>span.textContent)`);
+   assert.deepEqual(headerOverflow,[],`${label}: header labels exceed their controls`);
+
+   const towerPixelHeight=detail.objects.find(object=>object.id==='lighthouse').h;
+   if(g.height>g.width&&g.height<=650){assert(towerPixelHeight>=45,`${label}: compact lighthouse remains too small ${towerPixelHeight} CSS px`);assert(Math.abs(detail.zoom.h-44)<.5,`${label}: compact Zoom is not 44 CSS px`);}
+   const deviceCounts = await checkDeviceCounts(label);
+   const available = await evaluate(`['.prep-devices', '.prep-lens', '.prep-ability', '.prep-start'].map(selector => {
+     const button = document.querySelector(selector);
+     const {x,y,width,height} = button.getBoundingClientRect();
+     return !button.disabled && button.contains(document.elementFromPoint(x + width/2, y + height/2));
+   })`);
+   assert.deepEqual(available, [true,true,true,true], `${label}: unreachable devices, lens, ability or start button`);
+   layouts.push({label,...g,...detail,towerPixelHeight,deviceCounts});
    return g;
   };
   await cdp('Page.enable');await cdp('Runtime.enable');await cdp('Network.enable');
@@ -148,16 +239,199 @@ let ws, captureFailure;
   await navigate();
   for(const [label,w,h,touch,dpr] of [['desktop',1672,941,false,1],['desktop-1280',1280,720,false,1],['portrait',390,844,true,2],['portrait-360',360,740,true,1],['compact',320,568,true,1],['landscape',844,390,true,1]]){await viewport(w,h,touch,dpr);await geometry(label);await screenshot(label);check(`${label}: layout, no attempt on resize`);}
   await viewport(390,844,true,2);await navigate('?en&large');await geometry('en-large');await screenshot('en-large');check('English large text layout');
-  for(const [label,w,h,touch,query] of [['ru-large-compact',320,568,true,'?large'],['en-large-compact',320,568,true,'?en&large'],['en-large-landscape',844,390,true,'?en&large'],['en-large-desktop',1672,941,false,'?en&large']]){await viewport(w,h,touch);await navigate(query);await geometry(label);await screenshot(label);check(label+': text, control sizes, visibility and no overflow');}
+  for (const [label,w,h,touch,query] of [
+    ['en-compact',320,568,true,'?en'],
+    ['ru-large-compact',320,568,true,'?large'],
+    ['en-large-compact',320,568,true,'?en&large'],
+    ['ru-narrow-landscape',568,320,true,''],
+    ['en-narrow-landscape',568,320,true,'?en'],
+    ['ru-large-narrow-landscape',568,320,true,'?large'],
+    ['en-large-narrow-landscape',568,320,true,'?en&large'],
+    ['en-large-landscape',844,390,true,'?en&large'],
+    ['en-desktop',1672,941,false,'?en'],
+    ['en-large-desktop',1672,941,false,'?en&large'],
+  ]) {
+    await viewport(w,h,touch);await navigate(query);await geometry(label);await screenshot(label);
+    check(label+': text, control sizes, visibility and no overflow');
+  }
   console.log('LAYOUT ISSUES',JSON.stringify(issues));
   if(layoutOnly){fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({base,mode:'layout-only',checks,layouts,issues,runtimeErrors,realPhoneTested:false},null,2));console.log(JSON.stringify({out,checks:checks.length,issues,runtimeErrors},null,2));assert.equal(issues.length,0,issues.join('\n'));assert.equal(runtimeErrors.length,0,'Runtime errors or HTTP failures');await send('Browser.close');ws.close();return;}
   await viewport(1280,720,false);await navigate();
   const balance=(await snapshot()).resources;
-  for(const name of ['night','lens','recon','ability','shards','pearls']){await click(panel(name));assert(await evaluate(`!!document.querySelector('.prep-drawer')`));await screenshot(`drawer-${name}`);await click(action('close-panel'));assert.equal((await snapshot()).resources,balance);}
-  check('Night, lens, recon, ability and currency drawers; plus does not grant currency');
-  await click(panel('night'));await click('[data-action="select-night"][data-night="broken-shore"]');assert.equal(await evaluate('window.preparationFixture.app.view.selectedNightId'),'broken-shore');await click('[data-action="select-night"][data-night="first-light"]');await click(action('close-panel'));check('Night selection uses live application configuration');
-  await click(panel('devices'));assert.equal(await evaluate(`document.querySelectorAll('.prep-catalogue article').length`),8);await screenshot('device-panel');
-  const drawerBefore=await snapshot(),dr=await rect('.prep-drawer');await cdp('Input.dispatchMouseEvent',{type:'mouseWheel',x:dr.x+dr.width/2,y:dr.y+dr.height/2,deltaY:400,deltaX:0});await sleep(200);assert(await evaluate(`document.querySelector('.prep-drawer').scrollTop>0`));assert.deepEqual((await snapshot()).devices,drawerBefore.devices);check('Drawer scrolling does not place or mutate inventory');
+  for(const name of ['lens','recon','ability','shards','pearls']){await click(panel(name));assert(await evaluate(`!!document.querySelector('.prep-drawer')`));await screenshot(`drawer-${name}`);await click(action('close-panel'));assert.equal((await snapshot()).resources,balance);}
+  check('Lens, recon, ability and currency drawers; plus does not grant currency');
+
+  const chapter = id => `${action('chronicle-chapter')}[data-chapter="${id}"]`;
+  const night = id => `${action('chronicle-night')}[data-night="${id}"]`;
+  const selectedNight = () => evaluate('window.preparationFixture.app.view.selectedNightId');
+  const confirmNight = action('confirm-night');
+  const contentsTab = '.chronicle-bookmark';
+  const inspectChapter = action('chronicle-inspect-chapter');
+  const escapeKey = async () => {
+    for (const type of ['keyDown', 'keyUp']) await cdp('Input.dispatchKeyEvent', {type, key:'Escape', code:'Escape', windowsVirtualKeyCode:27});
+  };
+  const checkChronicleLayout = async english => {
+    const geometry = await evaluate(`(async () => {
+      const book = document.querySelector('.night-chronicle'), scroll = book.querySelector('.chronicle-scroll');
+      const buttons = [...book.querySelectorAll('button')].filter(b => b.getClientRects().length), footer = book.querySelector('.chronicle-actions');
+      await Promise.all([...book.querySelectorAll('img')].map(img => img.decode()));
+      return {
+        horizontalOverflow: scroll.scrollWidth > scroll.clientWidth || book.scrollWidth > book.clientWidth,
+        smallTargets: buttons.filter(b => b.offsetHeight < 44 || b.offsetWidth < 44).map(b => b.textContent),
+        footerVisible: footer.getBoundingClientRect().bottom <= innerHeight + 1,
+        russianText: [...book.querySelectorAll('[aria-label]')].map(e => e.getAttribute('aria-label')).join(' ') + book.textContent,
+      };
+    })()`);
+    assert(!geometry.horizontalOverflow, `Chronicle overflows horizontally: ${geometry.russianText}`);
+    assert.deepEqual(geometry.smallTargets, []);
+    assert(geometry.footerVisible);
+    if(english)assert(!/[а-яё]/i.test(geometry.russianText),geometry.russianText);
+  };
+
+  const beforeChronicle = await snapshot();
+  await click(panel('night'));
+  assert(await evaluate(`document.activeElement.matches('${contentsTab}')`));
+  assert(await evaluate(`(() => {
+    const beacon = document.querySelector('.chronicle-card [data-light="lit"] img');
+    const coast = document.querySelector('.chronicle-coast img');
+    return beacon?.src.endsWith('/images/avalon-watch/ui/icon-check.png') &&
+      coast?.currentSrc.endsWith('/images/avalon-watch/illustrations/harbor.png') && !document.querySelector('[data-prep-world]');
+  })()`));
+  await click(contentsTab);
+  assert(await evaluate(`!!document.querySelector('${chapter('1')}[aria-current="true"]')`));
+  await screenshot('chronicle-contents');
+  await click(chapter('2')); await click(inspectChapter);
+  assert(await evaluate(`document.querySelector('${confirmNight}').disabled && document.querySelector('.chronicle-condition').textContent.includes('Страж глубин')`));
+  await click(contentsTab);
+  await click(chapter('1')); await click(inspectChapter);
+  await click(night('winged-tide'));
+  assert(await evaluate(`document.activeElement.matches('${night('winged-tide')}[aria-pressed="true"]') && !!document.querySelector('${night('winged-tide')} [data-light="dim"]')`));
+  assert.equal(await selectedNight(),'first-light');
+  await checkChronicleLayout(false);
+  await screenshot('chronicle-desktop');
+  await escapeKey();
+  assert(await evaluate(`document.activeElement.matches('${panel('night')}')`));
+  assert.equal(await selectedNight(),'first-light');
+  await click(panel('night'));
+  await click(night('broken-shore'));
+  await click(confirmNight);
+  assert.equal(await selectedNight(),'broken-shore');
+  assert.deepEqual(await snapshot(),beforeChronicle);
+  await click(panel('night'));
+  await click(night('first-light'));
+  await click(confirmNight);
+  assert.equal(await selectedNight(),'first-light');
+  check('Chronicle: locked chapter, lit completion, draft selection, Escape focus and free replay');
+
+  await viewport(390,844,true,2);
+  await navigate('?clear-shore&en&large');
+  await click(panel('night'),true);
+  await checkChronicleLayout(true);
+  await screenshot('chronicle-portrait-en-large');
+  await click(contentsTab,true);
+  await click(chapter('2'),true); await click(inspectChapter,true);
+  await click(night('far-shore'),true);
+  await cdp('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:2,mobile:true});
+  await sleep(250);
+  assert(await evaluate(`!!document.querySelector('${night('far-shore')}[aria-pressed="true"]')`));
+  await checkChronicleLayout(true);
+  await screenshot('chronicle-landscape-en-large');
+  await click(confirmNight,true);
+  assert.equal(await selectedNight(),'far-shore');
+  await click(panel('night'),true);
+  await click(contentsTab,true);
+  assert(await evaluate(`!!document.querySelector('${chapter('2')}[aria-current="true"]')`));
+  await click(action('chronicle-trials'),true);
+  await checkChronicleLayout(true);
+  await screenshot('trials-landscape-en-large');
+  await click(night('armored-front'),true);
+  await click(confirmNight,true);
+  assert.equal(await selectedNight(),'armored-front');
+  await click(panel('recon'),true);
+  assert(await evaluate(`!!document.querySelector('.prep-drawer [data-action="select-late-mode"]')`));
+  await click(action('close-panel'),true);
+  check('Chronicle: touch, large English text, orientation, unlocked chapter and late trials');
+
+  for(const [label,width,height,query,english] of [
+    ['portrait-ru',390,844,'',false],
+    ['compact-ru-large',320,568,'?large',false],
+    ['compact-en-large',320,568,'?en&large',true],
+    ['landscape-en',844,390,'?en',true],
+  ]){
+    await viewport(width,height,true);
+    await navigate(query);
+    await click(panel('night'),true);
+    await checkChronicleLayout(english);
+    await screenshot(`chronicle-${label}`);
+    if(label==='compact-ru-large'){
+      assert(await evaluate(`Array.from(document.querySelectorAll('.chronicle-card .prep-label')).every(label => getComputedStyle(label).fontFamily.includes('Avalon Menu') && label.scrollWidth <= label.clientWidth + 1)`), 'Compact night names use the pixel lettering');
+      assert(await evaluate(`(() => {
+        const scroll = document.querySelector('.chronicle-scroll');
+        scroll.scrollTop = scroll.scrollHeight;
+        const lastCard = document.querySelector('.chronicle-nights li:last-child');
+        return scroll.scrollTop > 0 && lastCard.getBoundingClientRect().bottom <= scroll.getBoundingClientRect().bottom;
+      })()`));
+      await checkChronicleLayout(english);
+      await screenshot('chronicle-compact-ru-large-scrolled');
+    }
+    await click(action('close-panel'),true);
+  }
+  check('Chronicle: normal and large text in Russian and English, compact layout and fixed actions');
+
+  await viewport(1280,720,false); await navigate('?long-chapter&clear-shore');
+  await click(panel('night'));
+  assert.equal(await evaluate(`document.querySelectorAll('.chronicle-nights li').length`),4);
+  await screenshot('chronicle-sheet-1');
+  await click(`${action('chronicle-page')}[data-page="1"]`);
+  assert.equal(await evaluate(`document.querySelectorAll('.chronicle-nights li').length`),2);
+  assert(await evaluate(`!!document.querySelector('${night('far-shore')}') && document.querySelector('${confirmNight}').disabled`));
+  await screenshot('chronicle-sheet-2');
+  await cdp('Emulation.setTouchEmulationEnabled',{enabled:true});
+  await evaluate(`Object.defineProperty(navigator,'maxTouchPoints',{configurable:true,get:()=>1})`);
+  await cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
+  await sleep(250);
+  const pageCard = await rect('.chronicle-nights li:first-child');
+  const swipeX = pageCard.x + pageCard.width * .25;
+  const swipeY = pageCard.y + pageCard.height * .45;
+  await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:swipeX,y:swipeY}]});
+  await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipeX+44,y:swipeY}]});
+  await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:swipeX+90,y:swipeY}]});
+  await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await wait(`document.querySelectorAll('.chronicle-nights li').length === 4`);
+  assert.equal(await selectedNight(),'first-light');
+  await click(`${action('chronicle-page')}[data-page="1"]`,true);
+  await wait(`document.querySelectorAll('.chronicle-nights li').length === 2`);
+  await click(night('far-shore'),true);
+  await click(confirmNight,true);
+  await click(panel('night'),true);
+  assert(await evaluate(`!!document.querySelector('${night('far-shore')}[aria-pressed="true"]')`));
+  check('Chronicle: four entries per sheet, touch swipe, second-page selection and reopening');
+
+  await cdp('Page.navigate',{url:`${base}/tests/browser/preparation-frame.html?game-menu`});
+  await wait(`document.querySelector('.reference-game-menu')?.dataset.ready === 'true' && !document.querySelector('.reference-game-menu').inert`);
+  await click('[data-action="trials"]',true);
+  await wait(`!!document.querySelector('.trials-panel [data-chronicle-kind="trials"]')`);
+  await checkChronicleLayout(false);
+  await screenshot('trials-portrait-ru');
+  assert.equal(await selectedNight(),'winged-tide');
+  await escapeKey();
+  await wait(`document.querySelector('.reference-game-menu')?.dataset.ready === 'true' && !document.querySelector('.reference-game-menu').inert`);
+  await click('[data-action="trials"]',true);
+  await wait(`!!document.querySelector('.trials-panel [data-chronicle-kind="trials"]')`);
+  await click(night('rescue-trial'),true);
+  await click(confirmNight,true);
+  assert.equal(await selectedNight(),'rescue-trial');
+  assert.equal((await snapshot()).screen,'preparation');
+  assert.equal((await snapshot()).writes,0);
+  assert(await evaluate(`document.activeElement.matches('${panel('night')}')`));
+  await click(`${action('back')}.prep-back`,true);
+  await wait(`!!document.querySelector('.reference-game-menu')`);
+  await navigate();
+  check('Trials: standalone book from game menu, Escape cancellation, confirmation and return from preparation');
+
+  await viewport(1280,720,false);await navigate();
+  await click(panel('devices'));assert.equal(await evaluate(`document.querySelectorAll('.prep-mechanisms button').length`),8);await screenshot('device-panel');
+  const drawerBefore=await snapshot(),dr=await rect('.prep-drawer-body');await cdp('Input.dispatchMouseEvent',{type:'mouseWheel',x:dr.x+dr.width/2,y:dr.y+dr.height/2,deltaY:400,deltaX:0});await sleep(200);assert(await evaluate(`document.querySelector('.prep-drawer-body').scrollTop>0`));assert.deepEqual((await snapshot()).devices,drawerBefore.devices);check('Drawer scrolling does not place or mutate inventory');
   await click(`${action('move-device')}[data-device-id="2"]`);await click(action('close-panel'));
   const beforeMove=await snapshot();await worldClick(-200,150);const afterMove=await snapshot();
   const moved=afterMove.devices.find(d=>d.id===2);assert(Math.abs(moved.position.x+200)<.01,JSON.stringify({position:moved.position,preview:afterMove.preview,expected:await point(-200,150)}));assert.equal(moved.health,42);assert.deepEqual(afterMove.devices.find(d=>d.id===4),beforeMove.devices.find(d=>d.id===4));assert.equal(afterMove.resources,beforeMove.resources);check('Exact owned id 2 moved with damage and spare instance preserved');
@@ -165,9 +439,10 @@ let ws, captureFailure;
   await worldClick(-200,150);assert(await evaluate(`!!document.querySelector('.prep-inspector')`));
   const overview=await point(0,0);await click(action('zoom'));const close=await point(0,0);assert(close.camera.zoom>overview.camera.zoom);await screenshot('selected-close');await click(action('zoom'));await click(action('deselect'));check('Context selection and explicit close camera');
   await click(panel('devices'));await click(`${action('remove-device')}[data-device-id="1"]`);await click(`${action('owned-device')}[data-device-id="4"]`);await click(action('close-panel'));
+  await checkDeviceCounts('returned to stock');
   const beforeInvalid=await snapshot();const sea=await point(150,0);await mouse(sea);await sleep(100);assert.equal((await snapshot()).preview.valid,false);await worldClick(150,0);assert.deepEqual((await snapshot()).devices,beforeInvalid.devices);check('Sea preview and click reject invalid placement');
   const start=await point(-120,-100),end=await point(-190,-130);await mouse(start);await mouse(start,'mousePressed');await cdp('Input.dispatchMouseEvent',{type:'mouseMoved',x:end.x,y:end.y,button:'left',buttons:1});await mouse(end,'mouseReleased');await sleep(100);assert.deepEqual((await snapshot()).devices,beforeInvalid.devices);check('Map drag does not place');
-  await worldClick(-140,-140);assert(Math.abs((await snapshot()).devices.find(d=>d.id===4).position.x+140)<.01);await click(action('cancel-placement'));check('Real mouse placement uses world coordinates');
+  await worldClick(-140,-140);assert(Math.abs((await snapshot()).devices.find(d=>d.id===4).position.x+140)<.01);await click(action('cancel-placement'));await checkDeviceCounts('placed from stock');check('Real mouse placement uses world coordinates and updates the counters');
   await click(panel('devices'));await click(`${action('repair-device')}[data-device-id="2"]`);const repaired=await snapshot();assert.equal(repaired.devices.find(d=>d.id===2).health,70);assert(repaired.resources<afterMove.resources);
   await click(`${action('purchase-device')}[data-kind="cannon"]`);assert.equal((await snapshot()).devices.length,5);await click(action('close-panel'));check('Repair and purchase persist real inventory and currency');
   await click(action('start'));await wait(`window.preparationFixture.app.view.screen==='battle' && !!document.querySelector('.chapter-world-underlay')`);await sleep(500);await screenshot('battle');
@@ -178,8 +453,8 @@ let ws, captureFailure;
   await click(action('start'));await wait(`window.preparationFixture.app.view.screen==='battle'`);assert.notEqual((await snapshot()).raw.activeAttempt.id,attempt);await screenshot('battle-landscape');check('Second attempt reuses shared world renderer');
   await navigate('?invalid');await viewport(390,844,true);assert.equal(await evaluate(`document.querySelector('[data-prep-action="start"]').disabled`),true);assert.equal((await snapshot()).devices.find(d=>d.id===1).position.x,100);await screenshot('invalid-preserved');
   await click(panel('devices'),true);await click(`${action('move-device')}[data-device-id="1"]`,true);await click(action('close-panel'),true);await worldClick(-140,-140,true);assert(Math.abs((await snapshot()).devices.find(d=>d.id===1).position.x+140)<.01);await click(action('cancel-placement'),true);assert.equal(await evaluate(`document.querySelector('[data-prep-action="start"]').disabled`),false);check('Invalid legacy coordinate retained, blocked, then repaired by touch move');
-  await navigate('?stock');await click(panel('devices'),true);await click(`${action('recharge-device')}[data-device-id="5"]`,true);assert.equal((await snapshot()).devices.find(d=>d.id===5).trapCharges,1);check('Trap recharge persists charges');
-  await click(action('close-panel'),true);await navigate('?new');assert.equal((await snapshot()).devices.length,0);assert.equal(await evaluate(`document.querySelector('[data-prep-action="start"]').disabled`),false);await screenshot('empty');check('New profile can start without devices');
+  await navigate('?stock');await click(panel('devices'),true);await click(`${action('browse-device')}[data-kind="light-trap"]`,true);await click(`${action('recharge-device')}[data-device-id="5"]`,true);assert.equal((await snapshot()).devices.find(d=>d.id===5).trapCharges,1);check('Trap recharge persists charges');
+  await click(action('close-panel'),true);await navigate('?new');assert.equal((await snapshot()).devices.length,0);assert.equal(await evaluate(`document.querySelector('[data-prep-action="start"]').disabled`),false);await checkDeviceCounts('new profile');await screenshot('empty');check('New profile can start without devices');
   await viewport(1280,720,false);await navigate();await click(panel('devices'));await click(`${action('remove-device')}[data-device-id="1"]`);await click(`${action('owned-device')}[data-device-id="1"]`);await click(action('close-panel'));
   const beforeFailure=await snapshot();await evaluate('window.preparationFixture.fail(true)');await worldClick(-100,-100);assert((await snapshot()).error);assert.equal((await snapshot()).raw.profile.devices.find(d=>d.id===1).position,null);await screenshot('save-failure');await evaluate('window.preparationFixture.fail(false)');await click('[data-action="save"]');const recovered=await snapshot();assert(!recovered.error);assert(Math.abs(recovered.devices.find(d=>d.id===1).position.x+100)<.01);assert.equal(recovered.resources,beforeFailure.resources);assert.equal(recovered.devices.length,beforeFailure.devices.length);check('Placement save failure and retry preserve profile and exact instance');
   await navigate();await click(panel('devices'));await click(`${action('remove-device')}[data-device-id="1"]`);await click(`${action('owned-device')}[data-device-id="1"]`);await click(action('close-panel'));await evaluate(`document.querySelector('[data-prep-world]').focus()`);

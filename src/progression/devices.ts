@@ -52,6 +52,7 @@ export function deviceDeployments(profile: Readonly<Profile>): DeviceDeployment[
   return profile.devices.flatMap(device => device.position === null ? [] : [{
     id: device.id, kind: device.kind, x: device.position.x, y: device.position.y,
     health: device.health, consumed: device.consumed,
+    ...(device.variantId === undefined ? {} : { variantId: device.variantId }),
     ...(device.kind === 'light-trap' ? { trapCharges: remainingTrapCharges(device) } : {}),
   }]);
 }
@@ -70,7 +71,7 @@ export function battleDeviceDeployments(profile: Readonly<Profile>, definitions:
 export function normalizedDeviceResults(devices: readonly DeviceDeployment[], snapshot: readonly DeviceDeployment[], definitions: DeviceRules['definitions']): DeviceDeployment[] {
   return devices.map(device => {
     const initial = snapshot.find(item => item.id === device.id && item.kind === device.kind);
-    if (!initial) throw new Error('Итог устройств не соответствует стартовому снимку.');
+    if (!initial || initial.variantId !== device.variantId) throw new Error('Итог устройств не соответствует стартовому снимку.');
     if (device.kind === 'light-trap'
       ? !Number.isSafeInteger(device.trapCharges) || device.trapCharges! < 0
         || device.trapCharges! > remainingTrapCharges(initial) || device.consumed !== (device.trapCharges === 0)
@@ -83,6 +84,7 @@ export function normalizedDeviceResults(devices: readonly DeviceDeployment[], sn
     const health = device.health === startHealth ? initial.health : base === maximum ? device.health
       : Math.min(initial.health, device.health / maximum * base);
     return { id: device.id, kind: device.kind, x: device.x, y: device.y, health, consumed: device.consumed,
+      ...(initial.variantId === undefined ? {} : { variantId: initial.variantId }),
       ...(device.kind === 'light-trap' ? { trapCharges: remainingTrapCharges(device) } : {}) };
   });
 }

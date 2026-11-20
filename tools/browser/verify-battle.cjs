@@ -4,6 +4,7 @@ const path = require('node:path');
 const assert = require('node:assert/strict');
 const { createTestBrowser } = require('./browser-profile.cjs');
 const base = process.env.LIGHTHOUSE_TEST_URL || process.argv.slice(2).find(arg=>!arg.startsWith('--')) || 'http://127.0.0.1:5173';
+const productionOnly = process.argv.includes('--production-only');
 
 const out = path.resolve('test-results', `battle-${Date.now()}-${process.pid}`);
 fs.mkdirSync(out, { recursive: true });
@@ -80,14 +81,34 @@ let ws;
   };
   const layouts = [], issues = [];
   const geometry = async label => {
-    const metrics = await evaluate(`(()=>{const box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}},canvas=document.querySelector('.chapter-world-underlay');return{width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,field:box(document.querySelector('.play-area')),header:box(document.querySelector('.statusbar')),dock:box(document.querySelector('.battle-controls')),controls:[...document.querySelectorAll('.statusbar button,.battle-controls button,.battle-device-access summary,.battle-brief summary')].filter(e=>e.getClientRects().length).map(e=>({...box(e),action:e.dataset.action||e.className})),bars:JSON.parse(canvas.dataset.indicators),bodies:JSON.parse(canvas.dataset.enemyBodies),camera:JSON.parse(canvas.dataset.worldCamera),pixel:[...document.querySelectorAll('.battle-pixel')].filter(e=>e.getClientRects().length).map(e=>({text:e.innerText,ready:e.dataset.painted,w:e.clientWidth,h:e.clientHeight}))}})()`);
+    const metrics = await evaluate(`(async()=>{
+      await document.fonts.ready;
+      const box=e=>{const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};
+      const canvas=document.querySelector('.chapter-world-underlay');
+      const labels=[...document.querySelectorAll('.battle-night-label,[data-health],[data-phase],[data-timer],[data-battle-lens],[data-targets],[data-battle-flash-label],[data-flash-status],[data-wave-button],[data-wave-detail],[data-battle-devices-label]')].map(e=>{
+        const bounds=e.matches('[data-phase]')&&!matchMedia('(orientation: portrait)').matches?e.parentElement:e.closest('.night-state,.integrity,.battle-controls button,.light-status,.battle-device-access,[data-phase],[data-timer]');
+        const p=bounds.getBoundingClientRect(),range=document.createRange();
+        range.selectNodeContents(e);
+        return {text:e.textContent,font:getComputedStyle(e).fontFamily,inside:[...range.getClientRects()].every(r=>r.left>=p.left-1&&r.right<=p.right+1&&r.top>=p.top-1&&r.bottom<=p.bottom+1&&bounds.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2)))};
+      });
+      return {width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,scrollHeight:document.documentElement.scrollHeight,
+        field:box(document.querySelector('.play-area')),header:box(document.querySelector('.statusbar')),dock:box(document.querySelector('.battle-controls')),
+        controls:[...document.querySelectorAll('.statusbar button,.battle-controls button,.battle-device-access summary,.battle-brief summary')].filter(e=>e.getClientRects().length).map(e=>({...box(e),action:e.dataset.action||e.className})),
+        bars:JSON.parse(canvas.dataset.indicators),bodies:JSON.parse(canvas.dataset.enemyBodies),camera:JSON.parse(canvas.dataset.worldCamera),
+        labels,loaded:document.fonts.check('14px "Avalon Menu"'),
+        icons:[...document.querySelectorAll('.battle-controls img,.integrity img')].every(e=>e.naturalWidth===16&&e.src.includes('/avalon-watch/ui/')),
+        slate:getComputedStyle(document.querySelector('.battle-controls')).borderImageSource};
+    })()`);
     layouts.push({ label, ...metrics });
     if(metrics.scrollWidth>metrics.width||metrics.scrollHeight>metrics.height+1)issues.push(`${label}: document overflow`);
     for(const r of metrics.controls)if(r.w<43.9||r.h<43.9||r.x<-.5||r.x+r.w>metrics.width+.5||r.y<-.5||r.y+r.h>metrics.height+.5)issues.push(`${label}: clipped/undersized action ${JSON.stringify(r)}`);
     assert(metrics.field.h>150,`${label}: field height ${metrics.field.h}`);
     if(label==='mobile')assert(metrics.field.h>=590,`390x844 field too short ${metrics.field.h}`);
-    for(const bar of metrics.bars){assert(bar.width>=44,`${label}: health width ${bar.width}`);assert(bar.x>=2&&bar.x+bar.width<=metrics.field.w-2,`${label}: clipped bar`);}
-    assert(metrics.pixel.every(label=>label.ready==='true'),`${label}: missing pixel glyph or partial text`);
+    const enlarged = label.includes('en-large');
+    const minimumHealthWidth = enlarged ? 54 : metrics.field.w <= 900 ? 24 : 44;
+    for(const bar of metrics.bars){assert(bar.width>=minimumHealthWidth,`${label}: health width ${bar.width}`);assert(bar.x>=2&&bar.x+bar.width<=metrics.field.w-2,`${label}: clipped bar`);}
+    assert(metrics.loaded && metrics.labels.every(entry=>entry.text && entry.inside && entry.font.includes('Avalon Menu')), `${label}: missing or clipped HUD lettering ${JSON.stringify(metrics.labels)}`);
+    assert(metrics.icons && metrics.slate.includes('/avalon-watch/ui/panel.png'), `${label}: missing Avalon Watch slate or icons`);
     assert(await evaluate('Number(getComputedStyle(document.querySelector(".ocean > canvas:not(.chapter-world-underlay)")).zIndex)>Number(getComputedStyle(document.querySelector(".chapter-world-underlay")).zIndex)'),`${label}: combat canvas behind terrain`);
     await screenshot(label);
   };
@@ -99,24 +120,35 @@ let ws;
   await wait('!!document.querySelector("[data-action=new-game]")');
   await wait('document.querySelector(".reference-game-menu").dataset.ready === "true" && !document.querySelector(".reference-game-menu").inert && !document.querySelector("[data-game-menu-ghost]")');
   await click('[data-action="new-game"]');
+  const skipIntro = '[aria-labelledby="campaign-intro-title"] [data-prep-action="acknowledge-intro"]:last-of-type';
+  await wait(`!!document.querySelector(${JSON.stringify(skipIntro)})`);
+  await click(skipIntro);
   await wait('!!document.querySelector("[data-prep-action=start]")');
   await click('[data-prep-action="start"]');
-  await wait('document.querySelector(".chapter-world-underlay").dataset.worldReady === "true"');
+  const battleReady = 'document.querySelector(".is-battle .chapter-world-underlay")?.dataset.headlandReady === "true"';
+  await wait(battleReady);
   await screenshot('normal-start');
   if(process.argv.includes('--gpu'))assert(await evaluate('!document.querySelector(".ocean > canvas:not(.chapter-world-underlay)").getContext("2d")'),'WebGL renderer must actually be active in GPU verification');
   console.log('Normal entry canvas:',await evaluate('JSON.stringify([...document.querySelectorAll(".ocean canvas")].map(c=>({class:c.className,w:c.width,h:c.height,css:getComputedStyle(c).display,rect:{w:c.clientWidth,h:c.clientHeight},is2d:!!c.getContext("2d")})))'));
   check('Main menu to preparation to battle renders the world');
-  await cdp('Page.reload');
+  if (productionOnly) {
+    const oldLink = new URL('?campaign=1', base).href;
+    assert.equal((await cdp('Page.navigate', { url: oldLink })).errorText, undefined);
+    await wait(`location.href === ${JSON.stringify(oldLink)} && !!document.querySelector('[data-action="game-menu"]')`);
+    const profile = await evaluate('JSON.parse(localStorage.getItem("lighthouse.campaign.v1"))');
+    assert.equal(profile.activeAttempt, null);
+    assert.equal(profile.lastSettled.outcome, 'interrupted');
+  } else await cdp('Page.reload');
   await wait('!!document.querySelector("[data-action=game-menu]")');
   await click('[data-action="game-menu"]');
   await wait('document.querySelector(".reference-game-menu")?.dataset.ready === "true" && !document.querySelector(".reference-game-menu").inert && !document.querySelector("[data-game-menu-ghost]")');
   await click('[data-action="continue-game"]');
   await wait('!!document.querySelector("[data-prep-action=start]")');
   await click('[data-prep-action="start"]');
-  await wait('document.querySelector(".chapter-world-underlay").dataset.worldReady === "true"');
+  await wait(battleReady);
   await screenshot('cached-restart');
-  check('Cached reload and continue also boot the battle renderer');
-  if (process.argv.includes('--production-only')) {
+  check(productionOnly ? 'Old campaign link resumes the same profile and boots the battle renderer' : 'Cached reload and continue also boot the battle renderer');
+  if (productionOnly) {
     // Production has no fixtures. Exercise the actual entry and cached save flow,
     // then verify that both renderers survive phone rotation in the built app.
     for (const [width,height,label] of [[390,844,'portrait'],[844,390,'landscape']]) {
@@ -132,6 +164,11 @@ let ws;
       await wait('document.querySelector("[data-overlay]").hidden');
       check(`Production ${label}: pause and native touch resume`);
     }
+    await evaluate('localStorage.setItem("lighthouse.campaign.v1", "{")');
+    assert.equal((await cdp('Page.navigate', { url: base })).errorText, undefined);
+    await wait('!!document.querySelector(\'.save-error:not([hidden]) [data-action="reload-campaign"]\')?.getClientRects().length');
+    assert.equal(await evaluate('localStorage.getItem("lighthouse.campaign.v1")'), '{');
+    check('Root URL offers to reload an unreadable campaign save and preserves its data');
     fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({base,mode:'production-only',checks,issues,layouts,runtimeErrors,realPhoneTested:false},null,2));
     console.log(JSON.stringify({out,checks:checks.length,issues,runtimeErrors},null,2));
     assert.equal(runtimeErrors.length,0,'Production runtime or HTTP errors');
@@ -177,6 +214,11 @@ let ws;
   await click('[data-action="close-device"]',true); check('Touch selects cannon and enemy by visible sprite bounds');
   await evaluate("window.dispatchEvent(new Event('blur'))"); await sleep(100); assert((await snapshot()).paused); await evaluate('window.battleFixture.app.resume()'); await wait('document.querySelector("[data-overlay]").hidden'); check('Activity loss pauses combat');
   await click('[data-action="pause"]',true); const paused=await snapshot(); assert(paused.paused);
+  assert(await evaluate(`(() => {
+    const rail=document.querySelector('.battle-rail'), pause=document.querySelector('.overlay.screen-battle'), hull=document.querySelector('.integrity');
+    const hud=hull.getBoundingClientRect(), rect=pause.getBoundingClientRect(), top=document.elementFromPoint(hud.left+8,hud.top+8);
+    return rail.inert && getComputedStyle(hull).visibility==='visible' && rect.top===0 && rect.height===innerHeight && pause.contains(top);
+  })()`),'Visible battle HUD is inert and covered by the pause overlay');
   await evaluate('window.battleFixture.step(5)'); assert.equal((await snapshot()).tick,paused.tick); await screenshot('paused');
   await cdp('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27}); await cdp('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape',windowsVirtualKeyCode:27}); await sleep(150); assert(!(await snapshot()).paused); check('Pause/resume never accumulates battle time');
   await viewport(844,390,true); await ready(); await geometry('mobile-landscape'); assert.equal((await snapshot()).attempt,original.attempt);
@@ -185,7 +227,7 @@ let ws;
   for(const night of ['rescue-trial','abyss-warden']){await viewport(390,844,true);await navigate(`?night=${night}`);await geometry(night);}
   await viewport(390,844,true); await navigate('?armor'); await geometry('mobile-armor');
   assert(await evaluate('window.battleFixture.app.view.battle.enemies.some(e=>e.kind==="turtle"&&e.armor>0)'),'Live armor fixture');
-  const armored=await evaluate('JSON.parse(document.querySelector(".chapter-world-underlay").dataset.indicators).filter(i=>i.height>15)'); assert(armored.length>0); check('Armor retains separate enlarged strip above health');
+  const armored=await evaluate('JSON.parse(document.querySelector(".chapter-world-underlay").dataset.indicators).filter(i=>i.height>=10)'); assert(armored.length>0); check('Armor retains a separate strip above health in the compact phone layout');
   await evaluate('window.battleFixture.step(240)'); await sleep(100); assert.equal((await snapshot()).screen,'result');
   assert(await evaluate('document.querySelector(".battle-rail").hidden')); check('Battle-only menus disappear on result');
   check('RU/EN, large type, small portrait, landscape, ship and boss layouts');

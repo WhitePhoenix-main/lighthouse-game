@@ -4,7 +4,7 @@ import type { CampaignAbilityPrice } from './campaignAbilityBalanceTypes';
 import { LENSES, LENS_UPGRADES } from './lenses';
 
 const OPENING = { overload: 2, seal: 3, barrage: 4, bastion: 5 } as const;
-const AVERAGE_NODE_PRICE = [35, 55, 80, 110, 145, 185, 235] as const;
+export const AVERAGE_NODE_PRICE = [35, 55, 80, 110, 145, 185, 235] as const;
 /** Earmarked INSIDE chapter 3 otherProgression, not an additional/double charge. */
 export const BASIC_PAIRED_PREREQUISITE_SHARDS = LENS_UPGRADES
   .filter(u => ['basic-power-1', 'basic-power-2', 'basic-width'].includes(u.id))

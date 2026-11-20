@@ -9,7 +9,63 @@ export function resolveLanguage(preference: LanguagePreference, platformLanguage
 }
 
 // Presentation-only dictionary. Content identifiers and simulation data remain language independent.
+import { CAMPAIGN_ENEMIES } from '../../content/campaignEnemies';
+
 const entries = `
+РАЗБЕГ! Обстрел устройств|WINDUP! Device bombardment
+РЫВОК! Обстрел устройств|CHARGE! Device bombardment
+Летает · подавляет орудие|Flying · suppresses a weapon
+Перечитать сохранение|Reload saved profile
+Перечитать записанный профиль? Незавершённая ночь будет прервана.|Reload the saved profile? An unfinished night will be interrupted.
+Терновые топи|Thorn Marsh
+Пепельные утёсы|Ashen Cliffs
+Кладбище кораблей|Ship Graveyard
+Затмение Авалона|Avalon Eclipse
+Последний рассвет|Last Dawn
+Затонувший капитан|Drowned Captain
+Сердце топи|Marsh Heart
+Пепельный колосс|Ash Colossus
+Вечерний звон|Evening Knell
+Падший хранитель|Fallen Keeper
+Сердце тумана|Fog Heart
+Перегрузка света|Light Overload
+Печать сдерживания|Seal of Restraint
+Орудийный залп|Barrage
+Бастион Авалона|Avalon Bastion
+Открытие перегрузки|Unlock Overload
+Мощность перегрузки|Overload Power
+Продолжительная перегрузка|Extended Overload
+Быстрое восстановление|Quick Recovery
+Ускоренный привод|Accelerated Drive
+Прожигающий свет|Searing Light
+Световое наведение|Light Guidance
+Открытие печати|Unlock Seal
+Сила сдерживания|Restraint Strength
+Обширная печать|Wider Seal
+Устойчивая печать|Enduring Seal
+Остаточные путы|Lingering Bonds
+Входной импульс|Entry Pulse
+Открытие залпа|Unlock Barrage
+Сила залпа|Barrage Power
+Бронебойный залп|Armor-Piercing Barrage
+Воздушный перехват|Air Intercept
+Широкий разрыв|Wide Blast
+Быстрый навес|Fast Lob
+Световая корректировка|Light Spotting
+Открытие бастиона|Unlock Bastion
+Сила защиты|Protection Strength
+Продолжительный бастион|Extended Bastion
+Защита механизмов|Mechanism Protection
+Упор против тяжёлого удара|Heavy Impact Brace
+Мягкое угасание|Gentle Fade
+Срыв подготовки|Disruption
+Открытая уязвимость|Exposed Weakness
+Быстрый разворот|Quick Turn
+Стойкость под натиском|Onslaught Resilience
+Аварийное окно|Emergency Window
+Стабилизация поля|Field Stabilization
+Защита от обстрела|Bombardment Protection
+Резервное управление|Backup Controls
 Колокола|Bells
 Генераторы|Generators
 Гарпуны|Harpoons
@@ -516,6 +572,7 @@ HP за завершённую волну|HP per completed wave
 Генератор|Generator
 Пушка|Cannon
 Пушки|Cannons
+Открывает пушки.|Unlocks cannons.
 Барьеры|Barriers
 Мощность II|Power II
 Мощность I|Power I
@@ -597,6 +654,86 @@ HP за завершённую волну|HP per completed wave
 Оборона|Defense
 Переходы|Navigation
 Выбор ночи|Night Selection
+Каталог типов|Device types
+Улучш.|Upgrades
+Откройте тип в улучшениях|Unlock this device in Upgrades
+Нет устройств этого типа|No owned devices of this type
+При открытии типа вы получите первый экземпляр|Unlocking a type grants its first device
+Целей луча|Beam targets
+Ночи|Nights
+Волн|Waves
+Ночей|Nights
+Лист|Leaf
+осколков|shards
+жемчужин|pearls
+Видеопредложения|Video offers
+Прототип|Prototype
+Держите корабль в луче|Keep the ship in the beam for
+пока не истекли|before the deadline at
+Спасение корабля|Ship rescue
+Осмотреть ночи|Inspect nights
+Перенос|Move
+Установка устройства|Place a device
+Первая волна|First wave
+Оснащена|Equipped
+Привод|Drive
+Корпус маяка|Lighthouse hull
+Ёмкость поля|Shield capacity
+Восстановление поля|Shield regeneration
+Сила вспышки|Flash power
+Восстановление вспышки|Flash cooldown
+Урон пушек|Cannon damage
+Скорострельность пушек|Cannon rate of fire
+Дальность пушек|Cannon range
+Урон гарпунов|Harpoon damage
+Скорострельность гарпунов|Harpoon rate of fire
+Дальность гарпунов|Harpoon range
+Урон мортир|Mortar damage
+Взрыв мортир|Mortar blast
+Сила ремонта|Repair strength
+Запас ремонта|Repair charges
+Прочность барьеров|Barrier health
+Прочность генераторов|Generator health
+Защита генератора|Generator protection
+Урон ловушек|Trap damage
+Радиус взрыва|Blast radius
+Радиус вспышки|Flash radius
+Оглушение вспышки|Flash stun
+Бережный ремонт|Efficient repair
+Усиление корпусов|Reinforced housings
+Координация пушек|Cannon coordination
+Экономная перезарядка|Efficient recharge
+Добивающий свет|Finishing light
+Наведение светом|Light guidance
+Защита маяка|Lighthouse protection
+Аварийная защита|Emergency protection
+Восстановление между волнами|Between-wave recovery
+Упор против тяжёлых ударов|Heavy-impact bracing
+Быстрый возврат поля|Rapid shield recovery
+Радиус поля|Shield radius
+Защита при включении|Protection on activation
+Ровное сияние|Steady glow
+Удержание|Hold
+Жар|Heat
+Сила дальнего света|Long-range beam power
+Ширина дальнего света|Long-range beam width
+Сила широкого света|Wide beam power
+Хроника маяка|Lighthouse Chronicle
+Оглавление|Contents
+Главы|Chapters
+К ночам|To Nights
+К испытаниям|To Trials
+Перелистывание|Page Navigation
+Предыдущая страница|Previous Page
+Следующая страница|Next Page
+Помогите кораблю светом.|Guide the ship with your light.
+Испытаний пока нет.|No trials yet.
+Выбрано|Selected
+Главы и испытания|Chapters and trials
+Отдельные испытания|Side Trials
+К подготовке|To Preparation
+Пройдена|Completed
+Выбрана|Selected
 Глава|Chapter
 Отдельное испытание|Separate Challenge
 Необязательное событие. Не продвигает главу.|Optional event. Does not advance the chapter.
@@ -693,6 +830,7 @@ HP за завершённую волну|HP per completed wave
 Выбор одной линзы|Single Lens Selection
 Одна линза на ночь|One Lens per Night
 Выбор бесплатный. До старта это черновик; выбранная линза сохраняется при начале ночи. Во время боя линзу менять нельзя. Закрытые линзы открываются в развитии.|Selection is free and remains a draft until the night starts. The lens is saved when you start. You cannot change lenses in battle. Unlock lenses on the development screen.
+Выбор бесплатный. Линза сохраняется сразу при выборе. Во время боя линзу менять нельзя. Закрытые линзы открываются в развитии.|Selection is free. The lens is saved as soon as you select it. You cannot change lenses in battle. Unlock lenses on the development screen.
 Текущие эффекты: скорость выбранной цели|Current effects: selected target speed
 урон броне|armor damage
 Противоброневая линза не усиливает урон здоровью.|The armor-breaking lens does not increase health damage.
@@ -940,6 +1078,12 @@ HP за завершённую волну|HP per completed wave
 Экземпляры, прочность, заряд и расстановка сохраняются.|Devices, health, charges and placement are saved.
 Устройства и расстановка сохраняются между ночами и перезагрузками.|Devices and placement persist between nights and reloads.
 Устройства вернутся к состоянию перед началом ночи. Покупки и ремонт подготовки сохраняются.|Devices return to their state before the night. Preparation purchases and repairs are kept.
+Все награды и новые встречи этой ночи будут потеряны.|All rewards and new encounters from this night will be lost.
+Результат ещё не сохранён.|Result not saved yet.
+Ошибка сохранения|Save error
+Подробности|Details
+Результат ещё не сохранён. Повторите сохранение.|Result not saved yet. Retry saving.
+За первую победу|First victory bonus
 Не хватает осколков для покупки.|Not enough shards to buy.
 Не хватает осколков для ремонта.|Not enough shards to repair.
 Не хватает осколков для перезарядки.|Not enough shards to recharge.
@@ -1022,8 +1166,161 @@ HP за завершённую волну|HP per completed wave
 Прочный корпус ловушки|Sturdy trap hull
 Бронебойная вспышка|Armor-piercing blast
 Второй заряд|Second charge
+Пепельный колосс|Ash Colossus
+Затонувший капитан|Drowned Captain
+Сердце топи|Marsh Heart
+Вечерний звон|Evening Knell
+Падший хранитель|Fallen Keeper
+Сердце тумана|Heart of the Mist
+Разрушение части босса отменяет её следующую атаку.|Destroy a boss part to stop its next attack.
+Это устройство не атакует летающие цели.|This device cannot attack flying targets.
+Фаза|Phase
+УДАР ПО МАЯКУ|LIGHTHOUSE STRIKE
+ЗАЛП|SALVO
+ПОДАВЛЕНИЕ|SUPPRESSION
+ПРИЗЫВ|SUMMON
+ЗАЩИТА|GUARDED
+ОТКРЫТ|EXPOSED
+ЛЕЧЕНИЕ|HEALING
+КОРНИ|ROOTS
+ОБСТРЕЛ МАЯКА|SIEGE ATTACK
+ПЕСНЯ|SONG
+ОБСТРЕЛ УСТРОЙСТВ|BOMBARDMENT
+СМЕНА СТОЙКИ|CHANGING STANCE
+ЗЕРКАЛО|MIRROR
+СВЯЗАНО|ROOTED
+ПОДАВЛЕНО|SUPPRESSED
+Сердце|Core
+Молот|Hammer
+Горн|Furnace
+Разлом|Rift
+Корень|Root
+Орудие|Weapon
+Северное щупальце|North tentacle
+Южное щупальце|South tentacle
+Знамя|Standard
+Сигнал|Signal
+Северный корень|North root
+Южный корень|South root
+Носовое орудие|Bow gun
+Кормовое орудие|Stern gun
+Северный клинок|North blade
+Южный клинок|South blade
+Туман отступил. Семь маяков встретили рассвет, и корабли снова видят путь домой.|The mist has lifted. Seven lighthouses greet the dawn, and ships can find their way home.
+Рассвет Авалона|Avalon's Dawn
+Следующая ночь|Next night
+Подготовка к повтору|Prepare to replay
+Смотреть вступление|Watch the introduction
+К Хронике|Back to Chronicle
+Коллекция|Collection
+Осадная пушка|Siege cannon
+Дальний гарпун|Long-range harpoon
+Сначала откройте базовый тип.|Unlock the base device first.
+Обратный прилив|Turning Tide
+Огни на отмели|Lights on the Shoal
+Следы на косе|Tracks on the Spit
+Крыло над водой|Wings over Water
+Щиты у косы|Shields on the Spit
+Два огня|Two Lights
+Последняя отмель|Last Shoal
+Шёпот тростника|Whispering Reeds
+Корни на тропе|Roots across the Path
+Сухие тропы|Dry Paths
+Чёрная заводь|Black Backwater
+Глухой обход|Hidden Approach
+Ведьмин круг|The Witch's Circle
+За проломом|Through the Breach
+Обвал|Rockslide
+Осадный обоз|Siege Train
+Дальний выстрел|Long Shot
+Каменная гряда|Stone Ridge
+Раскалённый ветер|Scorching Wind
+Последняя осада|Last Siege
+Звон над фарватером|Bells over the Channel
+На абордаж|Boarding Party
+Горящие обломки|Burning Wrecks
+Погоня за сиреной|Hunting the Siren
+Тесная гавань|Narrow Harbor
+Шторм над мачтами|Storm above the Masts
+Якорная цепь|Anchor Chain
+Ход мёртвых судов|March of the Dead Fleet
+Первое отражение|First Reflection
+У погасшей башни|The Darkened Tower
+Двое ворот|Twin Gates
+Разбитые зеркала|Broken Mirrors
+Третья башня|Third Tower
+Тёмный караул|Dark Watch
+Кольцо руин|Ring of Ruins
+Перед затмением|Before the Eclipse
+Сигнал в разломе|Signal in the Rift
+Возвращение прилива|Returning Tide
+Два мыса|Twin Headlands
+Час осадников|Hour of the Siege Beasts
+Остатки флота|Remnants of the Fleet
+Вторая тень|Second Shadow
+Два предупреждения|Two Warnings
+До последнего огня|Until the Last Light
+Поворачивайте луч заранее. Броня черепахи сохраняет повреждения после переключения.|Turn the beam early. Turtle armor stays damaged when you switch targets.
+Остановите готовящийся рывок и проверьте, где барьер выиграет время.|Stop the charge during its windup and find where a barrier buys you time.
+Летучие мыши атакуют устройства с воды. Пушка не достаёт летающих.|Bats attack devices from the water. Cannons cannot hit flying targets.
+Переключайтесь между двумя подходами. Черепаха впереди может закрыть минотавра.|Switch between two approaches. A turtle in front can block the light from reaching a minotaur.
+Проверьте вспышку и разнесите устройства по двум подходам.|Try the Flash and spread your defenses across both approaches.
+Срывайте атаки щупалец, пока с берега подходят наземные волны.|Interrupt the tentacle attacks while ground waves advance along the shore.
+Генератор и гарпун доступны для покупки. Утопленник прикрывается щитом.|The Generator and Harpoon are available to buy. The drowned foe shelters behind a shield.
+Падальщики быстро доходят с тыла. Поймайте их до смены фронта.|Scavengers close in fast from the rear. Catch them before switching fronts.
+Гарпун держит ската и мышь над водой, пока луч работает по суше.|The Harpoon handles rays and bats above the water while you aim the beam inland.
+Щитоносец может закрыть быстрого падальщика на одном подходе.|A Shieldbearer can screen a fast Scavenger on the same approach.
+Разведите огонь и поле по разным подходам.|Cover separate approaches with weapons and the shared shield.
+Сначала скат, затем щиты и быстрая атака с другого направления.|A ray arrives first, followed by shields and a fast attack from the other direction.
+Сорванная команда сокращает подкрепление босса. Волны с берега всё равно придут.|Interrupt the Captain's order to cut off his reinforcements. The shore waves will still arrive.
+Колокол может удержать группу. Ведьма лечит раненых рядом.|The Bell can hold back a group. The Witch heals nearby wounded allies.
+Корнеплёт предупреждает, прежде чем связать устройство.|The Rootweaver signals before it binds a weapon.
+На месте погибшего выводка появляются призраки. Ловушка полезна на сухой тропе.|A dead Brood releases ghosts. A trap is useful on a dry path.
+Используйте сухие обходы для перехвата. Острова пригодны для орудий.|Intercept enemies on the dry detours. Islands can hold weapons.
+Отвлеките поддержку лучом, ловушкой или колоколом.|Disrupt the support group with the beam, a Trap, or a Bell.
+Выводок прикрывает ведьму; оставьте оборону на второй тропе.|The Brood screens the Witch. Leave defenses on the second path.
+Сравните широкий луч и Печать против поддержки с двух сторон.|Try a wider beam and the Seal against supporting enemies on both sides.
+Разбейте корни до подавления. Следите за ведьмами на сухих подходах.|Destroy the roots before they disable weapons. Watch for witches on the dry approaches.
+Дальнобойная линза и Залп доступны для покупки. Осадник предупреждает перед выстрелом.|The Long-range Lens and Barrage are available to buy. Siege Beasts warn before firing.
+Голем распадается после гибели. Оставьте свет или орудие для мелких целей.|The Golem breaks apart when it dies. Save some light or a weapon for the smaller targets.
+Носитель прикрывает голема и перелетает барьеры.|The Carrier shields the Golem and flies over barriers.
+Перехватывайте осадников прежде, чем они закончат подготовку.|Intercept Siege Beasts before they finish preparing to fire.
+Ломайте броню впереди или временно удерживайте подход мортирой.|Break the armor up front or use a Mortar to hold the approach.
+Атаки приходят с обоих краёв плато. Найдите время для поворота.|Attacks come from both sides of the plateau. Leave time to turn.
+Совместите дальний перехват и устройство, прикрывающее второй подход.|Combine long-range interception with a device covering the other approach.
+Разрушение оружия Колосса отменяет его выстрелы. Осадники продолжают наступать.|Destroy the Colossus's weapons to prevent their attacks. The Siege Beasts keep advancing.
+Сирена ускоряет ближайших существ. Ремонтный фонарь доступен в развитии.|The Siren speeds up nearby enemies. The Repair Lamp is available in upgrades.
+Абордажники идут к устройствам. Укройте огневую позицию общим полем.|Boarders hunt devices. Cover your firing position with the shared shield.
+Бомбардир показывает место удара. Разнесите уязвимые устройства.|The Bombardier marks its impact area. Spread out vulnerable devices.
+Уберите сирену, пока ускоренная группа ещё за берегом.|Take out the Siren before the boosted group reaches the shore.
+Пользуйтесь разнесёнными площадками, чтобы один залп не задел всю оборону.|Use separate positions to keep one salvo from hitting all your defenses.
+Смена направления проверяет связку гарпуна с лучом или мортирой.|Use a Harpoon alongside the beam or Mortar to cover the changing attack directions.
+Оборона должна выдержать и ускоренную группу, и дальний обстрел.|Your defenses must handle both a boosted group and a long-range bombardment.
+Проверьте, когда выгоднее остановить выстрел, а когда ослабить отряд.|Decide when to stop the shot and when to thin out the group.
+Уничтожайте орудия корабля до залпа и держите подход со стороны причалов.|Destroy the ship's guns before they fire and hold the approach from the piers.
+Зеркальный рыцарь меняет защиту. Следите за его стойкой.|The Mirror Knight changes its defenses. Watch its stance.
+Гаситель предупреждает перед остановкой орудия. Отбейте его или дождитесь восстановления.|The Snuffer warns before disabling a weapon. Stop it or wait for the weapon to recover.
+Начинайте поворот до того, как вторая группа зайдёт за опоры.|Start turning before the second group reaches the pillars.
+Проверяйте, когда выгоднее луч, а когда подготовленный огонь устройств.|Decide when to use the beam and when to rely on your weapons.
+Гасители и бомбардиры требуют разных ответов. Держите запасной фронт.|Snuffers and Bombardiers call for different responses. Keep a second line.
+Рыцарь прикрывает других существ, пока вы ведёте луч по противоположной стороне.|The Knight screens other enemies while you aim the beam at the opposite side.
+Срывайте подавление и переводите огонь между двумя путями через руины.|Interrupt suppression and switch fire between two paths through the ruins.
+Способность и вторая линия устройств дают время на позднее переключение.|An ability and a second line of devices buy time for a late switch.
+Следите за стойкой хранителя и стороной следующей атаки.|Watch the Keeper's stance and the direction of the next attack.
+Освободите один подход и оставьте орудия против волны с другого.|Clear one approach and leave weapons to face the wave from the other.
+Сирена на воде и ведьма на суше помогают разным группам.|The Siren over water and the Witch inland support different groups.
+Смотрите на предупреждения у разлома, пока сухие подходы удерживают устройства.|Watch warnings near the rift while your devices hold the dry approaches.
+Выбирайте между уничтожением дальнего осадника и срывом ближнего залпа.|Choose between destroying a distant Siege Beast and interrupting a nearby salvo.
+Хорошая расстановка удержит часть угроз, пока луч занят на другом берегу.|Well-placed defenses hold back part of the wave while the beam covers the other shore.
+Сохраняйте ответ на подавление, если броня вынуждает удерживать луч.|Keep a response to suppression ready if armor forces you to hold the beam.
+Сроки двух атак различаются. Начните с угрозы, которую ещё можно сорвать.|The two attacks have different deadlines. Start with the threat you can still interrupt.
+Используйте знакомые ответы на броню, поддержку и быструю атаку.|Use familiar counters to armor, support, and fast attacks.
+Фазы повторяют знакомые угрозы. Доведите оборону до рассвета после гибели босса.|Each phase brings back familiar threats. Hold until dawn after defeating the boss.
 `.trim().split('\n').filter(line => line.trim()).map(line => line.split('|') as [string, string]);
 
+for (const enemy of Object.values(CAMPAIGN_ENEMIES)) {
+  entries.push([enemy.name, enemy.nameEn], [enemy.description, enemy.descriptionEn]);
+}
 const dictionary = new Map(entries);
 const alternatives = entries.map(([source]) => source).sort((a, b) => b.length - a.length)
   .map(source => source.replace(/[.*+?^\x24{}()|[\]\\]/g, '\\$&')).join('|');

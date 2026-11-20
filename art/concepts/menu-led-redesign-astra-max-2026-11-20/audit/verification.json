@@ -1,0 +1,31 @@
+{
+  "states": 47,
+  "boards": 564,
+  "views": [
+    "ru-normal",
+    "ru-large",
+    "en-normal",
+    "en-large"
+  ],
+  "viewports": [
+    "desktop",
+    "phone-landscape",
+    "phone-portrait"
+  ],
+  "atlasFrames": 108,
+  "nineSliceFrames": 45,
+  "routeSheets": 54,
+  "nativeEvidenceSheets": 1,
+  "journalPlates": 8,
+  "terrainTiles": 4,
+  "controlsCompared": 1904,
+  "rimPixelsCompared": 3808,
+  "desktopTwiceNative": true,
+  "distinctLocaleAndSizeImagesPerState": 4,
+  "allSpriteAlphaRanges": [
+    0,
+    255
+  ],
+  "nativeTerrainPoints": 48,
+  "hashes": 741
+}

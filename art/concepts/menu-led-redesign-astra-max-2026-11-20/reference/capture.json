@@ -1,0 +1,198 @@
+[
+  {
+    "name": "desktop",
+    "language": "ru",
+    "size": "normal",
+    "mobile": false,
+    "viewport": [
+      1280,
+      720
+    ],
+    "orientation": "landscape",
+    "scale": 2,
+    "buttons": [
+      {
+        "label": "Играть",
+        "x": 36,
+        "y": 404,
+        "width": 480,
+        "height": 96
+      },
+      {
+        "label": "Настройки",
+        "x": 36,
+        "y": 516,
+        "width": 480,
+        "height": 96
+      }
+    ]
+  },
+  {
+    "name": "phone-landscape",
+    "language": "ru",
+    "size": "normal",
+    "mobile": true,
+    "viewport": [
+      844,
+      390
+    ],
+    "orientation": "landscape",
+    "scale": 1.0833333333333333,
+    "buttons": [
+      {
+        "label": "Играть",
+        "x": 94.8125,
+        "y": 218.828125,
+        "width": 259.984375,
+        "height": 52
+      },
+      {
+        "label": "Настройки",
+        "x": 94.8125,
+        "y": 279.484375,
+        "width": 259.984375,
+        "height": 52
+      }
+    ]
+  },
+  {
+    "name": "phone-portrait",
+    "language": "ru",
+    "size": "normal",
+    "mobile": true,
+    "viewport": [
+      390,
+      844
+    ],
+    "orientation": "portrait",
+    "scale": 1.31875,
+    "buttons": [
+      {
+        "label": "Играть",
+        "x": 36.734375,
+        "y": 668.59375,
+        "width": 316.484375,
+        "height": 63.296875
+      },
+      {
+        "label": "Настройки",
+        "x": 36.734375,
+        "y": 750.359375,
+        "width": 316.484375,
+        "height": 63.296875
+      }
+    ]
+  },
+  {
+    "name": "native-landscape",
+    "language": "ru",
+    "size": "normal",
+    "mobile": false,
+    "viewport": [
+      640,
+      360
+    ],
+    "orientation": "landscape",
+    "scale": 1,
+    "buttons": [
+      {
+        "label": "Играть",
+        "x": 18,
+        "y": 202,
+        "width": 240,
+        "height": 48
+      },
+      {
+        "label": "Настройки",
+        "x": 18,
+        "y": 258,
+        "width": 240,
+        "height": 48
+      }
+    ]
+  },
+  {
+    "name": "native-portrait",
+    "language": "ru",
+    "size": "normal",
+    "mobile": true,
+    "viewport": [
+      360,
+      640
+    ],
+    "orientation": "portrait",
+    "scale": 1,
+    "buttons": [
+      {
+        "label": "Играть",
+        "x": 60,
+        "y": 507,
+        "width": 240,
+        "height": 48
+      },
+      {
+        "label": "Настройки",
+        "x": 60,
+        "y": 569,
+        "width": 240,
+        "height": 48
+      }
+    ]
+  },
+  {
+    "name": "phone-portrait-large-en",
+    "language": "en",
+    "size": "large",
+    "mobile": true,
+    "viewport": [
+      390,
+      844
+    ],
+    "orientation": "portrait",
+    "scale": 1.31875,
+    "buttons": [
+      {
+        "label": "Play",
+        "x": 36.734375,
+        "y": 668.59375,
+        "width": 316.484375,
+        "height": 63.296875
+      },
+      {
+        "label": "Settings",
+        "x": 36.734375,
+        "y": 750.359375,
+        "width": 316.484375,
+        "height": 63.296875
+      }
+    ]
+  },
+  {
+    "name": "phone-landscape-large-en",
+    "language": "en",
+    "size": "large",
+    "mobile": true,
+    "viewport": [
+      844,
+      390
+    ],
+    "orientation": "landscape",
+    "scale": 1.0833333333333333,
+    "buttons": [
+      {
+        "label": "Play",
+        "x": 94.8125,
+        "y": 218.828125,
+        "width": 259.984375,
+        "height": 52
+      },
+      {
+        "label": "Settings",
+        "x": 94.8125,
+        "y": 279.484375,
+        "width": 259.984375,
+        "height": 52
+      }
+    ]
+  }
+]

@@ -1,0 +1,587 @@
+{
+  "sprites/navigation/bronze-devices.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/dawn-beacon.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/long-harpoon.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/moonbeam.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/optic.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/paired-optic.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/navigation/siege-cannon.png": {
+    "sourceRect": [
+      0,
+      0,
+      64,
+      48
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/disabled.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/fill-armor.png": {
+    "sourceRect": [
+      0,
+      0,
+      4,
+      5
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/fill-enemy.png": {
+    "sourceRect": [
+      0,
+      0,
+      4,
+      5
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/fill-health.png": {
+    "sourceRect": [
+      0,
+      0,
+      4,
+      5
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/fill-shield.png": {
+    "sourceRect": [
+      0,
+      0,
+      4,
+      5
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/focus.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/frame.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/gatehouse.png": {
+    "sourceRect": [
+      0,
+      0,
+      400,
+      360
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/gold.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/hover.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-back.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-book.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-cannon.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-charge.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-check.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-coin.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-exit.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-gear.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-generator.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-heart.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-light.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-lock.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-pause.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-pearl.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-play.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-repair.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-shield.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-target.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-trap.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-tree.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/icon-wave.png": {
+    "sourceRect": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/inset.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/meter.png": {
+    "sourceRect": [
+      0,
+      0,
+      12,
+      9
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/panel.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/pressed.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/primary.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/secondary.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/selected.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/slider-thumb.png": {
+    "sourceRect": [
+      0,
+      0,
+      11,
+      16
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/ui/tab.png": {
+    "sourceRect": [
+      0,
+      0,
+      50,
+      32
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/armored-turtle.png": {
+    "sourceRect": [
+      0,
+      0,
+      48,
+      33
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/bat.png": {
+    "sourceRect": [
+      0,
+      0,
+      43,
+      28
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/beacon.png": {
+    "sourceRect": [
+      0,
+      0,
+      80,
+      124
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/bell.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/generator.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/ghost.png": {
+    "sourceRect": [
+      0,
+      0,
+      32,
+      34
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/harpoon.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/headland.png": {
+    "sourceRect": [
+      0,
+      0,
+      1000,
+      900
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/landing-pier.png": {
+    "sourceRect": [
+      0,
+      0,
+      99,
+      58
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/light-trap.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/mortar.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/palisade.png": {
+    "sourceRect": [
+      0,
+      0,
+      39,
+      26
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/repair-lamp.png": {
+    "sourceRect": [
+      0,
+      0,
+      38,
+      40
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/ruined-arch.png": {
+    "sourceRect": [
+      0,
+      0,
+      87,
+      68
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/shore-cannon.png": {
+    "sourceRect": [
+      0,
+      0,
+      36,
+      30
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/tidal-rock.png": {
+    "sourceRect": [
+      0,
+      0,
+      43,
+      27
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/warden-core.png": {
+    "sourceRect": [
+      0,
+      0,
+      56,
+      56
+    ],
+    "mode": "RGBA"
+  },
+  "sprites/world/warden-tentacle.png": {
+    "sourceRect": [
+      0,
+      0,
+      56,
+      56
+    ],
+    "mode": "RGBA"
+  }
+}

@@ -98,6 +98,14 @@ function fixture(initial: 'menu' | 'settings' | 'other' = 'menu', ready = 'true'
       else { board = element(); scrim = element(); page = { ...page }; }
       controller.sync();
     },
+    presentFrame(time: number) {
+      for (const animation of animations) {
+        if (animation.cancel.mock.calls.length) continue;
+        animation.timeline.currentTime = time;
+        animation.startTime ??= time - animation.currentTime;
+        animation.currentTime = time - animation.startTime;
+      }
+    },
     finish(index: number) { const a = animations[index]!; a.currentTime = Number(a.options.duration); a.onfinish!(); },
   };
 }
@@ -113,7 +121,13 @@ describe('settings navigation motion', () => {
     expect(s.animations).toHaveLength(3);
     expect(s.animations[0]!.frames).toEqual([{ transform: 'translateX(calc(-100% - 1px))', opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }]);
     expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
-    expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    // The previous document frame was at 1000; startup kept the main thread
+    // busy longer than the whole effect before this frame could be presented.
+    s.presentFrame(1700);
+    expect(s.animations.map(a => a.startTime)).toEqual([1700, 1700, 1700]);
+    expect(s.animations.map(a => a.currentTime)).toEqual([0, 0, 0]);
+    s.presentFrame(1720);
+    expect(s.animations.map(a => a.currentTime)).toEqual([20, 20, 20]);
     expect(s.animations[2]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
     const ghost = s.ghosts[0]!;
     const copy = s.ghostBoard;
@@ -152,13 +166,15 @@ describe('settings navigation motion', () => {
     s.controller.openSettings(() => s.show('settings'));
     expect(s.animations[0]!.frames).toEqual([{ transform: 'translateY(calc(100% + 1px))', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }]);
     expect(s.animations.map(a => a.options.duration)).toEqual([560, 560, 560]);
+    s.presentFrame(1000);
     expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     s.finish(0);
     const close = vi.fn(() => s.show('menu'));
     s.controller.closeSettings(close);
     expect(s.animations[3]!.frames.at(-1)).toEqual({ transform: 'translateY(calc(100% + 1px))', opacity: 0 });
     expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([560, 560, 560]);
-    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
+    s.presentFrame(1700);
+    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1700, 1700, 1700]);
     expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
     expect(close).not.toHaveBeenCalled();
     s.finish(3); expect(close).toHaveBeenCalledOnce();
@@ -272,7 +288,8 @@ describe('settings navigation motion', () => {
     expect(s.ghostBoard).toBe(copy);
     s.ready();
     expect(s.animations.slice(3).map(a => a.currentTime)).toEqual([180, 180, 180]);
-    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([820, 820, 820]);
+    s.presentFrame(1700);
+    expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1520, 1520, 1520]);
     s.controller.destroy();
   });
 
@@ -285,6 +302,7 @@ describe('settings navigation motion', () => {
     expect(incoming.dataset.settingsMenuDirection).toBe('in');
     expect(s.ghosts[0]!.dataset.settingsMenuDirection).toBe('out');
     expect(s.animations.slice(3).map(a => a.options.duration)).toEqual([560, 560, 560]);
+    s.presentFrame(1000);
     expect(s.animations.slice(3).map(a => a.startTime)).toEqual([1000, 1000, 1000]);
     expect(s.animations[5]!.frames).toEqual([{ opacity: 0 }, { opacity: 1 }]);
     expect(s.page.inert).toBe(true); expect(close).not.toHaveBeenCalled();

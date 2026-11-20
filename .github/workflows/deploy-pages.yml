@@ -44,6 +44,20 @@ jobs:
       - name: Build game
         run: pnpm build
 
+      - name: Smoke-test the production battle on a Pages path
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          google-chrome --version
+          export LIGHTHOUSE_BROWSER_PATH="$(mktemp)"
+          trap 'rm -f -- "$LIGHTHOUSE_BROWSER_PATH"' EXIT
+          cat > "$LIGHTHOUSE_BROWSER_PATH" <<'CHROME'
+          #!/usr/bin/env bash
+          exec google-chrome --use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader "$@"
+          CHROME
+          chmod +x "$LIGHTHOUSE_BROWSER_PATH"
+          node tools/browser/verify-pages-build.mjs
+
       - name: Upload site
         uses: actions/upload-pages-artifact@v5
         with:

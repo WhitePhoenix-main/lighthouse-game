@@ -90,7 +90,7 @@ let ws;
     const data = await cdp('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
     fs.writeFileSync(path.join(out, `${name}.png`), Buffer.from(data.data, 'base64'));
   };
-  const geometry = () => evaluate(`(()=>{const p=document.querySelector('.reference-settings');return{width:innerWidth,scrollWidth:document.documentElement.scrollWidth,controls:[...p.querySelectorAll('.settings-control')].map(e=>{const r=e.getBoundingClientRect();return{name:e.dataset.setting,x:r.x,y:r.y,w:r.width,h:r.height}})}})()`);
+  const geometry = () => evaluate(`(()=>{const p=document.querySelector('.reference-settings');return{width:innerWidth,scrollWidth:document.documentElement.scrollWidth,controls:[...p.querySelectorAll('button,input[type=range]')].map(e=>{const r=e.getBoundingClientRect();return{name:e.dataset.setting||e.dataset.action,x:r.x,y:r.y,w:r.width,h:r.height}})}})()`);
   const validateGeometry = async label => {
     const g = await geometry(); assert.equal(g.controls.length, 10);
     assert(g.scrollWidth <= g.width, `${label}: horizontal document overflow`);
@@ -105,30 +105,19 @@ let ws;
     return g.controls;
   };
   const validateLayout = async (label, mobile, coarse = mobile) => {
-    const layout=await evaluate(`(()=>{const p=document.querySelector('.reference-settings'),b=p.querySelector('.settings-board');const box=s=>{const r=p.querySelector(s).getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height}};return{mode:p.dataset.layout,coarse:matchMedia('(hover: none) and (pointer: coarse)').matches,width:p.clientWidth,height:p.clientHeight,scale:+getComputedStyle(p).getPropertyValue('--settings-ui-scale'),board:box('.settings-board'),on:box('[data-setting="on"]'),ru:box('[data-setting="ru"]'),back:box('[data-setting="back"]'),scroll:p.scrollTop}})()`);
-    assert.equal(layout.coarse,coarse,`${label}: wrong input emulation`);
-    assert.equal(layout.mode,mobile?'mobile':'desktop',`${label}: wrong settings layout`);
-    if(mobile){
-      assert(layout.on.y<layout.height*.3,`${label}: obsolete portrait top gap`);
-      if(layout.width>=375&&layout.height>=700&&layout.height>=layout.width)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: tall phone does not use full viewport without scrolling`);
-      if(layout.width>layout.height){
-        assert(layout.ru.x>layout.width*.5,`${label}: landscape settings do not occupy right column`);
-        if(layout.width>=800)assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: Back needs avoidable landscape scrolling`);
-      }
-    } else {
-      const expectedScale=Math.min(layout.width/1120,Math.max(.8,layout.height/630));
-      assert(Math.abs(layout.scale-expectedScale)<.001,`${label}: enlarged desktop scale differs`);
-      assert(Math.abs(layout.on.x-300*layout.scale)<1,`${label}: desktop panel moved from original left position`);
-      assert(Math.abs(layout.on.w-128*layout.scale)<1,`${label}: desktop button scale changed`);
-      if(layout.width>=1000){
-        const oldScale=Math.min(layout.width/1280,Math.max(.8,layout.height/720));
-        assert(layout.scale>oldScale*1.1,`${label}: desktop UI was not enlarged`);
-        assert(layout.back.y+layout.back.h<=layout.height+1,`${label}: enlarged desktop Back clips below viewport`);
-      }
-      assert(layout.board.w<=640*layout.scale+1,`${label}: desktop canvas exceeds the left panel`);
-      assert(layout.back.y+layout.back.h<=630*layout.scale+49,`${label}: desktop vertical gaps grew beyond density cap`);
-      assert(layout.ru.x<layout.width*.4,`${label}: desktop settings moved to right column`);
-    }
+    const layout=await evaluate(`(()=>{
+      const page=document.querySelector('.reference-settings');
+      const rect=s=>page.querySelector(s).getBoundingClientRect().toJSON();
+      return {width:page.clientWidth,height:page.clientHeight,coarse:matchMedia('(hover:none) and (pointer:coarse)').matches,
+        orientation:page.dataset.orientation,audio:rect('.sound-shelf'),reading:rect('.reading-shelf'),back:rect('.settings-back')};
+    })()`);
+    assert.equal(layout.coarse,coarse,label+' input emulation');
+    const portrait=layout.height>=layout.width;
+    assert.equal(layout.orientation,portrait?'portrait':'landscape');
+    const sideBySide=!portrait && (layout.width<960 || layout.height<=560);
+    assert(sideBySide ? layout.reading.left>=layout.audio.right : layout.reading.top>=layout.audio.bottom,label+' shelf overlap');
+    assert(layout.back.top>=Math.max(layout.audio.bottom,layout.reading.bottom)-1,label+' Back overlaps settings');
+    if(layout.height>=640) assert(layout.back.bottom<=layout.height+1,label+' Back off screen');
     return layout;
   };
   const rangeValue = name => evaluate(`Number(document.querySelector('[data-action="${name}-volume"]').value)`);
@@ -142,19 +131,21 @@ let ws;
   };
   const drag = async (name, target, touch = false) => {
     const r = await rect(`[data-action="${name}-volume"]`), y = r.y + r.height / 2;
-    const start = { x: r.x + r.width * .5, y };
+    // Native thumb centres travel along the rail, inside the input's hit area.
+    const rail = await evaluate(`document.querySelector('[data-setting="${name}"] .settings-track').getBoundingClientRect().toJSON()`);
+    const start = { x: rail.x + rail.width * .5, y };
     if (touch) await cdp('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [start] });
     else {
       await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', ...start });
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', ...start, button: 'left', buttons: 1, clickCount: 1 });
     }
     for (let i = 1; i <= 8; i++) {
-      const point = { x: r.x + r.width * (.5 + (target - .5) * i / 8), y };
+      const point = { x: rail.x + rail.width * (.5 + (target - .5) * i / 8), y };
       if (touch) await cdp('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [point] });
       else await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point, button: 'left', buttons: 1 });
     }
     if (touch) await cdp('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    else await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: r.x + r.width * target, y, button: 'left', buttons: 0, clickCount: 1 });
+    else await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: rail.x + rail.width * target, y, button: 'left', buttons: 0, clickCount: 1 });
     await sleep(150);
     assert(Math.abs(await rangeValue(name) - target * 100) <= 3, `${touch?'touch':'mouse'} ${name} drag: ${await rangeValue(name)}`);
   };
@@ -211,7 +202,7 @@ let ws;
   check('mouse hover and drag, keyboard Home/End/arrows, independent levels survive mute');
   await click('[data-setting="en"]'); await ready();
   assert.equal(await evaluate('document.documentElement.lang'),'en');
-  assert.equal(await evaluate('/[А-Яа-яЁё]/.test(document.body.textContent)'),false);
+  assert.equal(await evaluate('/[А-Яа-яЁё]/.test(document.body.innerText)'),false);
   await click('[data-setting="large"]'); await ready(); await validateGeometry('English large');
   await evaluate(`document.querySelector('.reference-settings').scrollTop=0`); await screenshot('english-large');
   await click('[data-setting="ru"]'); await ready(); assert.equal(await evaluate('document.documentElement.lang'),'ru');
@@ -253,38 +244,34 @@ let ws;
   assert.equal(await rangeValue('music'),1);
   assert.equal(await evaluate('document.documentElement.lang'),'en');
   assert.equal(await evaluate('document.documentElement.dataset.textSize'),'large');
+  assert.equal(await evaluate('localStorage.getItem("lighthouse.campaign.v1")'),null);
   assert.equal(await evaluate('localStorage.getItem("lighthouse.save.v1")'),null);
   check('real localStorage survives reload without creating game profile');
   // Fresh document resets the artwork module cache; block a required sprite sheet.
   await cdp('Network.enable');
   await cdp('Network.setCacheDisabled',{cacheDisabled:true});
-  await cdp('Network.setBlockedURLs',{urls:['*frame-states.png*']});
+  await cdp('Network.setBlockedURLs',{urls:['*/images/settings-stone/*.png']});
   await cdp('Page.navigate',{url:`${base}/tests/browser/settings-screen-frame.html`});
   await wait('!!window.settingsTest && !!document.querySelector(\'[data-action="settings"]\')');
   await click('[data-action="settings"]');
-  await wait(`document.querySelector('.reference-settings')?.dataset.ready==='error'`);
-  assert.equal(await evaluate(`document.querySelector('.settings-load-status').hidden`),false);
-  const fallback = await evaluate(`(()=>{const label=document.querySelector('[data-setting="music"] .settings-native-label');const a=document.querySelector('[data-setting="on"] .settings-native-label');const b=document.querySelector('[data-setting="off"] .settings-native-label');const r=label.getBoundingClientRect();return{label:label.textContent,clip:getComputedStyle(label).clipPath,width:r.width,height:r.height,inputOpacity:getComputedStyle(document.querySelector('[data-setting="music"] input')).opacity,selected:getComputedStyle(a).backgroundColor,other:getComputedStyle(b).backgroundColor,marker:getComputedStyle(a,'::after').content}})()`);
-  assert(fallback.label.length>0 && fallback.width>44 && fallback.height>0 && fallback.clip==='none','fallback range label is hidden');
-  assert.equal(fallback.inputOpacity,'1');
-  assert.notEqual(fallback.selected,fallback.other,'fallback selection has no visual contrast');
-  assert(fallback.marker.includes('✓'),'fallback selection has no check mark');
+  await ready();
+  const fallback=await evaluate(`(()=>{const p=document.querySelector('.reference-settings');return {
+    label:p.querySelector('[data-setting="music"] span').innerText,checked:p.querySelector('[data-setting="on"]').getAttribute('aria-pressed'),
+    checkedColor:getComputedStyle(p.querySelector('[data-setting="on"]')).color,otherColor:getComputedStyle(p.querySelector('[data-setting="off"]')).color
+  }})()`);
+  assert(fallback.label.length>0);assert.equal(fallback.checked,'true');assert.notEqual(fallback.checkedColor,fallback.otherColor);
   await screenshot('artwork-fallback');
-  await key('music','Home'); await key('music','ArrowRight'); assert.equal(await rangeValue('music'),1);
+  await key('music','Home');await key('music','ArrowRight');assert.equal(await rangeValue('music'),1);
   await cdp('Network.setBlockedURLs',{urls:[]});
-  await viewport(390,844,true); await ready();
-  assert.equal(await evaluate(`document.querySelector('.settings-load-status').hidden`),true);
-  assert.equal(await evaluate(`document.querySelector('.settings-load-status').textContent`),'');
-  await screenshot('artwork-recovered');
-  check('blocked artwork fallback exposes labels/ranges/selection; resize after unblock hides obsolete error');
-  // Reload at each DPR so artwork is painted natively at that backing resolution.
+  await viewport(390,844,true);await screenshot('artwork-recovered');
+  check('native labels, selected state and keyboard ranges survive unavailable artwork');
   const fontCrops=[];
-  const cropButton = async (name, setting, dpr) => {
-    const crop=await evaluate(`(()=>{const board=document.querySelector('.settings-board'),art=board.querySelector('.settings-art'),control=board.querySelector('[data-setting="${setting}"]');const b=board.getBoundingClientRect(),r=control.getBoundingClientRect(),ratio=art.width/b.width;const x=Math.round((r.left-b.left)*ratio),y=Math.round((r.top-b.top)*ratio),w=Math.round(r.width*ratio),h=Math.round(r.height*ratio);const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(art,x,y,w,h,0,0,w,h);return{png:c.toDataURL('image/png'),source:[x,y,w,h],ratio,backing:[art.width,art.height],dpr:devicePixelRatio,label:control.getAttribute('aria-label')}})()`);
-    assert(Math.abs(crop.ratio-Math.min(dpr,2))<.01,'font crop did not use native DPR backing');
-    const filename=`font-${name}-dpr-${dpr}.png`;
-    fs.writeFileSync(path.join(out,filename),Buffer.from(crop.png.split(',')[1],'base64'));
-    delete crop.png;fontCrops.push({filename,...crop});
+  const cropButton=async(name,setting,dpr)=>{
+    const source=await rect('[data-setting="'+setting+'"]');
+    const data=await cdp('Page.captureScreenshot',{format:'png',clip:{...source,scale:1},captureBeyondViewport:false});
+    const filename='font-'+name+'-dpr-'+dpr+'.png';
+    fs.writeFileSync(path.join(out,filename),Buffer.from(data.data,'base64'));
+    fontCrops.push({filename,source,dpr});
   };
   for(const dpr of [1,1.25,2]) {
     await cdp('Emulation.setTouchEmulationEnabled',{enabled:false});
@@ -297,7 +284,7 @@ let ws;
     await cropButton('off','off',dpr);await cropButton('russian','ru',dpr);
   }
   fs.writeFileSync(path.join(out,'font-crops.json'),JSON.stringify(fontCrops,null,2));
-  check('native canvas crops ВКЛ/OFF/RUSSIAN at DPR 1/1.25/2 for visual pixel QA');
+  check('native text crops ВКЛ/OFF/RUSSIAN at DPR 1/1.25/2 for visual pixel QA');
   assert.deepEqual(runtimeErrors,[],'browser runtime errors');
   fs.writeFileSync(path.join(out,'checks.json'),JSON.stringify({checks,runtimeErrors},null,2));
   await send('Browser.close'); ws.close();
