@@ -1,6 +1,7 @@
 import type { BattleState, DeviceState, NightConfig } from '../contracts';
 import { emitCombatEvent } from './events';
 import { bastionDamage } from './abilityEffects';
+import { groundShieldExit } from './groundRoutes';
 
 const EPSILON = 1e-9;
 
@@ -56,8 +57,15 @@ export function updateShield(state: BattleState, config: NightConfig): void {
   for (const enemy of state.enemies) {
     if (enemy.health <= 0) continue;
     const distance = Math.hypot(enemy.x, enemy.y);
-    const boundary = config.shield.radius + config.enemies[enemy.kind].radius;
+    const definition = config.enemies[enemy.kind];
+    const boundary = config.shield.radius + definition.radius;
     if (distance >= boundary) continue;
+    if (config.terrain?.groundRoutes && definition.movement === 'ground') {
+      const next = enemy.groundWaypoints?.[enemy.groundWaypointIndex ?? 0];
+      const destination = groundShieldExit(config.terrain, enemy, definition.radius, boundary, next);
+      if (destination) { enemy.x = destination.x; enemy.y = destination.y; }
+      continue;
+    }
     // Origin has a deterministic push direction; no random sampling.
     const angle = distance > EPSILON ? Math.atan2(enemy.y, enemy.x) : 0;
     enemy.x = Math.cos(angle) * boundary;
@@ -65,6 +73,7 @@ export function updateShield(state: BattleState, config: NightConfig): void {
   }
   if (state.boss && state.boss.health > 0 && config.boss) {
     for (const zone of state.boss.tentacles) {
+      if (state.boss.campaign && !state.boss.campaign.parts.some(part => part.zoneId === zone.id && part.moves)) continue;
       const distance = Math.hypot(zone.x, zone.y), boundary = config.shield.radius + config.boss.radius;
       if (distance >= boundary) continue;
       const angle = distance > EPSILON ? Math.atan2(zone.y, zone.x) : 0;

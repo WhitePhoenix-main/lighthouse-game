@@ -1,7 +1,7 @@
 import type { QuickTurnRules, ShieldStabilizationRules, UpgradeId } from '../contracts';
 import { UPGRADES } from './upgrades';
 
-/** Stage A candidates only: no prices, purchase integration or persistence contract. */
+/** Provisional general effects used by the active campaign loadout. */
 export type CampaignGeneralBranch = 'light' | 'optics' | 'hull' | 'field' | 'engineering';
 export type CampaignGeneralFamily = 'preparationDisruption' | 'exposedVulnerability' | 'quickTurn'
   | 'range' | 'width' | 'onslaughtResilience' | 'emergencyWindow' | 'shieldStabilization'

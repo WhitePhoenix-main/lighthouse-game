@@ -1,6 +1,8 @@
 import { lightGuidanceMultiplier, overloadGuidanceBonus } from './lightSupport';
 import type { BarrageAbilityRules } from '../abilityRules';
+import { effectiveWeaponDefinition } from '../content/campaignVariants';
 import type { BattleState, DeviceState, EnemyState, NightConfig } from '../contracts';
+import { activeCampaignCast, campaignDeviceRooted, campaignDeviceTarget, campaignMovementMultiplier } from './campaignEnemies';
 import { emitCombatEvent } from './events';
 import { contactFraction } from './geometry';
 import { damageBoss } from './boss';
@@ -34,19 +36,24 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
     if (enemy.health <= 0 || state.tick < (enemy.stunnedUntilTick ?? 0)) continue;
     const definition = config.enemies[enemy.kind];
     enemy.attackCooldown = Math.max(0, enemy.attackCooldown - dt);
+    if (activeCampaignCast(enemy)) continue;
     let targetX = 0, targetY = 0;
     let targetRadius = config.lighthouseRadius;
-    if (enemy.kind === 'bat') {
-      const targets = state.devices.filter(device => device.health > 0 && !device.consumed && device.kind !== 'barrier');
-      targets.sort((a, b) => Math.hypot(a.x - enemy.x, a.y - enemy.y) - Math.hypot(b.x - enemy.x, b.y - enemy.y) || a.id - b.id);
-      const target = targets[0];
+    const routeIndex = enemy.groundWaypointIndex ?? 0;
+    const waypoint = enemy.groundWaypoints?.[routeIndex];
+    const isTurn = waypoint && routeIndex < enemy.groundWaypoints!.length - 1;
+    if (isTurn) { targetX = waypoint.x; targetY = waypoint.y; targetRadius = -definition.radius; }
+    if (enemy.kind === 'bat' || definition.campaign?.kind === 'hunt-device') {
+      const target = enemy.kind === 'bat' ? state.devices.filter(device => device.health > 0 && !device.consumed && device.kind !== 'barrier')
+        .sort((a, b) => Math.hypot(a.x - enemy.x, a.y - enemy.y) - Math.hypot(b.x - enemy.x, b.y - enemy.y) || a.id - b.id)[0]
+        : campaignDeviceTarget(state, config, enemy);
       enemy.targetDeviceId = target?.id ?? null;
       if (target) { targetX = target.x; targetY = target.y; targetRadius = config.devices.definitions[target.kind].radius; }
     }
     const distance = Math.hypot(enemy.x - targetX, enemy.y - targetY);
     if (definition.charge) {
       enemy.chargePhase ??= 'ready';
-      if (enemy.chargePhase === 'ready' && distance <= definition.charge.triggerDistance) {
+      if (enemy.chargePhase === 'ready' && Math.hypot(enemy.x, enemy.y) <= definition.charge.triggerDistance) {
         enemy.chargePhase = 'windup'; enemy.chargeRemaining = definition.charge.windup;
         emitCombatEvent(state, { type: 'charge-started', enemyId: enemy.id, enemyKind: enemy.kind, x: enemy.x, y: enemy.y });
       }
@@ -60,7 +67,7 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
     }
     const speed = enemy.chargePhase === 'charging' && definition.charge ? definition.charge.speed : definition.speed;
     const multiplier = Math.min(movementSlowMultiplier(enemy, state.tick), litIds.includes(enemy.id) ? config.lens?.slowMultiplier ?? 1 : 1,
-      sealSlowMultiplier(enemy, state, config));
+      sealSlowMultiplier(enemy, state, config)) * (config.campaignMapId ? campaignMovementMultiplier(state, config, enemy) : 1);
     const nextDistance = Math.max(targetRadius + definition.radius, distance - speed * dt * multiplier);
     const scale = distance > nextDistance ? nextDistance / distance - 1 : 0;
     const dx = (enemy.x - targetX) * scale, dy = (enemy.y - targetY) * scale;
@@ -76,7 +83,7 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
       if (fraction !== null) { first = fraction; obstruction = 'shield'; }
     }
     for (const device of state.devices) {
-      if (device.health <= 0 || device.consumed || ((enemy.kind === 'ghost' || enemy.kind === 'bat') && device.kind === 'barrier')) continue;
+      if (device.health <= 0 || device.consumed || ((definition.movement === 'ethereal' || definition.movement === 'flying') && device.kind === 'barrier')) continue;
       if (state.shield.current > 0 && isProtected(device, config)) continue;
       const fraction = contactFraction(enemy.x - device.x, enemy.y - device.y, dx, dy,
         definition.radius + config.devices.definitions[device.kind].radius);
@@ -88,6 +95,9 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
     }
     enemy.x += dx * first;
     enemy.y += dy * first;
+    if (isTurn && enemy.targetDeviceId == null && Math.hypot(enemy.x - waypoint.x, enemy.y - waypoint.y) <= EPSILON) {
+      enemy.groundWaypointIndex = routeIndex + 1;
+    }
     if (obstruction) contacts.set(enemy.id, obstruction);
   }
   return contacts;
@@ -96,13 +106,13 @@ export function moveEnemies(state: BattleState, config: NightConfig, litIds: rea
 export function fireCannons(state: BattleState, config: NightConfig): void {
   for (const cannon of [...state.devices].sort((a, b) => a.id - b.id)) {
     if ((cannon.kind !== 'cannon' && cannon.kind !== 'harpoon') || cannon.health <= 0 || cannon.consumed
-      || state.tick < (cannon.suppressedUntilTick ?? 0)) continue;
+      || state.tick < (cannon.suppressedUntilTick ?? 0) || campaignDeviceRooted(state, cannon.id)) continue;
     const zones = state.boss && state.boss.health > 0 ? state.boss.tentacles.map(zone => ({ ...zone, health: state.boss!.health, armor: 0 })) : [];
-    const candidates = [...state.enemies.filter(enemy => enemy.health > 0 && (cannon.kind === 'harpoon' || enemy.kind !== 'bat')), ...zones];
+    const candidates = [...state.enemies.filter(enemy => enemy.health > 0 && (cannon.kind === 'harpoon' || config.enemies[enemy.kind].movement !== 'flying')), ...zones];
     const manual = candidates.find(target => target.id === cannon.targetId);
     if (!manual) cannon.targetId = null;
     if (cannon.attackCooldown > EPSILON) continue;
-    const definition = config.devices.definitions[cannon.kind];
+    const definition = effectiveWeaponDefinition(config, cannon);
     const available = candidates.filter(target => (!manual || target.id === manual.id)
       && Math.hypot(target.x - cannon.x, target.y - cannon.y) <= definition.range + EPSILON);
     const score = (target: typeof candidates[number]): number => cannon.priority === 'strongest' ? -(target.health + target.armor)
@@ -118,12 +128,12 @@ export function fireCannons(state: BattleState, config: NightConfig): void {
 export function fireDirectWeapon(state: BattleState, config: NightConfig, cannon: DeviceState,
   targetId: number, manual: boolean, barrage?: BarrageAbilityRules): boolean {
   if ((cannon.kind !== 'cannon' && cannon.kind !== 'harpoon') || cannon.health <= 0 || cannon.consumed
-    || state.tick < (cannon.suppressedUntilTick ?? 0)) return false;
+    || state.tick < (cannon.suppressedUntilTick ?? 0) || campaignDeviceRooted(state, cannon.id)) return false;
   const enemy = state.enemies.find(enemy => enemy.id === targetId && enemy.health > 0);
   const zone = state.boss && state.boss.health > 0 ? state.boss.tentacles.find(zone => zone.id === targetId) : undefined;
   const target = enemy ?? zone;
-  if (!target || (enemy?.kind === 'bat' && cannon.kind === 'cannon')) return false;
-  const definition = config.devices.definitions[cannon.kind];
+  if (!target || (enemy && config.enemies[enemy.kind].movement === 'flying' && cannon.kind === 'cannon')) return false;
+  const definition = effectiveWeaponDefinition(config, cannon);
   if (Math.hypot(target.x - cannon.x, target.y - cannon.y) > definition.range + EPSILON) return false;
   const ownerKey = enemy ? enemy.id : 0;
   const bonus = cannon.kind === 'cannon' && manual && !(cannon.manualBonusTargets ?? []).includes(ownerKey)

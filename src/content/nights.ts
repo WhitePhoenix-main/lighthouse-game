@@ -53,12 +53,12 @@ export const NIGHT_CATALOG: readonly NightDefinition[] = [
   ...createLateNights(base),
 ];
 export const NIGHT_IDS = ['first-light', 'broken-shore', 'winged-tide', 'rescue-trial', 'abyss-warden', 'far-shore', 'armored-front', 'sky-siege', 'cross-current'] as const;
-export function validateNightDefinitions(nights: readonly NightDefinition[]): void {
+export function validateNightDefinitions(nights: readonly NightDefinition[], allowedNightIds: readonly NightDefinition['id'][] = NIGHT_IDS): void {
   if (nights.length === 0) throw new Error('Пустой каталог ночей.');
   const byId = new Map(nights.map(night => [night.id, night]));
   if (byId.size !== nights.length) throw new Error('Повторный идентификатор ночи.');
   for (const night of nights) {
-    if (!NIGHT_IDS.includes(night.id) || !night.name.trim() || !night.chapter.trim() || typeof night.optional !== 'boolean'
+    if (!allowedNightIds.includes(night.id) || !night.name.trim() || !night.chapter.trim() || typeof night.optional !== 'boolean'
       || night.config.id !== night.id || !night.config.rulesVersion.trim() || !night.config.waves.length
       || !Number.isFinite(night.config.stepSeconds) || night.config.stepSeconds <= 0) throw new Error('Неверное определение ночи.');
     const config = night.config;
@@ -78,6 +78,9 @@ export function validateNightDefinitions(nights: readonly NightDefinition[]): vo
       || !Number.isFinite(config.ship.x) || !Number.isFinite(config.ship.y) || !Number.isSafeInteger(config.ship.reward) || config.ship.reward < 0)) throw new Error('Неверные правила корабля.');
     for (const wave of night.config.waves) {
       if (!wave.id || !wave.enemies.length || !Number.isFinite(wave.spawnInterval) || wave.spawnInterval <= 0
+        || (wave.fronts && (wave.fronts.length !== wave.enemies.length || wave.fronts.some(front => front !== 'north' && front !== 'south')))
+        || (wave.spawnOffsets && (wave.spawnOffsets.length !== wave.enemies.length || wave.spawnOffsets[0] !== 0
+          || wave.spawnOffsets.some((offset, index, all) => !Number.isFinite(offset) || (index > 0 && offset < all[index - 1]!))))
         || wave.enemies.some(kind => !night.config.enemies[kind])) throw new Error('Неверные правила волны.');
     }
     const visited = new Set<string>([night.id]);

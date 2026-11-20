@@ -12,7 +12,11 @@
     {
       "sha256": "0ae9767e11edbe304ffeb85fe6daafe5dfc31f0bf7322a2c769dfa5f89af0ad8",
       "path": "art/concepts/preparation-2026-11-17/full-screen-v1/glyphs.json"
+    },
+    {
+      "path": "public/images/game-menu/back-mobile.png",
+      "sha256": "0ef32dbbd723e64ad1e2d0e4e9bfe6152290cc66457284475ad3b5ae842cb3ad"
     }
   ],
-  "method": "Native crops; transparent chamfer outside panel; CSS border-image corners, contained icons"
+  "method": "Native crops; transparent chamfer outside panel; CSS border-image corners, contained icons; blue-stone and amber-stone from first 485x140 menu frame via prepare-preparation-stone.ps1, slice 40 74 fill"
 }

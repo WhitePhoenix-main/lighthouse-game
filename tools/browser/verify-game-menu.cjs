@@ -36,12 +36,10 @@ async function open(page, query = '') {
       try {
         await open(page, query);
         const report = await page.evaluate(() => ({
-          layout: document.querySelector('.reference-game-menu').dataset.layout,
-          artwork: document.querySelector('.reference-game-menu').dataset.artwork,
           scenePreserved: document.querySelector('.menu-scenery') === window.originalMenuScene,
           sceneCount: document.querySelectorAll('.menu-scenery').length,
-          floor: !document.querySelector('.game-menu-floor').hidden && getComputedStyle(document.querySelector('.game-menu-floor')).display !== 'none',
-          floorSource: document.querySelector('.game-menu-floor').getAttribute('src'),
+          gate: getComputedStyle(document.querySelector('.watch-gate div'),'::before').backgroundImage,
+          layout: document.querySelector('.reference-game-menu').dataset.orientation,
           boardControls: document.querySelectorAll('.game-menu-board .game-menu-control').length,
           backLabel: document.querySelector('.game-menu-back').textContent.trim(),
           backInsideBoard: !!document.querySelector('.game-menu-board .game-menu-back'),
@@ -54,8 +52,8 @@ async function open(page, query = '') {
         }));
         assert(report.scenePreserved && report.sceneCount === 1, `${name}: background was replaced`);
         assert(!report.overflow, `${name}: scroll overflow`);
-        assert.equal(report.floor, true, `${name}: floor must be visible in both layouts`);
-        assert(report.floorSource.endsWith(`floor-${report.artwork}.png`), `${name}: wrong floor source`);
+        assert(report.gate.includes('/avalon-watch/illustrations/harbor.png'), name + ': missing harbor');
+        assert.equal(report.layout, height >= width ? 'portrait' : 'landscape');
         assert.equal(report.boardControls, 4, `${name}: all four controls must share the board motion`);
         assert(report.backInsideBoard, `${name}: back must move with the board`);
         assert.equal(report.backLabel, query.includes('language=en') ? 'Back' : 'Назад');
@@ -69,15 +67,15 @@ async function open(page, query = '') {
         if (name === 'desktop-saved') {
           const button = page.locator('[data-action="trials"]');
           await button.hover();
-          assert.equal(await button.locator('.game-menu-sprite').evaluate(el => getComputedStyle(el).backgroundPositionX), '33.3333%');
+          assert.equal(await button.evaluate(el => getComputedStyle(el).borderImageSource.includes('hover.png')), true);
           await page.screenshot({ path: `${output}/desktop-hover.png` });
           await page.mouse.down();
-          assert.equal(await button.locator('.game-menu-sprite').evaluate(el => getComputedStyle(el).backgroundPositionX), '66.6667%');
+          assert.equal(await button.evaluate(el => getComputedStyle(el).borderImageSource.includes('pressed.png')), true);
           await page.screenshot({ path: `${output}/desktop-pressed.png` });
           await page.mouse.up();
           await page.locator('.trials-panel').waitFor();
           assert.equal(await page.evaluate(() => window.gameMenuFixture.writes()), 0);
-          await page.getByRole('button', { name: '← Назад' }).click(); await settled(page);
+          await page.locator('.trials-panel [data-prep-action="close-panel"]').click(); await settled(page);
           await page.locator('[data-action="new-game"]').click();
           await page.locator('.game-menu-confirm').waitFor();
           assert.equal(await page.evaluate(() => window.gameMenuFixture.writes()), 0);
@@ -177,14 +175,13 @@ async function open(page, query = '') {
     {
       const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
       const page = await context.newPage();
-      await page.route('**/images/game-menu/continue-desktop.png', route => route.abort());
+      await page.route('**/images/avalon-watch/ui/primary.png', route => route.abort());
       await page.goto(`${base}/tests/browser/game-menu-frame.html?saved`);
       await page.locator('.menu-title-ready').waitFor();
       await page.locator('.play-hotspot').click();
-      await page.waitForFunction(() => document.querySelector('.reference-game-menu')?.dataset.ready === 'error'
-        && !document.querySelector('.reference-game-menu').inert);
-      assert.equal(await page.locator('.game-menu-load-error').isVisible(), true);
-      assert.equal(await page.locator('.game-menu-lettering').first().evaluate(el => getComputedStyle(el).visibility), 'hidden');
+      await settled(page);
+      assert(await page.locator('[data-action="continue-game"]').isEnabled());
+      assert.equal(await page.locator('[data-action="continue-game"]').innerText(), 'Продолжить');
       await page.locator('[data-action="game-menu-back"]').click();
       await page.locator('.play-hotspot').waitFor();
       assert.equal(await page.evaluate(() => window.gameMenuFixture.writes()), 0);
@@ -196,7 +193,7 @@ async function open(page, query = '') {
       const page = await context.newPage();
       let delayed;
       const intercepted = new Promise(resolve => { delayed = resolve; });
-      await page.route('**/images/game-menu/continue-mobile.png', route => delayed(route));
+      await page.route('**/images/avalon-watch/illustrations/harbor.png', route => delayed(route));
       await page.goto(`${base}/tests/browser/game-menu-frame.html?saved`);
       await page.locator('.menu-title-ready').waitFor();
       await page.locator('.play-hotspot').tap();

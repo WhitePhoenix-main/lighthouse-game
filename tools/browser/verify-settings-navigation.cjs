@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
 const { createTestBrowser } = require('./browser-profile.cjs');
-const base = process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.0.0.1:5173';
+const base = (process.env.LIGHTHOUSE_TEST_URL || process.argv[2] || 'http://127.0.0.1:5173').replace(/\/$/, '');
 const out = path.resolve('test-results', `settings-navigation-${Date.now()}-${process.pid}`);
 fs.mkdirSync(out, { recursive: true });
 const testBrowser = createTestBrowser(out);
@@ -104,14 +104,15 @@ let ws;
       };
     }
     const token=window.navToken=(window.navToken||0)+1;
-    function sample(){
+    function sample(frameTime){
+      if(token!==navToken)return;
       const p=document.querySelector('.reference-settings'),g=document.querySelector('[data-settings-menu-ghost]'),ghost=g?.querySelector('.settings-menu-outgoing'),m=ghost||document.querySelector('.menu-artboard'),b=p?.querySelector('.settings-board'),s=p?.querySelector('.settings-scrim');
       const style=b&&getComputedStyle(b), menu=m&&getComputedStyle(m);
       const timing=e=>{const a=e?.getAnimations()[0];return a?{start:a.startTime,time:a.currentTime,duration:a.effect.getTiming().duration,state:a.playState}:null};
       const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);
-      navFrames.push({t:performance.now(),screen:window.settingsTest?.application.view.screen||null,layout:p?.dataset.layout,scrollTop:p?.scrollTop,boardTop:b?.getBoundingClientRect().top,viewportHeight:p?.clientHeight,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,y:style?new DOMMatrix(style.transform).m42:null,exitTarget:b?.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
-      if(token===navToken)requestAnimationFrame(sample);
-    } sample();requestAnimationFrame(sample);
+      navFrames.push({t:performance.now(),frameTime,screen:window.settingsTest?.application.view.screen||null,layout:p?.dataset.layout,scrollTop:p?.scrollTop,boardTop:b?.getBoundingClientRect().top,viewportHeight:p?.clientHeight,ready:p?.dataset.ready,enter:p?.dataset.entering,exit:p?.dataset.exiting,menu:ghost?(p?.dataset.exiting==='true'?'ghost-in':'out'):m?.dataset.menuTransition,ghost:!!g,ghostSafe:!g||(g.inert&&g.getAttribute('aria-hidden')==='true'&&!g.querySelector('[id],[data-action],[data-focus-key]')),ghostSibling:!g||g.parentElement===document.querySelector('[data-overlay]').parentElement,settingsPages:document.querySelectorAll('.reference-settings').length,settingsControls:document.querySelectorAll('.reference-settings .settings-control').length,duplicateIds:new Set(ids).size!==ids.length,menuActions:document.querySelectorAll('[data-action="settings"]').length,menuOpacity:menu?+menu.opacity:null,x:style?new DOMMatrix(style.transform).m41:null,y:style?new DOMMatrix(style.transform).m42:null,exitTarget:b?.getAnimations()[0]?.effect.getKeyframes().at(-1)?.transform,opacity:style?+style.opacity:null,scrim:s?+getComputedStyle(s).opacity:null,boardTiming:timing(b),scrimTiming:timing(s),menuTiming:timing(m),exitDuration:timing(b)?.duration,menuDuration:timing(m)?.duration});
+      requestAnimationFrame(sample);
+    } sample();
   })()`);
   const remember = () => evaluate(`(()=>{window.navScene=document.querySelector('.menu-scenery');window.navAnimations=navScene.getAnimations({subtree:true}).filter(a=>a instanceof CSSAnimation);window.navTimes=navAnimations.map(a=>a.currentTime);return navAnimations.length})()`);
   const continuity = async label => {
@@ -124,23 +125,28 @@ let ws;
   const open = async (touch=false,keyboard=false,holdArtwork=false) => {
     await menuReady(); await record();
     // Capture the native click/keyboard activation itself, not the CDP roundtrip.
-    await evaluate(`document.querySelector('[data-action="settings"]').addEventListener('click',()=>window.navActivation=performance.now(),{capture:true,once:true})`);
-    if(holdArtwork)await evaluate(`(()=>{window.navImageSource=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');window.navHeldImages=[];Object.defineProperty(HTMLImageElement.prototype,'src',{...navImageSource,set(value){if(String(value).includes('menu-buttons-v2/'))navHeldImages.push([this,value]);else navImageSource.set.call(this,value)}})})()`);
+    await evaluate(`document.querySelector('[data-action="settings"]').addEventListener('click',()=>{
+      window.navActivation=performance.now();
+      window.navActivationFrame=document.timeline.currentTime;
+      window.navMounted=null;
+      const observer=new MutationObserver(()=>{
+        if(document.querySelector('.reference-settings')){window.navMounted=performance.now();observer.disconnect();}
+      });
+      observer.observe(document.querySelector('[data-overlay]'),{childList:true});
+    },{capture:true,once:true})`);
+    if(holdArtwork) { await cdp('Network.enable'); await cdp('Network.setBlockedURLs',{urls:['*/images/settings-stone/*.png']}); }
     if(keyboard){if(keyboard!=='restored')await evaluate(`document.querySelector('[data-action="settings"]').focus()`);await key('Enter');}
     else await click('[data-action="settings"]',touch);
     if(holdArtwork){
-      await wait(`document.querySelector('.reference-settings')?.dataset.entering==='pending'`);
-      await sleep(180);
-      assert.equal(await evaluate('settingsTest.application.view.screen'),'settings','route did not commit immediately while artwork was pending');
-      assert((await evaluate('navHeldImages.length'))>0,'artwork readiness gate was not exercised');
-      await evaluate(`Object.defineProperty(HTMLImageElement.prototype,'src',navImageSource);for(const [image,value] of navHeldImages)navImageSource.set.call(image,value)`);
+      await wait("document.querySelector('.reference-settings')?.dataset.ready==='true'");
+      assert.equal(await evaluate('settingsTest.application.view.screen'),'settings','native controls wait for decorative images');
+      await cdp('Network.setBlockedURLs',{urls:[]});
     }
     await ready(); await sleep(40);
     const frames=await evaluate('navFrames'),out=frames.filter(f=>f.menu==='out');
-    timeline({phase:'open',frames});
-    const activated=await evaluate('navActivation');
-    const firstSettings=frames.find(f=>f.settingsPages);
-    assert(firstSettings&&firstSettings.t-activated<180,'Settings activation waited for button animation before mounting the page');
+    const activation=await evaluate('({click:navActivation,frame:navActivationFrame,mounted:navMounted})');
+    timeline({phase:'open',activation,frames});
+    assert(activation.mounted!==null&&activation.mounted-activation.click<180,'Settings activation waited for button animation before mounting the page');
     assert(out.length>=3,'menu ghost has no rendered frames');
     assert(out.some(f=>f.menuOpacity<.95&&f.menuOpacity>.05&&f.enter==='true'&&displacement(f)>0&&f.opacity>0&&f.opacity<1),'menu ghost fade and settings slide/fade did not share a frame');
     assert(out.every(f=>!f.screen||f.screen==='settings'),'settings route was delayed until after menu outro');
@@ -338,7 +344,7 @@ let ws;
   };
   const pixelDifference=(expected,data)=>{const actual=decodePng(data);assert.equal(actual.width,expected.width);assert.equal(actual.height,expected.height);let changed=0;for(let i=0;i<actual.pixels.length;i+=3)if(Math.abs(actual.pixels[i]-expected.pixels[i])>4||Math.abs(actual.pixels[i+1]-expected.pixels[i+1])>4||Math.abs(actual.pixels[i+2]-expected.pixels[i+2])>4)changed++;return changed;};
   const paintChecks=[];
-  const paintCases=[[390,844,false,0],[795,1543,false,0],[933,1051,false,0],[844,390,true,1],[844,390,false,0],[844,390,false,5],[568,320,true,1]];
+  const paintCases=[[390,844,false,0],[795,1543,false,0],[933,1051,false,0],[844,390,true,1],[844,390,false,0],[844,390,false,5],[568,320,true,1],[1280,720,false,0]];
   for(let index=0;index<paintCases.length;index++) {
     const [width,height,touch,touchPoints]=paintCases[index],language=index%2?'en':'ru',large=!!(index%2);
     await viewport(width,height,touch,1,touchPoints);
@@ -355,7 +361,17 @@ let ws;
       await evaluate(`paintSentinel.style.background='#ff0000';document.querySelector('[data-action="settings"]').click()`);await ready();
       const mode=await evaluate(`document.querySelector('.reference-settings').dataset.layout`);
       const input=await evaluate(`({width:innerWidth,height:innerHeight,coarse:matchMedia('(pointer:coarse)').matches,anyCoarse:matchMedia('(any-pointer:coarse)').matches,touch:navigator.maxTouchPoints})`);
-      assert.equal(mode, width<=600||(height>=width&&width<1000)||(Math.min(width,height)<800&&(touch||touchPoints>0))?'mobile':'desktop',`${label}: layout selection ${JSON.stringify(input)}`);
+      // The motion axis uses width. Only short or narrow landscape windows
+      // place the shelves side by side, regardless of pointer type.
+      assert.equal(mode, width<960?'mobile':'desktop',`${label}: navigation layout ${JSON.stringify(input)}`);
+      const shelves=await evaluate(`(()=>{
+        const sound=document.querySelector('.sound-shelf').getBoundingClientRect();
+        const reading=document.querySelector('.reading-shelf').getBoundingClientRect();
+        return {stacked:reading.top>=sound.bottom&&Math.abs(reading.left-sound.left)<1,
+          adjacent:reading.left>=sound.right&&Math.abs(reading.top-sound.top)<1};
+      })()`);
+      const sideBySide=width>height&&(width<960||height<=560);
+      assert(sideBySide?shelves.adjacent:shelves.stacked,`${label}: wrong shelf arrangement for viewport`);
       if(height<400)await evaluate(`document.querySelector('.reference-settings').scrollTop=10000`);
       const frames=[];const onFrame=event=>{const message=JSON.parse(event.data);if(message.method==='Page.screencastFrame'&&message.sessionId===sessionId){frames.push(message.params);cdp('Page.screencastFrameAck',{sessionId:message.params.sessionId}).catch(error=>runtimeErrors.push(error.message));}};
       ws.addEventListener('message',onFrame);await cdp('Page.startScreencast',{format:'png',everyNthFrame:1});

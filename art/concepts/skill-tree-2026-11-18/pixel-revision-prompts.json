@@ -1,0 +1,41 @@
+{
+  "tool": "Built-in ImageGen",
+  "generations": [
+    {
+      "file": "sea-chart-pixel-desktop.png",
+      "inputs": [
+        {
+          "file": "sea-chart-desktop.png",
+          "role": "Edit target"
+        },
+        {
+          "file": "../../../art/concepts/arthurian-lighthouse/menu-landscape-dark-pixel-v2-640x360.png",
+          "role": "Arthurian menu style reference"
+        },
+        {
+          "file": "../../../art/chapter1-headland-reference-v1/sprite-board.png",
+          "role": "Headland sprite shape and pixel texture reference"
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Make a strict pixel-art revision of image 1, our liked dark maritime skill tree reference for the game «Свет Авалона». Deliver one landscape 16:9 game UI screenshot, with the same exact header, text, wallet, tabs, filters, scale, legend, graph geography, and central lighthouse. Edit the visual medium, not composition. Reference 1 is the edit target. Reference 2 is the actual project Arthurian menu art (copy the visible pixel clusters, masonry, nocturnal hues and local warm lighting). Reference 3 is the pixel sprite source (copy the block shapes, lighthouse, rocks and crumbled arch). Art direction: genuinely hand-placed square-pixel clusters at a consistent internal pixel scale of 2–3 output px per art pixel. Reconstruct the art at a low native canvas resolution, directly nearest-neighbor upscaled; the coastline must have geometric stair-step silhouettes and flat 3–5-value pixel clusters, hard-edged wavelets, occasional colored ordered dither only in corner transitions, and exposed visible square pixels. Match the lighthouse and the ONE mossy broken stone arch from the project's art references: slate block masonry, cold blue stone, olive-gray moss, small inset amber lantern panes. Give the map a dark calm navy and desaturated blue flat fill with a few extremely faint short square-dash contour traces, subdued corner rocks and only one simple ruined arch. Leave most of the map behind the dependency graph flat and visually quiet. Larger rectangular chipped slate panels and simple pixel bevels are made of sharp steps, using dark blue flat planes and 2 cool highlight colors. Amber is muted copper for control and available borders; selected is a crisp double 1-art-pixel outline, with dark line between the rims. Some small bright candle amber is reserved for lighthouse panes. Pale cream pixel typography with sharp corners. Zero bloom, no photographic smooth stone, no smooth realistic etching, no airbrushed gradients, no feathering, no texture noise as a substitute for pixel art, no ornate faux-3D, no runes or additional lore symbols. Keep the lighthouse small and separate from all graph strokes. Four directional group labels on compact stone tiles, exact Cyrillic: \"МАЯК\" above, \"УСТРОЙСТВА\" left, \"ЛИНЗЫ\" right, \"ВСПЫШКА\" below. Maintain many small pixel medallions at the original density and keep their existing dependency lines on top of the flat background. Graph lines are fine angular solid lines, charcoal blue-gray and subdued amber. They always end at nodes and never extend to the lighthouse. The edges and text must still feel sharp and legible at full screenshot scale. Header exact: \"НАЗАД\", \"ДРЕВО УЛУЧШЕНИЙ\", shard \"450\", pearl \"6\". Tabs \"ВСЁ ДРЕВО\", \"МАЯК\", \"УСТРОЙСТВА\", \"ЛИНЗЫ\", \"СПОСОБНОСТИ\", then \"Все ветви\", \"Найти улучшение\". Legend \"Изучено\", \"Доступно\", \"Закрыто\", bottom right \"ОБЗОР\", \"−\", \"21%\", \"+\". Pixel art screen itself, no presentation text, no watermark."
+    },
+    {
+      "file": "sea-chart-pixel-mobile.png",
+      "inputs": [
+        {
+          "file": "sea-chart-mobile.png",
+          "role": "Edit target"
+        },
+        {
+          "file": "../../../art/concepts/arthurian-lighthouse/menu-landscape-dark-pixel-v2-640x360.png",
+          "role": "Arthurian menu style reference"
+        },
+        {
+          "file": "../../../art/chapter1-headland-reference-v1/sprite-board.png",
+          "role": "Headland sprite shape and pixel texture reference"
+        }
+      ],
+      "prompt": "Use case: precise-object-edit. Repaint the precise portrait composition of image 1 at mobile aspect 9:19.5 as genuinely hand-crafted pixel art for «Свет Авалона». Image 1 is our liked original \"Морская карта\" mobile screen edit target. Image 2 is the project's Arthurian menu, a pixel art style and palette reference. Image 3 is the actual coast sprite sheet to match the forms and pixel surface. Art direction: genuinely hand-placed square-pixel clusters at a consistent internal pixel scale of 2–3 output px per art pixel. Reconstruct the art at a low native canvas resolution, directly nearest-neighbor upscaled; the coastline must have geometric stair-step silhouettes and flat 3–5-value pixel clusters, hard-edged wavelets, occasional colored ordered dither only in corner transitions, and exposed visible square pixels. Match the lighthouse and the ONE mossy broken stone arch from the project's art references: slate block masonry, cold blue stone, olive-gray moss, small inset amber lantern panes. Give the map a dark calm navy and desaturated blue flat fill with a few extremely faint short square-dash contour traces, subdued corner rocks and only one simple ruined arch. Leave most of the map behind the dependency graph flat and visually quiet. Larger rectangular chipped slate panels and simple pixel bevels are made of sharp steps, using dark blue flat planes and 2 cool highlight colors. Amber is muted copper for control and available borders; selected is a crisp double 1-art-pixel outline, with dark line between the rims. Some small bright candle amber is reserved for lighthouse panes. Pale cream pixel typography with sharp corners. Zero bloom, no photographic smooth stone, no smooth realistic etching, no airbrushed gradients, no feathering, no texture noise as a substitute for pixel art, no ornate faux-3D, no runes or additional lore symbols. Preserve the order, positions and sizing of controls, selected cannon medallion and two connected small locked nodes on the left. Preserve the card under the map, with pixel art cannon inside a very simple chipped slate well, exact panel titles and cost. Keep the pixel lighthouse in the lower right of the map, away from graph edges. Draw only one small mossy broken stone arch along the map's lower-left edge. Surface beneath dependencies must remain low contrast so the thin cool gray branch edges are obvious. The buttons, bevels and borders must be obviously pixel-built and matte, even at full image scale. Exact existing words and numbers: \"НАЗАД\", \"ДРЕВО УЛУЧШЕНИЙ\", \"450\", \"6\", \"ВСЁ ДРЕВО\", \"МАЯК\", \"УСТРОЙСТВА\", \"ЛИНЗЫ\", \"Все ветви\", \"Найти улучшение\"; map label \"УСТРОЙСТВА\"; \"ОБЗОР\", \"−\", \"55%\", \"+\"; card \"ПУШКИ\", \"Доступно\", \"Открывает пушки.\", \"Требования\", \"✓ Победа: Первый свет\", \"ИЗУЧИТЬ · 35\" and shard sprite. Use the exact Russian spelling. High contrast supporting letter shapes, pixel headings with modest serif, no big serif logo. Output one full-screen game sprite mockup with no device frame, no added elements, no watermark."
+    }
+  ]
+}

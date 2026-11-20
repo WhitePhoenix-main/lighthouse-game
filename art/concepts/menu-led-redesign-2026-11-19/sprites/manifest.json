@@ -1,0 +1,744 @@
+{
+  "button-normal": {
+    "file": "sprites/button-normal.png",
+    "size": [
+      240,
+      48
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      0,
+      0,
+      240,
+      48
+    ]
+  },
+  "button-hover": {
+    "file": "sprites/button-hover.png",
+    "size": [
+      240,
+      48
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      242,
+      0,
+      240,
+      48
+    ]
+  },
+  "button-focus": {
+    "file": "sprites/button-focus.png",
+    "size": [
+      240,
+      48
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      0,
+      50,
+      240,
+      48
+    ]
+  },
+  "button-pressed": {
+    "file": "sprites/button-pressed.png",
+    "size": [
+      240,
+      48
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      242,
+      50,
+      240,
+      48
+    ]
+  },
+  "button-disabled": {
+    "file": "sprites/button-disabled.png",
+    "size": [
+      240,
+      48
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      0,
+      100,
+      240,
+      48
+    ]
+  },
+  "panel-normal": {
+    "file": "sprites/panel-normal.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      242,
+      100,
+      48,
+      36
+    ]
+  },
+  "tab-normal": {
+    "file": "sprites/tab-normal.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      292,
+      100,
+      48,
+      36
+    ]
+  },
+  "tab-selected": {
+    "file": "sprites/tab-selected.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      342,
+      100,
+      48,
+      36
+    ]
+  },
+  "tab-disabled": {
+    "file": "sprites/tab-disabled.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      392,
+      100,
+      48,
+      36
+    ]
+  },
+  "parchment-normal": {
+    "file": "sprites/parchment-normal.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      442,
+      100,
+      48,
+      36
+    ]
+  },
+  "frame-stone": {
+    "file": "sprites/frame-stone.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      0,
+      150,
+      48,
+      36
+    ]
+  },
+  "frame-parchment": {
+    "file": "sprites/frame-parchment.png",
+    "size": [
+      48,
+      36
+    ],
+    "nineSlice": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "fill": "tile",
+    "atlas": [
+      50,
+      150,
+      48,
+      36
+    ]
+  },
+  "icon-shard": {
+    "file": "sprites/icon-shard.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      100,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-diamond": {
+    "file": "sprites/icon-diamond.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      121,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-pearl": {
+    "file": "sprites/icon-pearl.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      142,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-lock": {
+    "file": "sprites/icon-lock.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      163,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-check": {
+    "file": "sprites/icon-check.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      184,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-back": {
+    "file": "sprites/icon-back.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      205,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-next": {
+    "file": "sprites/icon-next.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      226,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-down": {
+    "file": "sprites/icon-down.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      247,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-close": {
+    "file": "sprites/icon-close.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      268,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-pause": {
+    "file": "sprites/icon-pause.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      289,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-plus": {
+    "file": "sprites/icon-plus.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      310,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-aim": {
+    "file": "sprites/icon-aim.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      331,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-warning": {
+    "file": "sprites/icon-warning.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      352,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-flash": {
+    "file": "sprites/icon-flash.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      373,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-beacon": {
+    "file": "sprites/icon-beacon.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      394,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-book": {
+    "file": "sprites/icon-book.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      415,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-lens": {
+    "file": "sprites/icon-lens.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      436,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-cannon": {
+    "file": "sprites/icon-cannon.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      457,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-tree": {
+    "file": "sprites/icon-tree.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      478,
+      150,
+      19,
+      19
+    ]
+  },
+  "icon-wave": {
+    "file": "sprites/icon-wave.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      0,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-bag": {
+    "file": "sprites/icon-bag.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      21,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-ship": {
+    "file": "sprites/icon-ship.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      42,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-sound": {
+    "file": "sprites/icon-sound.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      63,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-gear": {
+    "file": "sprites/icon-gear.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      84,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-shield": {
+    "file": "sprites/icon-shield.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      105,
+      188,
+      19,
+      19
+    ]
+  },
+  "icon-moon": {
+    "file": "sprites/icon-moon.png",
+    "size": [
+      19,
+      19
+    ],
+    "atlas": [
+      126,
+      188,
+      19,
+      19
+    ]
+  },
+  "meter-health": {
+    "file": "sprites/meter-health.png",
+    "size": [
+      24,
+      6
+    ],
+    "atlas": [
+      147,
+      188,
+      24,
+      6
+    ]
+  },
+  "meter-armor": {
+    "file": "sprites/meter-armor.png",
+    "size": [
+      24,
+      6
+    ],
+    "atlas": [
+      173,
+      188,
+      24,
+      6
+    ]
+  },
+  "meter-light": {
+    "file": "sprites/meter-light.png",
+    "size": [
+      24,
+      6
+    ],
+    "atlas": [
+      199,
+      188,
+      24,
+      6
+    ]
+  },
+  "meter-danger": {
+    "file": "sprites/meter-danger.png",
+    "size": [
+      24,
+      6
+    ],
+    "atlas": [
+      225,
+      188,
+      24,
+      6
+    ]
+  },
+  "meter-empty": {
+    "file": "sprites/meter-empty.png",
+    "size": [
+      24,
+      6
+    ],
+    "atlas": [
+      251,
+      188,
+      24,
+      6
+    ]
+  },
+  "world-beacon": {
+    "file": "sprites/world-beacon.png",
+    "size": [
+      40,
+      78
+    ],
+    "anchor": [
+      20,
+      77
+    ],
+    "atlas": [
+      277,
+      188,
+      40,
+      78
+    ]
+  },
+  "world-cannon": {
+    "file": "sprites/world-cannon.png",
+    "size": [
+      27,
+      26
+    ],
+    "anchor": [
+      13,
+      25
+    ],
+    "atlas": [
+      319,
+      188,
+      27,
+      26
+    ]
+  },
+  "world-ghost": {
+    "file": "sprites/world-ghost.png",
+    "size": [
+      25,
+      19
+    ],
+    "anchor": [
+      12,
+      18
+    ],
+    "atlas": [
+      348,
+      188,
+      25,
+      19
+    ]
+  },
+  "world-turtle": {
+    "file": "sprites/world-turtle.png",
+    "size": [
+      32,
+      23
+    ],
+    "anchor": [
+      16,
+      22
+    ],
+    "atlas": [
+      375,
+      188,
+      32,
+      23
+    ]
+  },
+  "world-tentacle": {
+    "file": "sprites/world-tentacle.png",
+    "size": [
+      29,
+      38
+    ],
+    "anchor": [
+      14,
+      37
+    ],
+    "atlas": [
+      409,
+      188,
+      29,
+      38
+    ]
+  },
+  "terrain-land": {
+    "file": "sprites/terrain-land.png",
+    "size": [
+      360,
+      360
+    ]
+  },
+  "terrain-sea": {
+    "file": "sprites/terrain-sea.png",
+    "size": [
+      360,
+      360
+    ]
+  }
+}

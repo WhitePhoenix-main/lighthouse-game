@@ -17,7 +17,7 @@ export function skillIcon(name: string): string {
     flash: '<path d="m19 2-13 17h9l-2 11 13-18h-9z"/>',
     lens: '<path d="m16 3 10 6v14l-10 6-10-6V9zM16 7v18M10 11l12 10m0-10L10 21"/>',
     search: '<circle cx="13" cy="13" r="8"/><path d="m19 19 9 9"/>',
-    lock: '<path d="M10 14V9a6 6 0 0 1 12 0v5M7 14h18v14H7zM16 19v4"/>',
+    lock: '<path fill="currentColor" stroke="none" fill-rule="evenodd" d="M10 13V7h2V5h8v2h2v6h3v15H7V13zm3 0h6V8h-6zm1 5v3h1v4h2v-4h1v-3z"/>',
   };
   return `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true">${shapes[name] ?? shapes.beam}</svg>`;
 }

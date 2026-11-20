@@ -1,0 +1,282 @@
+{
+  "chapters": [
+    {
+      "number": 1,
+      "name": [
+        "Туманный берег",
+        "Misty Shore"
+      ],
+      "nightCount": 6,
+      "journal": [
+        "Я зажёг маяк в ответ на огни за каменным причалом. К берегу уже тянулись твари из тумана. У самой кромки света я увидел щупальце Стража глубин.",
+        "I lit the lighthouse in answer to the lights beyond the stone pier. Creatures were already emerging from the mist. At the edge of the light I saw a tentacle of the Abyss Warden."
+      ]
+    },
+    {
+      "number": 2,
+      "name": [
+        "Дальний берег",
+        "Far Shore"
+      ],
+      "nightCount": 7,
+      "journal": [
+        "После победы у причала я услышал из дальней бухты команды Затонувшего капитана. Его отряд уже шёл вдоль косы. Я принёс ядро из первой башни и зажёг новый маяк.",
+        "After the victory at the pier, I heard the Drowned Captain giving orders across the bay. His company was already marching along the spit. I carried the core from the first tower and lit the next beacon."
+      ]
+    },
+    {
+      "number": 3,
+      "name": [
+        "Терновые топи",
+        "Thorn Marsh"
+      ],
+      "nightCount": 8,
+      "journal": [
+        "После победы в бухте отлив обнажил чёрные корни. Я пошёл вдоль них по тропам между островками. Под старым маяком, где корни сходились, билось Сердце топи.",
+        "After the victory in the bay, the ebb exposed black roots. I followed them along the paths between the islands. The Marsh Heart beat beneath the old lighthouse where the roots met."
+      ]
+    },
+    {
+      "number": 4,
+      "name": [
+        "Пепельные утёсы",
+        "Ashen Cliffs"
+      ],
+      "nightCount": 8,
+      "journal": [
+        "Когда Сердце топи стихло, я разглядел над болотом обгоревшую башню. Я поднялся к ней с ядром и нашёл пролом в старой стене. На открытом плато стоял Пепельный колосс.",
+        "When the Marsh Heart fell silent, I saw a scorched tower above the bog. I carried the core uphill and found a breach in the old wall. The Ash Colossus stood on the open plateau."
+      ]
+    },
+    {
+      "number": 5,
+      "name": [
+        "Кладбище кораблей",
+        "Ship Graveyard"
+      ],
+      "nightCount": 9,
+      "journal": [
+        "Когда Колосс пал, с берега донёсся погребальный звон. Я спустился к маяку над фарватером. Среди обломков «Вечерний звон» собирал погибшие экипажи на последний штурм.",
+        "When the Colossus fell, a funeral bell rang along the coast. I descended to the lighthouse above the channel. Among the wrecks, the Evening Knell called the dead crews to one last assault."
+      ]
+    },
+    {
+      "number": 6,
+      "name": [
+        "Затмение Авалона",
+        "Avalon Eclipse"
+      ],
+      "nightCount": 9,
+      "journal": [
+        "Когда звон стих, я заметил в руинах ответный сигнал. Так прежде отзывался наш хранитель. Теперь он вёл тварей к маякам по сигналам, которым я привык доверять.",
+        "When the bell fell silent, a signal answered from the ruins. That was how our Keeper used to answer. Now he guided the creatures to our towers with the signals I once trusted."
+      ]
+    },
+    {
+      "number": 7,
+      "name": [
+        "Последний рассвет",
+        "Last Dawn"
+      ],
+      "nightCount": 9,
+      "journal": [
+        "После падения хранителя я увидел, откуда тянулся туман. По ту сторону разлома билось Сердце тумана. Я зажёг тот же свет, что когда-то над каменным причалом.",
+        "After the Keeper fell, I saw where the mist came from. Its Heart beat beyond the rift. I lit the same light I had once kindled over the stone pier."
+      ]
+    }
+  ],
+  "headland": [
+    [
+      35.15625,
+      -1071.428571
+    ],
+    [
+      45.410156,
+      -1029.575893
+    ],
+    [
+      -27.832031,
+      -987.723214
+    ],
+    [
+      -55.664062,
+      -941.685268
+    ],
+    [
+      -39.550781,
+      -885.184152
+    ],
+    [
+      13.183594,
+      -843.331473
+    ],
+    [
+      -76.171875,
+      -788.922991
+    ],
+    [
+      -104.003906,
+      -744.977679
+    ],
+    [
+      -76.171875,
+      -694.754464
+    ],
+    [
+      -43.945312,
+      -654.99442
+    ],
+    [
+      -38.085937,
+      -625.697545
+    ],
+    [
+      -99.609375,
+      -579.659598
+    ],
+    [
+      -123.046875,
+      -531.529018
+    ],
+    [
+      -84.960938,
+      -481.305804
+    ],
+    [
+      -46.875,
+      -437.360491
+    ],
+    [
+      -67.382813,
+      -401.785714
+    ],
+    [
+      -125.976562,
+      -355.747768
+    ],
+    [
+      -102.539063,
+      -295.061384
+    ],
+    [
+      -68.847656,
+      -246.930804
+    ],
+    [
+      -74.707031,
+      -205.078125
+    ],
+    [
+      -45.410156,
+      -146.484375
+    ],
+    [
+      27.832031,
+      -100.446429
+    ],
+    [
+      77.636719,
+      -60.686384
+    ],
+    [
+      79.101562,
+      -14.648438
+    ],
+    [
+      13.183594,
+      39.760045
+    ],
+    [
+      -24.902344,
+      75.334821
+    ],
+    [
+      13.183594,
+      121.372768
+    ],
+    [
+      21.972656,
+      159.040179
+    ],
+    [
+      -45.410156,
+      207.170759
+    ],
+    [
+      -99.609375,
+      263.671875
+    ],
+    [
+      -123.046875,
+      286.690848
+    ],
+    [
+      -104.003906,
+      334.821429
+    ],
+    [
+      -106.933594,
+      372.488839
+    ],
+    [
+      -80.566406,
+      418.526786
+    ],
+    [
+      -24.902344,
+      454.101563
+    ],
+    [
+      2.929688,
+      500.139509
+    ],
+    [
+      13.183594,
+      550.362723
+    ],
+    [
+      -26.367188,
+      602.678571
+    ],
+    [
+      -45.410156,
+      652.901786
+    ],
+    [
+      5.859375,
+      711.495536
+    ],
+    [
+      11.71875,
+      759.626116
+    ],
+    [
+      -42.480469,
+      807.756696
+    ],
+    [
+      -79.101562,
+      862.165179
+    ],
+    [
+      -60.058594,
+      904.017857
+    ],
+    [
+      -95.214844,
+      937.5
+    ],
+    [
+      -46.875,
+      985.63058
+    ],
+    [
+      -29.296875,
+      1025.390625
+    ],
+    [
+      -36.621094,
+      1071.428571
+    ]
+  ]
+}

@@ -1,0 +1,297 @@
+{
+  "panel": {
+    "file": "sprites/ui/panel.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "inset": {
+    "file": "sprites/ui/inset.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "gold": {
+    "file": "sprites/ui/gold.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "primary": {
+    "file": "sprites/ui/primary.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "secondary": {
+    "file": "sprites/ui/secondary.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "disabled": {
+    "file": "sprites/ui/disabled.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "pressed": {
+    "file": "sprites/ui/pressed.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "hover": {
+    "file": "sprites/ui/hover.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "focus": {
+    "file": "sprites/ui/focus.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "tab": {
+    "file": "sprites/ui/tab.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "selected": {
+    "file": "sprites/ui/selected.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "frame": {
+    "file": "sprites/ui/frame.png",
+    "width": 50,
+    "height": 32,
+    "sliceLTRB": [
+      9,
+      9,
+      9,
+      9
+    ],
+    "fill": "tile"
+  },
+  "icon-back": {
+    "file": "sprites/ui/icon-back.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-pause": {
+    "file": "sprites/ui/icon-pause.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-play": {
+    "file": "sprites/ui/icon-play.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-shield": {
+    "file": "sprites/ui/icon-shield.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-heart": {
+    "file": "sprites/ui/icon-heart.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-gear": {
+    "file": "sprites/ui/icon-gear.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-coin": {
+    "file": "sprites/ui/icon-coin.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-pearl": {
+    "file": "sprites/ui/icon-pearl.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-repair": {
+    "file": "sprites/ui/icon-repair.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-charge": {
+    "file": "sprites/ui/icon-charge.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-trap": {
+    "file": "sprites/ui/icon-trap.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-generator": {
+    "file": "sprites/ui/icon-generator.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-cannon": {
+    "file": "sprites/ui/icon-cannon.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-tree": {
+    "file": "sprites/ui/icon-tree.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-book": {
+    "file": "sprites/ui/icon-book.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-exit": {
+    "file": "sprites/ui/icon-exit.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-check": {
+    "file": "sprites/ui/icon-check.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-lock": {
+    "file": "sprites/ui/icon-lock.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-light": {
+    "file": "sprites/ui/icon-light.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-wave": {
+    "file": "sprites/ui/icon-wave.png",
+    "width": 16,
+    "height": 16
+  },
+  "icon-target": {
+    "file": "sprites/ui/icon-target.png",
+    "width": 16,
+    "height": 16
+  },
+  "gatehouse": {
+    "file": "sprites/ui/gatehouse.png",
+    "width": 400,
+    "height": 360
+  },
+  "slider-thumb": {
+    "file": "sprites/ui/slider-thumb.png",
+    "width": 11,
+    "height": 16
+  },
+  "fill-health": {
+    "file": "sprites/ui/fill-health.png",
+    "width": 4,
+    "height": 5,
+    "fill": "tile"
+  },
+  "fill-shield": {
+    "file": "sprites/ui/fill-shield.png",
+    "width": 4,
+    "height": 5,
+    "fill": "tile"
+  },
+  "fill-enemy": {
+    "file": "sprites/ui/fill-enemy.png",
+    "width": 4,
+    "height": 5,
+    "fill": "tile"
+  },
+  "fill-armor": {
+    "file": "sprites/ui/fill-armor.png",
+    "width": 4,
+    "height": 5,
+    "fill": "tile"
+  },
+  "meter": {
+    "file": "sprites/ui/meter.png",
+    "width": 12,
+    "height": 9,
+    "sliceLTRB": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "fill": "tile"
+  }
+}

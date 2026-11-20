@@ -1,0 +1,1516 @@
+{
+  "size": [
+    512,
+    427
+  ],
+  "format": "RGBA",
+  "nineSliceOrder": "left, top, right, bottom; repeat edges and centre",
+  "frames": {
+    "button-primary-idle": {
+      "file": "button-primary-idle.png",
+      "rect": [
+        2,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-primary-hover": {
+      "file": "button-primary-hover.png",
+      "rect": [
+        60,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-primary-pressed": {
+      "file": "button-primary-pressed.png",
+      "rect": [
+        118,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-primary-focus": {
+      "file": "button-primary-focus.png",
+      "rect": [
+        176,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-primary-disabled": {
+      "file": "button-primary-disabled.png",
+      "rect": [
+        234,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-primary-selected": {
+      "file": "button-primary-selected.png",
+      "rect": [
+        292,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-idle": {
+      "file": "button-quiet-idle.png",
+      "rect": [
+        350,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-hover": {
+      "file": "button-quiet-hover.png",
+      "rect": [
+        408,
+        2,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-pressed": {
+      "file": "button-quiet-pressed.png",
+      "rect": [
+        2,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-focus": {
+      "file": "button-quiet-focus.png",
+      "rect": [
+        60,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-disabled": {
+      "file": "button-quiet-disabled.png",
+      "rect": [
+        118,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-quiet-selected": {
+      "file": "button-quiet-selected.png",
+      "rect": [
+        176,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-idle": {
+      "file": "button-danger-idle.png",
+      "rect": [
+        234,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-hover": {
+      "file": "button-danger-hover.png",
+      "rect": [
+        292,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-pressed": {
+      "file": "button-danger-pressed.png",
+      "rect": [
+        350,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-focus": {
+      "file": "button-danger-focus.png",
+      "rect": [
+        408,
+        42,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-disabled": {
+      "file": "button-danger-disabled.png",
+      "rect": [
+        2,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "button-danger-selected": {
+      "file": "button-danger-selected.png",
+      "rect": [
+        60,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-idle": {
+      "file": "tab-idle.png",
+      "rect": [
+        118,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-hover": {
+      "file": "tab-hover.png",
+      "rect": [
+        176,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-pressed": {
+      "file": "tab-pressed.png",
+      "rect": [
+        234,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-focus": {
+      "file": "tab-focus.png",
+      "rect": [
+        292,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-disabled": {
+      "file": "tab-disabled.png",
+      "rect": [
+        350,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "tab-selected": {
+      "file": "tab-selected.png",
+      "rect": [
+        408,
+        82,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-stone": {
+      "file": "panel-stone.png",
+      "rect": [
+        2,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-inset": {
+      "file": "panel-inset.png",
+      "rect": [
+        60,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-slate": {
+      "file": "panel-slate.png",
+      "rect": [
+        118,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-picture": {
+      "file": "panel-picture.png",
+      "rect": [
+        176,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-leaf": {
+      "file": "panel-leaf.png",
+      "rect": [
+        234,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-page-row": {
+      "file": "panel-page-row.png",
+      "rect": [
+        292,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-page-selected": {
+      "file": "panel-page-selected.png",
+      "rect": [
+        350,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-hud": {
+      "file": "panel-hud.png",
+      "rect": [
+        408,
+        122,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-signal": {
+      "file": "panel-signal.png",
+      "rect": [
+        2,
+        162,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "panel-cover": {
+      "file": "panel-cover.png",
+      "rect": [
+        60,
+        162,
+        55,
+        37
+      ],
+      "nineSlice": [
+        12,
+        10,
+        13,
+        11
+      ]
+    },
+    "icon-shard": {
+      "file": "icon-shard.png",
+      "rect": [
+        118,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-pearl": {
+      "file": "icon-pearl.png",
+      "rect": [
+        141,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-beacon": {
+      "file": "icon-beacon.png",
+      "rect": [
+        164,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-lock": {
+      "file": "icon-lock.png",
+      "rect": [
+        187,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-check": {
+      "file": "icon-check.png",
+      "rect": [
+        210,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-back": {
+      "file": "icon-back.png",
+      "rect": [
+        233,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-next": {
+      "file": "icon-next.png",
+      "rect": [
+        256,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-book": {
+      "file": "icon-book.png",
+      "rect": [
+        279,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-lens": {
+      "file": "icon-lens.png",
+      "rect": [
+        302,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-flash": {
+      "file": "icon-flash.png",
+      "rect": [
+        325,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-sound": {
+      "file": "icon-sound.png",
+      "rect": [
+        348,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-settings": {
+      "file": "icon-settings.png",
+      "rect": [
+        371,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-repair": {
+      "file": "icon-repair.png",
+      "rect": [
+        394,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-flag": {
+      "file": "icon-flag.png",
+      "rect": [
+        417,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-target": {
+      "file": "icon-target.png",
+      "rect": [
+        440,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-tree": {
+      "file": "icon-tree.png",
+      "rect": [
+        463,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-collection": {
+      "file": "icon-collection.png",
+      "rect": [
+        486,
+        162,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-moon": {
+      "file": "icon-moon.png",
+      "rect": [
+        2,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-waves": {
+      "file": "icon-waves.png",
+      "rect": [
+        25,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-shield": {
+      "file": "icon-shield.png",
+      "rect": [
+        48,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-warning": {
+      "file": "icon-warning.png",
+      "rect": [
+        71,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-skull": {
+      "file": "icon-skull.png",
+      "rect": [
+        94,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-pause": {
+      "file": "icon-pause.png",
+      "rect": [
+        117,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-play": {
+      "file": "icon-play.png",
+      "rect": [
+        140,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-close": {
+      "file": "icon-close.png",
+      "rect": [
+        163,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-retry": {
+      "file": "icon-retry.png",
+      "rect": [
+        186,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-pin": {
+      "file": "icon-pin.png",
+      "rect": [
+        209,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-move": {
+      "file": "icon-move.png",
+      "rect": [
+        232,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-rank": {
+      "file": "icon-rank.png",
+      "rect": [
+        255,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-clock": {
+      "file": "icon-clock.png",
+      "rect": [
+        278,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-devices": {
+      "file": "icon-devices.png",
+      "rect": [
+        301,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-map": {
+      "file": "icon-map.png",
+      "rect": [
+        324,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-journal": {
+      "file": "icon-journal.png",
+      "rect": [
+        347,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-recon": {
+      "file": "icon-recon.png",
+      "rect": [
+        370,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-seal": {
+      "file": "icon-seal.png",
+      "rect": [
+        393,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-plus": {
+      "file": "icon-plus.png",
+      "rect": [
+        416,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-minus": {
+      "file": "icon-minus.png",
+      "rect": [
+        439,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "icon-sun": {
+      "file": "icon-sun.png",
+      "rect": [
+        462,
+        202,
+        20,
+        20
+      ],
+      "anchor": [
+        10,
+        10
+      ]
+    },
+    "meter-health": {
+      "file": "meter-health.png",
+      "rect": [
+        2,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "meter-armor": {
+      "file": "meter-armor.png",
+      "rect": [
+        35,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "meter-shield": {
+      "file": "meter-shield.png",
+      "rect": [
+        68,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "meter-boss": {
+      "file": "meter-boss.png",
+      "rect": [
+        101,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "meter-charge": {
+      "file": "meter-charge.png",
+      "rect": [
+        134,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "meter-inactive": {
+      "file": "meter-inactive.png",
+      "rect": [
+        167,
+        225,
+        30,
+        7
+      ],
+      "nineSlice": [
+        3,
+        2,
+        3,
+        2
+      ]
+    },
+    "target-lit": {
+      "file": "target-lit.png",
+      "rect": [
+        200,
+        225,
+        32,
+        24
+      ],
+      "nineSlice": [
+        7,
+        6,
+        7,
+        6
+      ],
+      "anchor": [
+        16,
+        12
+      ]
+    },
+    "target-active": {
+      "file": "target-active.png",
+      "rect": [
+        235,
+        225,
+        32,
+        24
+      ],
+      "nineSlice": [
+        7,
+        6,
+        7,
+        6
+      ],
+      "anchor": [
+        16,
+        12
+      ]
+    },
+    "target-invalid": {
+      "file": "target-invalid.png",
+      "rect": [
+        270,
+        225,
+        32,
+        24
+      ],
+      "nineSlice": [
+        7,
+        6,
+        7,
+        6
+      ],
+      "anchor": [
+        16,
+        12
+      ]
+    },
+    "foe-health": {
+      "file": "foe-health.png",
+      "rect": [
+        305,
+        225,
+        24,
+        6
+      ],
+      "anchor": [
+        12,
+        5
+      ]
+    },
+    "foe-lit-health": {
+      "file": "foe-lit-health.png",
+      "rect": [
+        332,
+        225,
+        24,
+        6
+      ],
+      "anchor": [
+        12,
+        5
+      ]
+    },
+    "foe-armor": {
+      "file": "foe-armor.png",
+      "rect": [
+        359,
+        225,
+        24,
+        6
+      ],
+      "anchor": [
+        12,
+        5
+      ]
+    },
+    "part-durability": {
+      "file": "part-durability.png",
+      "rect": [
+        386,
+        225,
+        24,
+        6
+      ],
+      "anchor": [
+        12,
+        5
+      ]
+    },
+    "slider-track": {
+      "file": "slider-track.png",
+      "rect": [
+        413,
+        225,
+        20,
+        7
+      ],
+      "nineSlice": [
+        4,
+        2,
+        4,
+        2
+      ]
+    },
+    "slider-fill": {
+      "file": "slider-fill.png",
+      "rect": [
+        436,
+        225,
+        20,
+        7
+      ],
+      "nineSlice": [
+        4,
+        2,
+        4,
+        2
+      ]
+    },
+    "slider-thumb": {
+      "file": "slider-thumb.png",
+      "rect": [
+        459,
+        225,
+        13,
+        15
+      ],
+      "anchor": [
+        6,
+        7
+      ]
+    },
+    "node-marked": {
+      "file": "node-marked.png",
+      "rect": [
+        475,
+        225,
+        18,
+        18
+      ],
+      "anchor": [
+        9,
+        9
+      ]
+    },
+    "node-open": {
+      "file": "node-open.png",
+      "rect": [
+        2,
+        252,
+        18,
+        18
+      ],
+      "anchor": [
+        9,
+        9
+      ]
+    },
+    "node-complete": {
+      "file": "node-complete.png",
+      "rect": [
+        23,
+        252,
+        18,
+        18
+      ],
+      "anchor": [
+        9,
+        9
+      ]
+    },
+    "node-locked": {
+      "file": "node-locked.png",
+      "rect": [
+        44,
+        252,
+        18,
+        18
+      ],
+      "anchor": [
+        9,
+        9
+      ]
+    },
+    "world-beacon": {
+      "file": "world-beacon.png",
+      "rect": [
+        65,
+        252,
+        36,
+        76
+      ],
+      "anchor": [
+        18,
+        74
+      ]
+    },
+    "object-beacon": {
+      "file": "object-beacon.png",
+      "rect": [
+        104,
+        252,
+        40,
+        86
+      ],
+      "anchor": [
+        20,
+        85
+      ]
+    },
+    "world-cannon": {
+      "file": "world-cannon.png",
+      "rect": [
+        147,
+        252,
+        32,
+        24
+      ],
+      "anchor": [
+        16,
+        22
+      ]
+    },
+    "object-cannon": {
+      "file": "object-cannon.png",
+      "rect": [
+        182,
+        252,
+        96,
+        69
+      ],
+      "anchor": [
+        48,
+        68
+      ]
+    },
+    "world-light-trap": {
+      "file": "world-light-trap.png",
+      "rect": [
+        281,
+        252,
+        24,
+        18
+      ],
+      "anchor": [
+        12,
+        16
+      ]
+    },
+    "object-light-trap": {
+      "file": "object-light-trap.png",
+      "rect": [
+        308,
+        252,
+        96,
+        71
+      ],
+      "anchor": [
+        48,
+        70
+      ]
+    },
+    "world-tentacle": {
+      "file": "world-tentacle.png",
+      "rect": [
+        407,
+        252,
+        35,
+        51
+      ],
+      "anchor": [
+        17,
+        49
+      ]
+    },
+    "object-tentacle": {
+      "file": "object-tentacle.png",
+      "rect": [
+        445,
+        252,
+        57,
+        86
+      ],
+      "anchor": [
+        28,
+        85
+      ]
+    },
+    "world-ghost": {
+      "file": "world-ghost.png",
+      "rect": [
+        2,
+        341,
+        30,
+        29
+      ],
+      "anchor": [
+        15,
+        27
+      ]
+    },
+    "world-turtle": {
+      "file": "world-turtle.png",
+      "rect": [
+        35,
+        341,
+        34,
+        26
+      ],
+      "anchor": [
+        17,
+        24
+      ]
+    },
+    "object-turtle": {
+      "file": "object-turtle.png",
+      "rect": [
+        72,
+        341,
+        96,
+        73
+      ],
+      "anchor": [
+        48,
+        72
+      ]
+    },
+    "world-minotaur": {
+      "file": "world-minotaur.png",
+      "rect": [
+        171,
+        341,
+        35,
+        33
+      ],
+      "anchor": [
+        17,
+        31
+      ]
+    },
+    "world-bat": {
+      "file": "world-bat.png",
+      "rect": [
+        209,
+        341,
+        32,
+        21
+      ],
+      "anchor": [
+        16,
+        19
+      ]
+    },
+    "world-generator": {
+      "file": "world-generator.png",
+      "rect": [
+        244,
+        341,
+        26,
+        29
+      ],
+      "anchor": [
+        13,
+        26
+      ]
+    },
+    "object-optics": {
+      "file": "object-optics.png",
+      "rect": [
+        273,
+        341,
+        100,
+        84
+      ],
+      "anchor": [
+        50,
+        77
+      ]
+    },
+    "object-siege-cannon": {
+      "file": "object-siege-cannon.png",
+      "rect": [
+        376,
+        341,
+        96,
+        69
+      ],
+      "anchor": [
+        48,
+        68
+      ]
+    }
+  }
+}

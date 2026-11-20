@@ -1,97 +1,82 @@
 import type { ApplicationView } from '../../contracts';
 import { resolveLanguage, translate } from '../shared/localization';
-import { loadSettingsAssets, paintSettingsArtwork, type SettingsAssets } from './settingsArtwork';
-import { settingsLayout, usesMobileSettingsLayout, type SettingsChoice, type SettingsLayout, type SettingsRect, type SettingsVolume } from './settingsLayout';
+import { paintSettingsCaption } from './settingsArtwork';
 
-const words: Record<SettingsChoice, string> = {
-  on: 'ВКЛ', off: 'ВЫКЛ', auto: 'АВТОМАТИЧЕСКИ', ru: 'РУССКИЙ', en: 'ENGLISH', normal: 'ОБЫЧНЫЙ', large: 'КРУПНЫЙ', back: 'НАЗАД'
-};
-const escape = (value: string): string => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]!);
-let assets: SettingsAssets | undefined;
-const pending = new WeakMap<HTMLCanvasElement, symbol>();
-
-/** Artwork and real native controls share a layout, including range thumb travel. */
 export function referenceSettings(view: ApplicationView): string {
-  const language = resolveLanguage(view.settings.language, undefined, typeof navigator === 'undefined' ? [] : navigator.languages);
-  const t = (word: string): string => escape(translate(word, language));
+  const settings = view.settings;
+  const language = resolveLanguage(settings.language, undefined, typeof navigator === 'undefined' ? [] : navigator.languages);
+  const t = (word: string): string => translate(word, language).replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[char]!);
   const disabled = view.settingsError ? 'disabled' : '';
-  const choice = (label: Exclude<SettingsChoice, 'back'>, action: string, data: string, selected: boolean): string =>
-    `<button class="settings-control" data-setting="${label}" data-action="${action}" ${data} aria-label="${t(words[label])}" aria-pressed="${selected}" ${disabled}><span class="settings-accessible-label settings-native-label">${label === 'auto' ? language === 'ru' ? 'АВТО' : 'AUTO' : t(words[label])}</span></button>`;
-  const slider = (label: SettingsVolume, word: string, value: number): string =>
-    `<label class="settings-control settings-slider" data-setting="${label}"><span class="settings-accessible-label settings-native-label">${t(word)}</span><input aria-label="${t(word)}" aria-valuetext="${value}%" data-action="${label}-volume" type="range" min="0" max="100" step="1" value="${value}" ${disabled}></label>`;
-  return `<section class="reference-settings" aria-labelledby="settings-title"><div class="settings-scrim" aria-hidden="true"></div><div class="settings-board"><canvas class="settings-art" aria-hidden="true"></canvas><h1 id="settings-title" class="settings-accessible-label" tabindex="-1">${t('Настройки')}</h1>
-    ${choice('on', 'sound-toggle', 'data-enabled="true"', view.settings.soundEnabled)}${choice('off', 'sound-toggle', 'data-enabled="false"', !view.settings.soundEnabled)}
-    ${slider('music', 'Музыка', view.settings.musicVolume)}${slider('effects', 'Звуки', view.settings.effectsVolume)}
-    ${choice('auto', 'language', 'data-language="auto"', view.settings.language === 'auto')}${choice('ru', 'language', 'data-language="ru"', view.settings.language === 'ru')}${choice('en', 'language', 'data-language="en"', view.settings.language === 'en')}
-    ${choice('normal', 'text-size', 'data-size="normal"', view.settings.textSize === 'normal')}${choice('large', 'text-size', 'data-size="large"', view.settings.textSize === 'large')}
-    <button class="settings-control" data-setting="back" data-action="back"><span class="settings-accessible-label settings-native-label">${t('Назад')}</span></button></div>
-    <p class="settings-load-status" role="status" hidden></p>
-    ${view.settingsError ? `<div class="reference-settings-error" role="alert"><p>${t(view.settingsError)}</p><button data-action="retry-settings">${t('Повторить сохранение')}</button><button data-action="cancel-settings">${t('Вернуться к сохранённому')}</button></div>` : ''}</section>`;
+  const caption = (label: string) => `<span class="settings-caption">${t(label)}</span>`;
+  const choice = (id: string, label: string, action: string, attribute: string, selected: boolean) =>
+    `<button type="button" class="settings-choice settings-control" data-setting="${id}" data-action="${action}" ${attribute} aria-pressed="${selected}" ${disabled}>${caption(label)}</button>`;
+  const volume = (id: 'music' | 'effects', label: string, value: number) =>
+    `<label class="settings-slider settings-control" data-setting="${id}">${caption(label)}
+    <output class="settings-caption" data-${id}-volume>${value}%</output>
+    <span class="settings-range"><span class="settings-track" aria-hidden="true"></span>
+    <input type="range" aria-label="${t(label)}" data-action="${id}-volume" min="0" max="100" step="1" value="${value}" aria-valuetext="${value}%" ${disabled}></span></label>`;
+  return `<section class="reference-settings" aria-labelledby="settings-title" data-ready="true" data-sound="${settings.soundEnabled}">
+    <div class="settings-scrim" aria-hidden="true"></div>
+    <div class="settings-board" ${view.settingsError ? 'inert' : ''}>
+    <div class="settings-stone settings-cabinet">
+      <header class="settings-lintel"><h1 id="settings-title" tabindex="-1">${caption('Настройки')}</h1></header>
+      <div class="settings-shelves">
+        <div class="sound-shelf">
+          <div class="sound-state settings-group">
+            <h2>${caption('Звук')}</h2>
+            <div class="settings-choices" role="group" aria-label="${t('Звук')}">
+              ${choice('on', 'Вкл', 'sound-toggle', 'data-enabled="true"', settings.soundEnabled)}
+              ${choice('off', 'Выкл', 'sound-toggle', 'data-enabled="false"', !settings.soundEnabled)}
+            </div>
+          </div>
+          <div class="settings-volumes">
+            ${volume('music', 'Музыка', settings.musicVolume)}
+            ${volume('effects', 'Звуки', settings.effectsVolume)}
+          </div>
+        </div>
+        <div class="reading-shelf">
+          <div class="settings-group">
+            <h2>${caption('Язык')}</h2>
+            <div class="settings-choices settings-languages" role="group" aria-label="${t('Язык')}">
+              ${choice('auto', 'Авто', 'language', 'data-language="auto"', settings.language === 'auto')}
+              ${choice('ru', 'Русский', 'language', 'data-language="ru"', settings.language === 'ru')}
+              ${choice('en', 'English', 'language', 'data-language="en"', settings.language === 'en')}
+            </div>
+          </div>
+          <div class="settings-group">
+            <h2>${caption('Размер текста')}</h2>
+            <div class="settings-choices" role="group" aria-label="${t('Размер текста')}">
+              ${choice('normal', 'Обычный', 'text-size', 'data-size="normal"', settings.textSize === 'normal')}
+              ${choice('large', 'Крупный', 'text-size', 'data-size="large"', settings.textSize === 'large')}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="settings-frame-button settings-back settings-control" data-setting="back" data-action="back">${caption('Назад')}</button></div>
+    ${view.settingsError ? `<div class="watch-dialog-shade settings-error-shade"><section class="reference-settings-error settings-stone" role="alertdialog" aria-modal="true" aria-labelledby="settings-error-title"><h2 id="settings-error-title">${t('Настройки не подтверждены')}</h2><p>${t(view.settingsError)}</p><div class="settings-error-actions"><button type="button" class="settings-frame-button" data-action="retry-settings">${t('Повторить сохранение')}</button><button type="button" class="settings-frame-button" data-action="cancel-settings">${t('Вернуться к сохранённому')}</button></div></section></div>` : ''}</section>`;
 }
 
-function position(element: HTMLElement, rect: SettingsRect, scale: number): void {
-  element.style.left = `${rect.x * scale}px`; element.style.top = `${rect.y * scale}px`;
-  element.style.width = `${rect.width * scale}px`; element.style.height = `${rect.height * scale}px`;
-}
-
+/** Preserve the mounted input during drags and refresh both the numeric and accessible value. */
 export function layoutReferenceSettings(root: HTMLElement, view: ApplicationView): void {
   const page = root.querySelector<HTMLElement>('.reference-settings');
-  const board = page?.querySelector<HTMLElement>('.settings-board');
-  const canvas = board?.querySelector<HTMLCanvasElement>('.settings-art');
-  if (!page || !board || !canvas || !page.clientWidth || !page.clientHeight) return;
-  let layout: SettingsLayout;
-  // A newly visible scrollbar can change available width on the first pass.
-  for (let pass = 0; pass < 2; pass++) {
-    const width = page.clientWidth;
-    const mobile = usesMobileSettingsLayout(width, page.clientHeight,
-      window.matchMedia('(pointer: coarse)').matches, navigator.maxTouchPoints);
-    layout = settingsLayout(width, page.clientHeight, view.settings.textSize, mobile);
-    board.style.width = `${layout.width * layout.scale}px`;
-    board.style.height = `${Math.ceil(layout.height * layout.scale)}px`;
-    if (page.clientWidth === width) break;
+  if (!page) return;
+  page.dataset.orientation = page.clientWidth > page.clientHeight ? 'landscape' : 'portrait';
+  page.dataset.layout = page.clientWidth < 960 ? 'mobile' : 'desktop';
+  for (const caption of page.querySelectorAll<HTMLElement>('.settings-caption:not(output)')) {
+    const parent = caption.parentElement;
+    const tone = parent?.matches('h1, .settings-back') ? 'gold'
+      : parent?.matches('[aria-pressed="true"]') ? 'selected'
+        : parent?.matches('[aria-pressed="false"]') ? 'choice' : 'heading';
+    paintSettingsCaption(caption, caption.textContent ?? '', tone);
   }
-  const current = layout!;
-  page.style.setProperty('--settings-ui-scale', String(current.scale));
-  page.style.setProperty('--settings-content-height', `${Math.ceil(current.height * current.scale)}px`);
-  page.dataset.orientation = current.orientation;
-  page.dataset.layout = current.mobile ? 'mobile' : 'desktop';
-  page.dataset.compact = String(current.compact);
-  for (const [label, rect] of Object.entries(current.choices)) {
-    position(board.querySelector<HTMLElement>(`[data-setting="${label}"]`)!, rect, current.scale);
+  for (const name of ['music','effects'] as const) {
+    const value = view.settings[name === 'music' ? 'musicVolume' : 'effectsVolume'] + '%';
+    const output = page.querySelector<HTMLOutputElement>(`[data-${name}-volume]`)!;
+    output.value = value;
+    paintSettingsCaption(output, value, 'value');
+    const slider = page.querySelector<HTMLInputElement>(`[data-action="${name}-volume"]`)!;
+    slider.setAttribute('aria-valuetext', value);
+    slider.parentElement!.style.setProperty('--volume', value);
   }
-  for (const label of ['music', 'effects'] as const) {
-    const rect = current.sliders[label], height = Math.max(44 / current.scale, rect.height);
-    const element = board.querySelector<HTMLElement>(`[data-setting="${label}"]`)!;
-    position(element, { ...rect, y: rect.y + 5 - height / 2, height }, current.scale);
-    element.style.setProperty('--slider-thumb', `${24 * current.scale}px`);
-    element.querySelector('input')!.setAttribute('aria-valuetext', `${view.settings[label === 'music' ? 'musicVolume' : 'effectsVolume']}%`);
-  }
-  if (!assets) {
-    page.dataset.ready = 'loading';
-    const ticket = Symbol(); pending.set(canvas, ticket);
-    void loadSettingsAssets().then(loaded => {
-      assets = loaded;
-      if (canvas.isConnected && pending.get(canvas) === ticket) layoutReferenceSettings(root, view);
-    }).catch(() => {
-      if (!canvas.isConnected || pending.get(canvas) !== ticket) return;
-      page.dataset.ready = 'error';
-      const status = page.querySelector<HTMLElement>('.settings-load-status')!;
-      const language = resolveLanguage(view.settings.language, undefined, navigator.languages);
-      status.textContent = language === 'ru' ? 'Не удалось загрузить оформление. Настройки доступны ниже.' : 'Could not load the artwork. Settings remain available below.';
-      status.hidden = false;
-    });
-    return;
-  }
-  const ratio = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.ceil(current.width * current.scale * ratio);
-  canvas.height = Math.ceil(current.height * current.scale * ratio);
-  const context = canvas.getContext('2d')!;
-  context.setTransform(current.scale * ratio, 0, 0, current.scale * ratio, 0, 0);
-  context.imageSmoothingEnabled = false;
-  const language = resolveLanguage(view.settings.language, undefined, navigator.languages);
-  paintSettingsArtwork(context, current, view.settings, language, assets, !view.settingsError);
-  const status = page.querySelector<HTMLElement>('.settings-load-status')!;
-  status.hidden = true;
-  status.textContent = '';
-  page.dataset.ready = 'true';
 }

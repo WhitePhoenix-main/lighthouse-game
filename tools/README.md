@@ -15,12 +15,18 @@
 
 ## Проверки текущих экранов
 
+`node tools/browser/verify-avalon-watch.cjs` запускает Chrome и локальный Vite без HMR. Нужны установленный Google Chrome и Playwright, путь к модулю можно передать через `LIGHTHOUSE_PLAYWRIGHT_PATH`. При заданном `LIGHTHOUSE_TEST_URL` используется существующий localhost-стенд. Проверка создаёт отдельный профиль для каждого размера окна, языка и размера текста. Переходы выполняются мышью либо эмулированными касаниями. Ночи ускоряются штатными фиксированными шагами симуляции, финальная глава запускается из подготовленного тестового сохранения. PNG и результаты записываются в `test-results/avalon-watch-runtime/`.
+
+Для попарной сверки `WATCH_ART_PASS=after` включает в `verify-avalon-watch.cjs` три точных размера эталонов и дополнительные состояния. `capture-watch-world.cjs` снимает берег с размещёнными устройствами и Стража, `capture-watch-workshop.cjs` открывает заданные страницы и покупки. Пары PNG собирает `tools/assets/compare-avalon-watch.py`. [Полная последовательность команд](../art/reviews/avalon-watch/README.md)
+
 При работающем `pnpm dev --port 5189 --strictPort`:
 
 ```powershell
 node tools/browser/verify-preparation.cjs http://127.0.0.1:5189
 node tools/browser/verify-battle.cjs http://127.0.0.1:5189
 node tools/browser/verify-battle.cjs http://127.0.0.1:5189 --gpu
+node tools/browser/verify-campaign.cjs http://127.0.0.1:5189
+node tools/browser/verify-campaign-presentation-rewards.cjs http://127.0.0.1:5189
 node tools/browser/verify-skill-tree.cjs http://127.0.0.1:5189
 node tools/browser/verify-settings-screen.cjs http://127.0.0.1:5189
 node tools/browser/verify-settings-navigation.cjs http://127.0.0.1:5189
@@ -45,6 +51,12 @@ node tools/browser/verify-build.cjs http://127.0.0.1:4173
 node tools/browser/verify-battle.cjs http://127.0.0.1:4173 --gpu --production-only
 ```
 
+`node tools/browser/verify-pages-build.mjs` запускает ту же проверку боя для
+готового `dist/` по префиксу `/lighthouse-game/`. Обёртка сама запускает и
+закрывает локальный сервер. GitHub Actions выполняет этот сценарий до загрузки
+артефакта Pages. На Ubuntu он использует установленный Google Chrome со
+SwiftShader для WebGL на сервере без аппаратного GPU.
+
 `verify-menu` проверяет работающий интерфейс. Дополнительная проверка покрытия
 исходных художественных масок включается только через
 `LIGHTHOUSE_AMBIENT_COVERAGE_PATH`; исторический отчёт масок отсутствует в checkout.
@@ -61,12 +73,21 @@ node tools/browser/verify-battle.cjs http://127.0.0.1:4173 --gpu --production-on
 node tools/assets/prepare-menu-scenery.mjs
 node tools/assets/prepare-game-menu.mjs
 pwsh -File tools/assets/prepare-preparation-ui.ps1
+pwsh -File tools/assets/prepare-preparation-stone.ps1
+pwsh -File tools/assets/prepare-skill-tree-chart.ps1
+pwsh -File tools/assets/prepare-skill-tree-chrome.ps1
+python tools/assets/prepare-chronicle-book.py
+python tools/assets/prepare-campaign-art.py
 ```
 
 `prepare-menu-scenery` копирует готовые атласы из `sprites/` без внешних пакетов.
+`prepare-campaign-art.py` использует Pillow и мастера в `art/campaign-f/masters/`.
 `prepare-game-menu` использует внешний `sharp` и исходники `art/game-menu-v2/`.
 PowerShell-генератор подготовки использует System.Drawing и источники из
 `art/concepts/preparation-2026-11-17/`.
+`prepare-skill-tree-chart.ps1` собирает два PNG-фона дерева из спрайтов мыса
+первой главы. `prepare-skill-tree-chrome.ps1` рисует пиксельные рамки и собирает
+маяк на скальном основании. Оба используют Windows с System.Drawing.
 
 `prepare-menu-buttons.mjs` сохранён как рецепт действующих атласов, но его входы
 `art/menu-buttons-v2/lettering.mjs` и `art/menu-buttons-reference-v1/` сейчас

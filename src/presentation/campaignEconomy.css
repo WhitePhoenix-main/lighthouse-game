@@ -1,0 +1,252 @@
+.lighthouse-app:has(.overlay.screen-collection) { width:100%; max-width:none; height:100dvh; min-height:280px; padding:0; }
+.lighthouse-app:has(.overlay.screen-collection) :is(.masthead,.battle-rail,.ocean) { display:none; }
+.lighthouse-app:has(.overlay.screen-collection) .play-area { min-height:0; margin:0; border:0; border-radius:0; }
+.lighthouse-app .overlay.screen-collection { display:block; overflow:hidden; padding:0; }
+.is-development .overlay.screen-development:has(.campaign-development) { overflow:hidden; }
+
+.economy-screen {
+  --economy-pad:max(8px,calc(9 * var(--watch-px)));
+  --economy-gap:max(5px,calc(5 * var(--watch-px)));
+  --economy-rail:url('/images/avalon-watch/navigation/copper-rail.png');
+  width:100%; height:100%; min-height:0; padding:var(--economy-pad); overflow:hidden;
+  display:flex; flex-direction:column; gap:var(--economy-gap); color:var(--watch-ink);
+  font:400 var(--watch-body)/1.25 var(--watch-font);
+  background:radial-gradient(ellipse at 30% -65%,#28435c,transparent 72%), #0e2032;
+}
+.economy-screen :is(h2,h3,p,dl,dd) { margin:0; }
+.economy-screen :is(button,summary):focus-visible { outline:2px solid #ffe1b2; outline-offset:-2px; }
+.economy-screen [tabindex="-1"]:focus { outline:none; }
+.economy-screen button, .economy-screen summary { touch-action:manipulation; }
+:is(.economy-screen,.campaign-currency-layout) .watch-icon { width:clamp(16px,calc(15 * var(--watch-px)),32px); height:clamp(16px,calc(15 * var(--watch-px)),32px); }
+.economy-header { position:relative; display:flex; align-items:center; min-width:0; gap:max(8px,calc(10 * var(--watch-px))); padding-bottom:calc(2 * var(--watch-px)); }
+.economy-header::after, .campaign-circuit-board footer::before, .campaign-shelf::after {
+  content:''; position:absolute; pointer-events:none; inset:auto 0 0; height:calc(4 * var(--watch-px));
+  border:solid transparent; border-width:0 calc(7 * var(--watch-px)); border-image:var(--economy-rail) 0 7 fill / 1 / 0 stretch;
+}
+.economy-header h1 { flex:1; margin:0; min-width:0; font:400 max(20px,calc(20 * var(--watch-px)))/1.1 var(--watch-font); letter-spacing:0; color:var(--watch-gold); text-shadow:0 var(--watch-px) #8f4822,var(--watch-px) calc(2 * var(--watch-px)) #1d1312; }
+[data-text-size="large"] .economy-header h1 { font-size:max(22px,calc(22 * var(--watch-px))); }
+.economy-header .economy-back { min-height:44px; height:clamp(44px,calc(34 * var(--watch-px)),72px); width:clamp(44px,calc(35 * var(--watch-px)),74px); }
+.economy-wallet, .economy-wallet span, .economy-price span { display:flex; align-items:center; gap:max(4px,calc(5 * var(--watch-px))); }
+.economy-wallet { gap:max(6px,calc(12 * var(--watch-px))); flex-wrap:wrap; justify-content:end; }
+.economy-header .economy-collection-count { color:var(--watch-muted); }
+
+.campaign-filters { position:relative; z-index:5; display:flex; gap:var(--economy-gap); }
+.campaign-filters > :is(button,details) { min-width:0; }
+.campaign-filters > button.watch-button, .campaign-filters summary {
+  min-height:max(44px,calc(30 * var(--watch-px)));
+  padding-inline:calc(6 * var(--watch-px)); font:400 var(--watch-body)/1.1 var(--watch-font);
+}
+.campaign-filters > button.watch-button { flex:0 1 calc(216 * var(--watch-px)); text-wrap:balance; }
+.campaign-filters > details { flex:0 1 calc(124 * var(--watch-px)); }
+.campaign-filters .campaign-group-picker:not([open]) summary {
+  border-image-source:url('/images/avalon-watch/ui/selected.png'); color:var(--watch-gold);
+}
+.campaign-filters .campaign-chart-picker > div { top:100%; left:0; right:auto; max-height:min(52dvh,420px); }
+.campaign-filters .campaign-chart-picker button { width:100%; }
+.campaign-development-board, .campaign-collection-board { flex:1; min-height:0; display:grid; gap:var(--economy-gap); }
+.campaign-development-board { grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); }
+.campaign-development-board:not(:has(.campaign-upgrade-inspector)) { grid-template-columns:minmax(0,1fr); }
+.campaign-circuit-board {
+  display:flex; flex-direction:column; min-width:0; min-height:0; position:relative;
+  border-image-source:url('/images/avalon-watch/ui/inset.png');
+  padding:0 calc(10 * var(--watch-px)) calc(2 * var(--watch-px));
+  isolation:isolate;
+}
+.campaign-circuit-board::before {
+  content:''; pointer-events:none; position:absolute; z-index:-1; inset:0;
+  --brass-pin:url('/images/avalon-watch/navigation/brass-pin.png');
+  --pin-size:calc(9 * var(--watch-px)) calc(10 * var(--watch-px));
+  background:var(--brass-pin) left top / var(--pin-size) no-repeat,
+    var(--brass-pin) right top / var(--pin-size) no-repeat,
+    var(--brass-pin) left bottom / var(--pin-size) no-repeat,
+    var(--brass-pin) right bottom / var(--pin-size) no-repeat,
+    url('/images/avalon-watch/navigation/optics-grid.png') 0 0 / calc(12 * var(--watch-px)) repeat;
+}
+.campaign-circuit-header {
+  position:relative; z-index:2; min-height:calc(22 * var(--watch-px)); display:flex; align-items:center;
+  gap:4px; padding:calc(4 * var(--watch-px)) 52px 0 calc(6 * var(--watch-px));
+}
+.campaign-circuit-header h2 { margin-right:auto; font:400 max(13px,calc(14 * var(--watch-px)))/1.2 var(--watch-font); color:var(--watch-ink); overflow-wrap:anywhere; }
+.campaign-circuit-header::before {
+  content:''; position:absolute; pointer-events:none; inset:0 calc(33 * var(--watch-px)) auto 0;
+  height:calc(6 * var(--watch-px));
+  background:url('/images/avalon-watch/navigation/optics-scale.png') left top / calc(35 * var(--watch-px)) calc(6 * var(--watch-px)) repeat-x;
+}
+.campaign-circuit-header .campaign-chart-picker { position:absolute; inset:0 0 auto auto; }
+.campaign-circuit-header .campaign-chart-picker > div { width:min(82vw,380px); max-height:min(45dvh,420px); }
+.campaign-chart-picker > summary {
+  display:flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; padding:0 7px;
+  border:max(5px,calc(8 * var(--watch-px))) solid transparent;
+  border-image:url('/images/avalon-watch/ui/secondary.png') 9 fill / 1 / 0 repeat;
+  color:var(--watch-ink); list-style:none; text-align:center; cursor:pointer;
+}
+.campaign-chart-picker[open] > summary { border-image-source:url('/images/avalon-watch/ui/selected.png'); }
+.campaign-chart-picker > summary::-webkit-details-marker { display:none; }
+.campaign-chart-picker > div {
+  position:absolute; top:46px; right:2px; z-index:4; width:min(94%,420px); max-height:calc(100% - 56px);
+  overflow:auto; overscroll-behavior:contain; padding:4px; display:grid; gap:4px;
+  background:#102438; box-shadow:0 8px 22px #000b;
+}
+.campaign-chart-picker > div section { display:grid; gap:4px; }
+.campaign-chart-picker button.watch-button { text-align:left; justify-content:start; }
+.campaign-chart-picker h3 { padding:6px 4px 0; color:var(--watch-gold); font:inherit; }
+.campaign-circuit-viewport {
+  position:relative; z-index:1; flex:1; min-height:0; overflow:auto; overscroll-behavior:contain;
+  scrollbar-color:#927860 #0d1e30; scrollbar-width:thin; container-type:inline-size;
+}
+.campaign-circuit-board footer {
+  position:relative; min-height:1.35em; margin-top:2px; padding-top:calc(4 * var(--watch-px));
+  color:var(--watch-muted); font-size:max(11px,calc(10 * var(--watch-px))); text-align:right;
+}
+.campaign-circuit-board footer::before { inset:0 0 auto; }
+.campaign-circuit { position:relative; width:max(100%,var(--optical-span,var(--circuit-w))); height:max(100%,158px); }
+.campaign-circuit svg { width:100%; height:100%; position:absolute; inset:0; pointer-events:none; }
+.campaign-circuit path { fill:none; stroke:#9c815f; stroke-width:calc(2 * var(--watch-px)); paint-order:stroke; filter:drop-shadow(0 calc(2 * var(--watch-px)) #060f19); vector-effect:non-scaling-stroke; }
+.campaign-circuit path[data-met="true"] { stroke:#c5945c; }
+.campaign-circuit path[data-related="true"] { stroke:#e2ad6a; }
+.campaign-circuit path[data-related="true"][data-met="false"] { stroke-dasharray:5 3; }
+.campaign-circuit-viewport:not([data-optics-scrolled]) path[data-off-plate="true"] { visibility:hidden; }
+button.campaign-circuit-node {
+  --node-size:clamp(44px,calc(44 * var(--watch-px)),88px);
+  position:absolute; display:grid; place-items:center; width:var(--node-size); height:var(--node-size); padding:0;
+  border:0; border-radius:0; background:none; box-shadow:none; color:var(--watch-ink); transform:translate(-50%,-50%);
+}
+button.campaign-circuit-node[aria-pressed="true"] { z-index:2; }
+.campaign-circuit-medal {
+  display:grid; place-items:center; width:calc(43 * var(--watch-px)); aspect-ratio:1;
+  background:var(--circuit-medal) center / contain no-repeat; image-rendering:pixelated;
+}
+.campaign-circuit-medal img { width:63%; aspect-ratio:1; object-fit:contain; image-rendering:pixelated; }
+[data-socket="wide"] .campaign-circuit-medal img { width:38%; }
+.campaign-circuit-node[aria-pressed="true"]::before {
+  content:''; position:absolute; pointer-events:none; width:calc(47 * var(--watch-px)); aspect-ratio:1;
+  background:url('/images/avalon-watch/navigation/optics-selection.png') center / contain no-repeat;
+}
+.campaign-circuit-mark, .campaign-shelf-mark { position:absolute; top:0; right:0; display:grid; place-items:center; border:1px solid #6c7980; border-radius:50%; background:#273747; }
+[data-state="purchased"] .campaign-circuit-mark { border-color:#c69a66; }
+.economy-screen .campaign-circuit-mark .watch-icon { width:clamp(15px,calc(10 * var(--watch-px)),20px); height:clamp(15px,calc(10 * var(--watch-px)),20px); }
+.campaign-circuit-label {
+  position:absolute; top:calc(50% + 20 * var(--watch-px)); width:max(96px,calc(110 * var(--watch-px))); padding:1px;
+  color:#e9cf9f; font:400 max(11px,calc(11 * var(--watch-px)))/1.05 var(--watch-font); text-align:center;
+  overflow-wrap:anywhere; text-shadow:0 1px 2px #01070e,0 1px 4px #01070e; pointer-events:none;
+}
+[data-socket="paired"] .campaign-circuit-label {
+  top:50%; right:calc(50% + 23 * var(--watch-px)); width:max-content; max-width:max(96px,calc(104 * var(--watch-px)));
+  transform:translateY(-50%); text-align:right; background:#102538;
+}
+[data-text-size="large"] .campaign-circuit-label { font-size:max(13px,calc(13 * var(--watch-px))); }
+.economy-empty { display:grid; place-items:center; flex:1; color:var(--watch-muted); padding:16px; text-align:center; }
+
+.campaign-upgrade-inspector, .campaign-display, .campaign-currency-offer {
+  display:flex; flex-direction:column; min-width:0; min-height:0; gap:var(--economy-gap); padding:var(--economy-gap);
+}
+.economy-inspector-body { display:flex; flex:1; flex-direction:column; min-height:0; overflow:auto; padding:1px 2px; gap:var(--economy-gap); overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#9c7858 #112840; }
+.campaign-upgrade-inspector {
+  --economy-gap:calc(3 * var(--watch-px));
+  font-size:max(12px,calc(12 * var(--watch-px)));
+}
+[data-text-size="large"] .campaign-upgrade-inspector { font-size:max(14px,calc(14 * var(--watch-px))); }
+.campaign-upgrade-inspector .economy-inspector-body { padding-block:0; }
+.economy-inspector-body > * { flex-shrink:0; }
+.economy-relic { height:calc(57 * var(--watch-px)); }
+.economy-relic img, .economy-archive img {
+  display:block; width:100%; height:100%; object-fit:cover; object-position:center; image-rendering:pixelated;
+}
+.economy-inspector-body h2 { font:400 max(18px,calc(21 * var(--watch-px)))/1.13 var(--watch-font); letter-spacing:0; color:var(--watch-gold); overflow-wrap:anywhere; }
+[data-text-size="large"] .economy-inspector-body h2 { font-size:max(20px,calc(23 * var(--watch-px))); }
+.economy-branch { color:#9dc7ca; font-size:max(11px,calc(11 * var(--watch-px))); }
+[data-text-size="large"] .economy-branch { font-size:max(13px,calc(13 * var(--watch-px))); }
+.campaign-upgrade-stats dd { font-size:max(17px,calc(18 * var(--watch-px))); color:#a5d2d3; }
+[data-text-size="large"] .campaign-upgrade-stats dd { font-size:max(19px,calc(20 * var(--watch-px))); }
+.campaign-upgrade-stats dd span { color:var(--watch-gold); }
+.campaign-upgrade-stats div + div { margin-top:.45em; }
+.campaign-requirements, .campaign-blockers { margin:0; list-style:none; padding:0; }
+.campaign-requirements { display:flex; flex-wrap:wrap; column-gap:calc(8 * var(--watch-px)); }
+.campaign-requirements li, .economy-reward-status, .economy-reward-amount { display:flex; align-items:center; gap:6px; }
+.campaign-requirements li { align-items:start; }
+.campaign-requirements button {
+  display:flex; align-items:start; min-width:44px; min-height:44px; padding:1px 2px 0;
+  color:inherit; background:none; border:0; border-radius:0; font:inherit; text-align:left; text-decoration:underline; text-underline-offset:3px;
+}
+.campaign-requirements li[data-met="true"], .economy-reward-status, .economy-reward-amount { color:#a7d1d5; }
+.campaign-blockers li + li { margin-top:.15em; }
+.economy-price { display:flex; align-items:center; flex-wrap:wrap; gap:.3em 1em; }
+.campaign-upgrade-actions { flex:none; display:grid; gap:var(--economy-gap); }
+.campaign-upgrade-actions button, .campaign-display > button { width:100%; flex:none; min-height:max(44px,calc(36 * var(--watch-px))); }
+.campaign-display > button[data-action="campaign-cosmetic"][aria-pressed="true"]:not(:hover,:focus-visible) {
+  border-image-source:url('/images/avalon-watch/ui/secondary.png'); color:var(--watch-ink);
+}
+
+.campaign-collection-board { grid-template-columns:minmax(0,4fr) minmax(0,5fr); }
+.campaign-cabinet {
+  position:relative; display:grid; grid-template-rows:repeat(2,minmax(0,1fr)); gap:var(--economy-gap); min-height:0;
+  padding:calc(10 * var(--watch-px)) calc(17 * var(--watch-px));
+  background:url('/images/avalon-watch/navigation/wood-planks.png') left top / calc(156 * var(--watch-px)) calc(88 * var(--watch-px)) repeat;
+  box-shadow:inset 0 0 0 calc(2 * var(--watch-px)) #241b1b; image-rendering:pixelated;
+}
+.campaign-cabinet::before, .campaign-cabinet::after {
+  content:''; position:absolute; inset:calc(2 * var(--watch-px)) auto calc(2 * var(--watch-px)) calc(3 * var(--watch-px));
+  width:calc(6 * var(--watch-px)); pointer-events:none;
+  background:url('/images/avalon-watch/navigation/wood-brace.png') left top / 100% calc(47 * var(--watch-px)) repeat-y;
+}
+.campaign-cabinet::after { inset-inline:auto calc(3 * var(--watch-px)); transform:scaleX(-1); }
+.campaign-shelf { position:relative; min-height:0; display:flex; flex-direction:column; gap:var(--economy-gap); padding-bottom:calc(6 * var(--watch-px)); }
+.campaign-shelf h2 { color:#ffd295; font:400 var(--watch-body)/1.15 var(--watch-font); }
+.campaign-shelf > div { flex:1; min-height:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--economy-gap); }
+button.campaign-shelf-slot.watch-inset, .campaign-display-case.watch-inset {
+  border:calc(10 * var(--watch-px)) solid transparent;
+  border-image:url('/images/avalon-watch/navigation/recess.png') 10 fill / 1 / 0 stretch;
+}
+button.campaign-shelf-slot.watch-inset {
+  position:relative; display:grid; place-items:center; min-width:44px; min-height:44px; padding:0; background:none; box-shadow:none;
+  border-image-width:calc(10 * var(--watch-px)); border-width:calc(4 * var(--watch-px));
+}
+button.campaign-shelf-slot.watch-inset[aria-pressed="true"] { border-image-source:url('/images/avalon-watch/navigation/recess-selected.png'); }
+.campaign-shelf-slot > img { display:block; width:100%; height:100%; min-height:0; object-fit:contain; image-rendering:pixelated; }
+.campaign-shelf-mark { top:0; right:0; border:0;background:#19332f; }
+.campaign-display-case {
+  position:relative; isolation:isolate; display:grid; align-items:center; justify-items:center; overflow:hidden;
+  height:calc(104 * var(--watch-px)); padding:0;
+}
+.campaign-display-case::before {
+  content:''; position:absolute; z-index:-1; inset:0;
+  background:url('/images/avalon-watch/navigation/display-dial.png') center / auto 110% no-repeat;
+}
+.campaign-display-case img { display:block; width:auto; height:115%; max-width:100%; object-fit:contain; image-rendering:pixelated; }
+.campaign-offer { margin-block:3px; }
+.campaign-offer p { margin:.35em 0; }
+.campaign-offer-actions { display:flex; flex-wrap:wrap; gap:5px; }
+.campaign-offer-actions button.watch-button { font-size:var(--watch-body); }
+.economy-offer-reason, [data-reward-notice] { color:var(--watch-muted); }
+.campaign-result-reward { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.campaign-result-reward > img { width:64px; height:48px; image-rendering:pixelated; }
+
+.preparation-screen .prep-drawer:has(.campaign-currency-layout) {
+  inset:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right))
+    max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+  width:auto; height:auto; max-height:none; transform:none;
+}
+.prep-drawer-body:has(.campaign-currency-layout) { display:flex; flex-direction:column; }
+.campaign-currency-layout { flex:1 0 auto; display:grid; grid-template-columns:minmax(0,4fr) minmax(0,5fr); gap:var(--economy-gap,8px); }
+.economy-archive { min-height:0; position:relative; }
+.economy-archive img { position:absolute; inset:0; }
+.campaign-currency-offer { padding:var(--economy-pad,10px); font:400 var(--watch-body)/1.25 var(--watch-font); }
+.campaign-currency-offer h3 { margin:0; padding-bottom:6px; border-bottom:2px solid #a87451; color:var(--watch-gold); font:400 max(16px,calc(19 * var(--watch-px)))/1.15 var(--watch-font); }
+.campaign-currency-offer .campaign-offer-actions { display:grid; }
+.campaign-currency-offer .economy-close-offer { width:100%; margin-top:auto; }
+.campaign-currency-offer .campaign-pending, .campaign-display .campaign-pending { padding:0; border:0; background:none; }
+
+@media(orientation:portrait) {
+  .campaign-development-board, .campaign-collection-board { grid-template-columns:minmax(0,1fr); }
+  .campaign-development-board:has(.campaign-upgrade-inspector) { grid-template-rows:minmax(145px,45%) minmax(0,1fr); }
+  .campaign-collection-board { grid-template-rows:minmax(150px,39%) minmax(0,1fr); }
+  .campaign-display-case { height:calc(123 * var(--watch-px)); }
+  .campaign-currency-layout { grid-template-columns:minmax(0,1fr); grid-template-rows:clamp(90px,26dvh,180px) auto; }
+  .economy-relic { height:calc(72 * var(--watch-px)); }
+}
+@media(orientation:portrait), (max-height:450px) {
+  .economy-screen { padding-top:0; }
+}
+@media(max-height:450px) and (orientation:landscape) {
+  .economy-relic { height:calc(41 * var(--watch-px)); }
+}

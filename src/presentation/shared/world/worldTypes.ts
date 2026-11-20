@@ -1,4 +1,4 @@
-import type { DeviceKind, NightConfig } from '../../../contracts';
+import type { DeviceKind, DeviceVariantId, NightConfig } from '../../../contracts';
 
 export interface WorldViewport { x: number; y: number; width: number; height: number }
 export interface WorldCamera {
@@ -10,12 +10,16 @@ export interface WorldCamera {
 }
 export interface WorldDevice {
   id: number; kind: DeviceKind; x: number; y: number;
+  variantId?: DeviceVariantId;
   health?: number; maxHealth?: number; consumed?: boolean;
 }
 export interface ChapterWorldAssets {
-  terrain: HTMLImageElement;
-  lighthouse: HTMLImageElement;
-  props: HTMLImageElement;
+  headland?: HTMLImageElement;
+  lighthouse?: HTMLImageElement;
+  rock?: HTMLImageElement;
+  arch?: HTMLImageElement;
+  devices: Partial<Record<DeviceKind, HTMLImageElement>>;
+  variants: Partial<Record<DeviceVariantId, HTMLImageElement>>;
 }
 export interface WorldPaintOptions {
   devices: readonly WorldDevice[];

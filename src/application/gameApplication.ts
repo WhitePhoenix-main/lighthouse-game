@@ -9,6 +9,13 @@ import {checkDraft, checkPlacement} from './placement';
 import {actualDeviceHealth, battleDeviceDeployments, deviceDeployments, normalizedDeviceResults, repairCost, rechargeCost} from '../progression/devices';
 import {validateNightDefinitions} from '../content/nights';
 import {defaultSettings, memorySettingsStore, SettingsRepository} from './settings';
+import { CampaignGameStore } from './campaignGameStore';
+import type { CampaignAbilityId } from './campaignProfileTypes';
+import { CAMPAIGN_NIGHT_CATALOG } from '../content/campaignRuntime';
+import { campaignLensUnlockId } from '../content/campaignTreeDraft';
+import { DEVICE_VARIANTS, type DeviceVariantId } from '../content/campaignVariants';
+import type { CampaignCosmeticId, CampaignCosmeticSlot, CampaignRewardId } from '../content/campaignRewards';
+import type { CampaignRewardRequest } from './campaignProfileTypes';
 
 export interface AttemptIdentity {
     id: string;
@@ -17,8 +24,11 @@ export interface AttemptIdentity {
 
 export class LighthouseApplication implements GameApplication {
     readonly view: ApplicationView;
-    private readonly saves: SaveRepository;
+    private readonly saves: SaveRepository | CampaignGameStore;
+    private readonly campaign: CampaignGameStore | null;
+    private pendingCampaignAction: (() => void) | null = null;
     private initialized = false;
+    private startupInterruptionId: string | null = null;
     private accumulator = 0;
     private commands: BattleCommand[] = [];
     private attemptId: string | null = null;
@@ -30,13 +40,15 @@ export class LighthouseApplication implements GameApplication {
     private pendingLensPurchase: {kind:'lens';id:LensId}|{kind:'upgrade';id:LensUpgradeId}|null = null;
     private pendingPurchase: UpgradeId | null = null;
     private pendingStart: { identity: AttemptIdentity; config: NightConfig; battle: BattleState; cost: number } | null = null;
-    private pendingDeviceOperation: { kind: 'purchase'; deviceKind: DeviceKind; id: number }
+    private pendingDeviceOperation: { kind: 'purchase'; deviceKind: DeviceKind; id: number; variantId?: DeviceVariantId }
         | { kind: 'repair' | 'recharge'; id: number }
         | { kind: 'placement'; placements: DevicePlacement[]; config: NightConfig } | null = null;
     private readonly settings: SettingsRepository;
     private settingsInitialized = false;
     private pendingSettings: UserSettings | null = null;
     private developmentOrigin: 'menu' | 'preparation' | 'result' = 'menu';
+    private collectionOrigin: 'preparation' | 'result' = 'preparation';
+    private rewardNotice: 'confirmed' | 'dismissed' | 'unavailable' | undefined;
     private settingsOrigin: Exclude<ApplicationScreen, 'settings'> = 'menu';
     private pendingPreparation = false;
     private placementPreviewDeviceId: number | undefined;
@@ -44,11 +56,12 @@ export class LighthouseApplication implements GameApplication {
     private pendingAbandon: 'menu' | 'preparation' | null = null;
 
     constructor(store: SaveStore, config: NightConfig, private readonly identity: () => AttemptIdentity,
-        settingsStore: SaveStore = memorySettingsStore(), catalog?: readonly NightDefinition[]) {
-        this.saves = new SaveRepository(store);
+        settingsStore: SaveStore = memorySettingsStore(), catalog?: readonly NightDefinition[], campaign?: CampaignGameStore) {
+        this.campaign = campaign ?? null;
+        this.saves = campaign ?? new SaveRepository(store);
         this.settings = new SettingsRepository(settingsStore);
         this.catalog = structuredClone(catalog ?? [{ id: 'first-light', name: 'Первый свет', description: 'Защитите маяк.', chapter: 'Туманный берег', requires: null, optional: false, config: { ...config, id: 'first-light' } }]);
-        validateNightDefinitions(this.catalog);
+        validateNightDefinitions(this.catalog, campaign ? CAMPAIGN_NIGHT_CATALOG.map(night => night.id) : undefined);
         this.baseConfig = structuredClone(this.catalog[0]!.config);
         this.view = {
             selectedNightId: this.catalog[0]!.id, nights: [], selectedLensId: 'basic', lenses: [],
@@ -65,18 +78,29 @@ export class LighthouseApplication implements GameApplication {
     private refreshProfile(): void {
         this.view.profile = this.saves.current.profile;
         this.view.hasProgress = this.saves.hasProfile;
+        if (this.campaign) {
+            this.view.campaign = this.campaign.presentationView(this.view.screen === 'development');
+            this.view.campaign.rewards.notice = this.rewardNotice;
+            this.view.selectedLensId = this.view.profile.selectedLensId;
+        }
         this.view.nights = this.catalog.map(night => {
             const available = night.requires === null || this.view.profile.wonNightIds.includes(night.requires);
             return { id: night.id, name: night.name, description: isLateNight(night.id) && this.selectedLateMode === 'transition' ? lateNightModeOptions(night.config)[0]!.description : night.description, chapter: night.chapter, optional: night.optional,
-                ...(night.config.boss ? {bossLevel:this.view.profile.bossLevel,materialReward:getBossRules(this.view.profile.bossLevel).materialReward}:{}), available, completed: this.view.profile.wonNightIds.includes(night.id), reason: available ? '' : `Требуется победа: ${this.catalog.find(item => item.id === night.requires)!.name}` };
+                ...(night.config.boss ? {bossLevel:this.view.profile.bossLevel,materialReward:this.campaign?.firstRewards(night.id, true).firstWinPearls ?? getBossRules(this.view.profile.bossLevel).materialReward}:{}), available, completed: this.view.profile.wonNightIds.includes(night.id), reason: available ? '' : `Требуется победа: ${this.catalog.find(item => item.id === night.requires)!.name}` };
         });
         this.view.lateNightModes = lateNightModeOptions(this.baseConfig);
         this.view.lenses = createLensViews(this.view.profile, this.view.selectedLensId);
-        this.view.upgrades = createUpgradeViews(this.view.profile, this.baseConfig);
+        if (!this.campaign) this.view.upgrades = createUpgradeViews(this.view.profile, this.baseConfig);
         if (!this.attemptConfig && this.view.screen !== 'battle' && !(this.view.screen === 'settings' && this.settingsOrigin === 'battle')) {
-            this.view.config = calculateNightConfig(resolveLateNight(this.baseConfig, this.selectedLateMode), this.view.profile.purchasedUpgrades, this.view.profile.legacyEquipment, this.loadout());
+            this.view.config = this.currentConfig();
         }
         this.refreshPreparation();
+    }
+
+    private currentConfig(): NightConfig {
+        if (this.campaign) return this.campaign.calculateConfig(this.baseConfig);
+        const profile = this.saves.current.profile;
+        return calculateNightConfig(resolveLateNight(this.baseConfig, this.selectedLateMode), profile.purchasedUpgrades, profile.legacyEquipment, this.loadout());
     }
 
     private refreshPreparation(): void {
@@ -89,8 +113,8 @@ export class LighthouseApplication implements GameApplication {
         const check = checkDraft(this.view.config, draft.placements);
         draft.cost = 0;
         draft.remaining = this.view.profile.resources;
-        draft.reason = !check.valid ? check.reason : '';
-        draft.canStart = check.valid;
+        draft.reason = !check.valid ? check.reason : this.view.campaign?.intro ? 'Сначала откройте вступление главы.' : '';
+        draft.canStart = check.valid && !this.view.campaign?.intro;
         if (draft.preview && draft.selectedType) {
             const { x, y } = draft.preview;
             draft.preview = { x, y, ...this.placementCheck(draft.selectedType, x, y, this.placementPreviewDeviceId) };
@@ -103,13 +127,106 @@ export class LighthouseApplication implements GameApplication {
         if (!night || !this.view.nights.find(item => item.id === id)?.available
             || (this.view.screen === 'trials' && !night.optional)
             || (id === this.view.selectedNightId && this.view.screen !== 'trials')) return;
+        if (this.campaign) {
+            this.campaignAction(() => {
+                this.campaign!.selectNight(id);
+                this.applyNight(night);
+            });
+            return;
+        }
+        this.applyNight(night);
+        this.refreshProfile();
+    }
+
+    private applyNight(night: NightDefinition): void {
         if (this.view.screen === 'trials') this.view.screen = 'preparation';
         if (this.view.result) { this.clearAttempt(); this.view.screen = 'preparation'; }
-        this.view.selectedNightId = id;
+        this.view.selectedNightId = night.id;
         this.baseConfig = structuredClone(night.config);
         this.view.preparation.selectedType = null;
         this.view.preparation.preview = null;
+    }
+
+    private campaignAction(action: () => void): void { this.pendingCampaignAction = action; this.completeCampaignAction(); }
+
+    private completeCampaignAction(): void {
+        if (!this.pendingCampaignAction) return;
+        try {
+            this.pendingCampaignAction();
+            this.pendingCampaignAction = null;
+            this.refreshProfile();
+            this.view.error = null;
+        } catch (error) { this.fail(error); }
+    }
+
+    selectAbility(id: CampaignAbilityId | null): void {
+        if (!this.campaign || !this.canEditPreparation() || (id !== null && !this.view.campaign?.abilities.some(ability => ability.id === id && ability.available))) return;
+        this.campaignAction(() => this.campaign!.selectAbility(id));
+    }
+
+    acknowledgeIntro(): void {
+        if (!this.campaign || !this.canEditPreparation() || !this.view.campaign?.intro) return;
+        this.campaignAction(() => this.campaign!.acknowledgeIntro());
+    }
+
+    private canUseRewards(): boolean {
+        const { screen, error, result } = this.view;
+        return this.initialized && !!this.campaign && !error && !this.view.campaign?.intro
+          && (screen === 'preparation' || screen === 'collection' || (screen === 'result' && result?.saved === true));
+    }
+
+    openCollection(): void {
+        const { screen } = this.view;
+        if (!this.canUseRewards() || (screen !== 'preparation' && screen !== 'result')) return;
+        this.collectionOrigin = screen;
+        this.rewardNotice = undefined;
+        this.view.screen = 'collection';
         this.refreshProfile();
+    }
+
+    claimCampaignReward(id: CampaignRewardId): void {
+        if (!this.canUseRewards() || !this.view.campaign?.rewards.collection.some(item => item.id === id && item.canClaimOrdinary)) return;
+        this.campaignAction(() => this.campaign!.claimReward(id));
+    }
+
+    equipCampaignCosmetic(slot: CampaignCosmeticSlot, id: CampaignCosmeticId | null): void {
+        if (!this.canUseRewards() || this.view.screen !== 'collection') return;
+        if (id !== null && !this.view.campaign?.rewards.collection.some(item => item.id === id &&
+          item.type === 'cosmetic' && item.slot === slot && item.unlocked)) return;
+        this.campaignAction(() => this.campaign!.equipCosmetic(slot, id));
+    }
+
+    beginRewardPreview(request: CampaignRewardRequest): void {
+        if (!this.canUseRewards() || !this.view.campaign?.rewards.testAvailable) return;
+        if (request.kind === 'collection' && !this.view.campaign.rewards.collection.some(item => item.id === request.rewardId)) return;
+        const offer = this.campaign!.rewardOffer(request);
+        if (offer.unavailableReason) { this.refreshProfile(); return; }
+        const id = this.identity().id;
+        this.campaignAction(() => {
+            this.campaign!.beginRewardPreview(id, offer);
+            this.rewardNotice = undefined;
+        });
+    }
+
+    finishRewardPreview(id: string, decision: 'confirmed' | 'dismissed' | 'unavailable'): void {
+        if (!this.canUseRewards() || (decision !== 'dismissed' && !this.view.campaign?.rewards.testAvailable)) return;
+        const pending = this.view.campaign?.rewards.pending;
+        if (!pending || pending.id !== id) return;
+        const resolution = this.campaign!.resolveRewardPreview(id, decision);
+        if (resolution) this.campaignAction(() => {
+            this.campaign!.saveRewardResolution(resolution);
+            this.rewardNotice = resolution.result;
+        });
+    }
+
+    refreshCampaignRewards(): void {
+        if (this.canUseRewards()) this.refreshProfile();
+    }
+
+    purchaseCampaignNode(id: string): void {
+        if (!this.campaign || !this.initialized || this.view.error || this.view.screen !== 'development'
+            || !this.view.campaign?.purchases.some(entry => entry.node.id === id && entry.available)) return;
+        this.campaignAction(() => this.campaign!.purchaseNode(id));
     }
 
     selectLateMode(mode: LateNightMode): void {
@@ -145,7 +262,9 @@ export class LighthouseApplication implements GameApplication {
         const kind = this.view.preparation.selectedType;
         if (!kind || !this.previewPlacement(x, y, deviceId).valid) return;
         const device = deviceId === undefined ? this.availableDevice(kind)! : this.view.profile.devices.find(device => device.id === deviceId)!;
-        this.savePlacements([...this.view.preparation.placements.filter(placement => placement.id !== device.id), { id: device.id, kind, x, y }]);
+        this.savePlacements([...this.view.preparation.placements.filter(placement => placement.id !== device.id), {
+          id: device.id, kind, x, y, ...(device.variantId ? { variantId: device.variantId } : {}),
+        }]);
         this.view.preparation.preview = null;
         this.placementPreviewDeviceId = undefined;
     }
@@ -162,7 +281,7 @@ export class LighthouseApplication implements GameApplication {
     }
 
     private availableDevice(kind: DeviceKind) {
-        return this.view.profile.devices.find(device => device.kind === kind && !device.position && device.health > 0 && !device.consumed);
+        return this.view.profile.devices.find(device => device.kind === kind && !device.variantId && !device.position && device.health > 0 && !device.consumed);
     }
 
     private placementCheck(kind: DeviceKind, x: number, y: number, deviceId?: number): PlacementCheck {
@@ -180,9 +299,13 @@ export class LighthouseApplication implements GameApplication {
         this.completeDeviceOperation();
     }
 
-    purchaseDevice(kind: DeviceKind): void {
+    purchaseDevice(kind: DeviceKind, variantId?: DeviceVariantId): void {
         if (!this.canEditPreparation()) return;
-        this.pendingDeviceOperation = { kind: 'purchase', deviceKind: kind, id: this.view.profile.nextDeviceId };
+        if (variantId !== undefined && (!this.canUseRewards() || DEVICE_VARIANTS[variantId]?.kind !== kind
+          || !this.view.campaign?.rewards.collection.some(item => item.id === variantId && item.unlocked)
+          || !this.view.config.availableDevices?.includes(kind))) return;
+        this.pendingDeviceOperation = { kind: 'purchase', deviceKind: kind, id: this.view.profile.nextDeviceId,
+          ...(variantId ? { variantId } : {}) };
         this.completeDeviceOperation();
     }
 
@@ -202,7 +325,10 @@ export class LighthouseApplication implements GameApplication {
         const operation = this.pendingDeviceOperation;
         if (!operation) return;
         try {
-            if (operation.kind === 'purchase') this.saves.purchaseDevice(operation.deviceKind, operation.id);
+            if (operation.kind === 'purchase') {
+                if (this.campaign) this.campaign.purchaseDevice(operation.deviceKind, operation.id, operation.variantId);
+                else this.saves.purchaseDevice(operation.deviceKind, operation.id);
+            }
             else if (operation.kind === 'repair') this.saves.repairDevice(operation.id);
             else if (operation.kind === 'recharge') this.saves.rechargeDevice(operation.id);
             else if (operation.kind === 'placement') this.saves.savePlacements(operation.placements, operation.config);
@@ -219,13 +345,17 @@ export class LighthouseApplication implements GameApplication {
 
     private initialize(): void {
         try {
-            this.saves.load();
+            if (this.campaign && this.startupInterruptionId) this.campaign.settle(this.startupInterruptionId, 'interrupted', 0, []);
+            else this.saves.load();
             const active = this.saves.current.activeAttempt;
             if (active) {
+                this.startupInterruptionId = active.id;
                 this.saves.settle(active.id, 'interrupted', 0, []);
-                this.view.interrupted = true;
             }
+            this.view.interrupted = this.startupInterruptionId !== null;
+            this.startupInterruptionId = null;
             this.view.selectedLensId = this.saves.current.profile.selectedLensId;
+            if (this.campaign) this.applyNight(this.catalog.find(night => night.id === this.campaign!.selectedNightId)!);
             this.refreshProfile();
             this.initialized = true;
             this.view.error = null;
@@ -262,6 +392,12 @@ export class LighthouseApplication implements GameApplication {
     }
 
     private selectCampaignContinuation(): void {
+        if (this.campaign) {
+            const selected = this.catalog.find(night => night.id === this.campaign!.selectedNightId)!;
+            this.applyNight(selected);
+            this.refreshProfile();
+            return;
+        }
         const available = this.catalog.filter(night => !night.optional && this.view.nights.find(item => item.id === night.id)?.available);
         const night = available.find(item => !this.view.profile.wonNightIds.includes(item.id)) ?? available.at(-1);
         if (!night) return;
@@ -273,7 +409,7 @@ export class LighthouseApplication implements GameApplication {
     }
 
     openGameMenu(): void {
-        if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'menu') return;
+        if (!this.canNavigate() || this.hasLiveBattle() || !['menu', 'preparation'].includes(this.view.screen)) return;
         this.selectCampaignContinuation();
         this.view.screen = 'game-menu';
     }
@@ -286,6 +422,7 @@ export class LighthouseApplication implements GameApplication {
 
     openTrials(): void {
         if (!this.canNavigate() || this.hasLiveBattle() || this.view.screen !== 'game-menu') return;
+        if (this.campaign) return;
         this.view.screen = 'trials';
     }
 
@@ -319,6 +456,11 @@ export class LighthouseApplication implements GameApplication {
                 return;
             }
             this.pendingNewGame = null;
+            if (this.campaign) {
+                this.initialized = false;
+                this.initialize();
+                return;
+            }
             this.view.error = null;
             this.refreshProfile();
         } catch (error) { this.fail(error); }
@@ -364,6 +506,9 @@ export class LighthouseApplication implements GameApplication {
             // Returning to battle keeps its existing pause; only resume() may lift it.
         } else if (this.view.screen === 'development' && this.canNavigate()) {
             this.view.screen = this.developmentOrigin;
+            this.refreshProfile();
+        } else if (this.canNavigate() && this.view.screen === 'collection') {
+            this.view.screen = this.collectionOrigin;
             this.refreshProfile();
         } else if (this.canNavigate() && this.view.screen === 'game-menu') {
             this.view.screen = 'menu';
@@ -467,7 +612,7 @@ export class LighthouseApplication implements GameApplication {
         if (!this.view.preparation.canStart) return;
         try {
             const identity = this.identity();
-            const config = calculateNightConfig(resolveLateNight(this.baseConfig, this.selectedLateMode), this.saves.current.profile.purchasedUpgrades, this.saves.current.profile.legacyEquipment, this.loadout());
+            const config = this.currentConfig();
             const placements = battleDeviceDeployments(this.saves.current.profile, config.devices.definitions);
             const cost = 0;
             const battle = createBattle(config, identity.seed, undefined, placements);
@@ -483,7 +628,9 @@ export class LighthouseApplication implements GameApplication {
         const { identity, config, battle, cost } = this.pendingStart;
         try {
             const snapshot = deviceDeployments(this.saves.current.profile);
-            this.saves.begin({...identity, placementCost: cost, deviceSnapshot: snapshot, nightId: this.view.selectedNightId, ...(config.lateMode ? {lateMode: config.lateMode} : {}), lensId: config.lens?.id ?? 'basic', ...(config.boss && this.view.selectedNightId === 'abyss-warden' ? {bossLevel:config.boss.level,bossReward:config.boss.materialReward}:{})});
+            const attempt = {...identity, placementCost: cost, deviceSnapshot: snapshot, nightId: this.view.selectedNightId, ...(config.lateMode ? {lateMode: config.lateMode} : {}), lensId: config.lens?.id ?? 'basic', ...(config.boss && this.view.selectedNightId === 'abyss-warden' ? {bossLevel:config.boss.level,bossReward:config.boss.materialReward}:{})};
+            if (this.campaign) this.campaign.begin(attempt, config);
+            else this.saves.begin(attempt);
             this.attemptId = identity.id;
             this.attemptConfig = config;
             this.attemptDeviceSnapshot = snapshot;
@@ -507,16 +654,19 @@ export class LighthouseApplication implements GameApplication {
 
     selectLens(id: LensId): void {
         if (!this.canNavigate() || !['menu','preparation'].includes(this.view.screen) || this.hasLiveBattle() || !this.view.profile.unlockedLenses.includes(id)) return;
+        if (this.campaign) { this.campaignAction(() => this.campaign!.selectLens(id)); return; }
         this.view.selectedLensId = id;
         this.refreshProfile();
     }
 
     purchaseLens(id: LensId): void {
+        if (this.campaign) { this.purchaseCampaignNode(campaignLensUnlockId(id)); return; }
         if (!this.initialized || this.view.error || this.view.screen !== 'development' || getLensAvailability(this.view.profile,id).status !== 'available') return;
         this.pendingLensPurchase = {kind:'lens',id}; this.completeLensPurchase();
     }
 
     purchaseLensUpgrade(id: LensUpgradeId): void {
+        if (this.campaign) { this.purchaseCampaignNode(id); return; }
         if (!this.initialized || this.view.error || this.view.screen !== 'development' || getLensUpgradeAvailability(this.view.profile,id).status !== 'available') return;
         this.pendingLensPurchase = {kind:'upgrade',id}; this.completeLensPurchase();
     }
@@ -530,6 +680,7 @@ export class LighthouseApplication implements GameApplication {
     }
 
     purchaseUpgrade(id: UpgradeId): void {
+        if (this.campaign) { this.purchaseCampaignNode(id); return; }
         if (!this.initialized || this.view.error || this.view.screen !== 'development') return;
         if (getUpgradeAvailability(this.view.profile, id).status !== 'available') return;
         this.pendingPurchase = id;
@@ -577,13 +728,14 @@ export class LighthouseApplication implements GameApplication {
             this.accumulator = Math.max(0, this.accumulator - step);
         }
         if (battle.outcome !== 'playing') {
-            const victoryReward = battle.outcome === 'victory' ? config.victoryReward : 0;
+            const first = this.campaign?.firstRewards(this.view.selectedNightId, battle.outcome === 'victory');
+            const victoryReward = battle.outcome === 'victory' ? config.victoryReward + (first?.firstWinShards ?? 0) : 0;
             const totalResources = battle.earnedResources + battle.earnedBonus + battle.earnedRescue + victoryReward;
             this.view.screen = 'result';
             this.view.result = {
                 attemptId: this.attemptId!, outcome: battle.outcome, ...(config.lateMode ? {lateMode: config.lateMode} : {}),
-                victoryReward, totalResources,
-                resources: battle.earnedResources, bonus: battle.earnedBonus, kills: battle.kills, saved: false, nightId: this.view.selectedNightId, rescue: battle.earnedRescue, bossDefeated: battle.boss?.health === 0, bossMaterials: battle.outcome === 'victory' && this.view.selectedNightId === 'abyss-warden' ? config.boss?.materialReward ?? 0 : 0
+                victoryReward, totalResources, ...(first ? { firstWinShards: first.firstWinShards } : {}),
+                resources: battle.earnedResources, bonus: battle.earnedBonus, kills: battle.kills, saved: false, nightId: this.view.selectedNightId, rescue: battle.earnedRescue, bossDefeated: battle.boss?.health === 0, bossMaterials: first?.firstWinPearls ?? (battle.outcome === 'victory' && this.view.selectedNightId === 'abyss-warden' ? config.boss?.materialReward ?? 0 : 0)
             };
             this.finish();
         }
@@ -594,7 +746,7 @@ export class LighthouseApplication implements GameApplication {
         if (!result || !this.view.battle || !this.attemptConfig || !this.attemptDeviceSnapshot) return;
         try {
             const devices = normalizedDeviceResults(this.view.battle.devices, this.attemptDeviceSnapshot, this.attemptConfig.devices.definitions);
-            this.saves.settle(result.attemptId, result.outcome, result.totalResources, this.view.battle.encountered, devices);
+            this.saves.settle(result.attemptId, result.outcome, result.totalResources - (result.firstWinShards ?? 0), this.view.battle.encountered, devices);
             this.view.result = {...result, saved: true};
             this.refreshProfile();
             this.view.error = null;
@@ -619,6 +771,7 @@ export class LighthouseApplication implements GameApplication {
     retrySave(): void {
         if (!this.initialized) this.initialize();
         else if (this.pendingNewGame) this.completeNewGame();
+        else if (this.pendingCampaignAction) this.completeCampaignAction();
         else if (this.pendingPreparation) this.completePreparation();
         else if (this.pendingAbandon) this.completeAbandon();
         else if (this.view.result && !this.view.result.saved) this.finish();

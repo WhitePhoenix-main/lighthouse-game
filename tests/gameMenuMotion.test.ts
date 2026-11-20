@@ -117,7 +117,8 @@ describe('game menu navigation motion', () => {
     ]);
     expect(s.animations[1]!.frames).toEqual([{ opacity: 1 }, { opacity: 0 }]);
     expect(s.animations.map(a => a.options)).toEqual(Array(2).fill({ duration: 560, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' }));
-    expect(s.animations.map(a => a.startTime)).toEqual([1000, 1000]);
+    // Neither animation may be backdated to the test timeline's previous frame.
+    expect(s.animations.map(a => a.startTime)).toEqual([null, null]);
     expect(s.page.inert).toBe(true); // Escape reverses entry without enabling duplicate button actions
     const ghost = s.ghosts[0]!;
     expect(ghost.inert).toBe(true);

@@ -1,0 +1,33 @@
+{
+  "seed": 42,
+  "victory": {
+    "night": "first-light",
+    "kills": 40,
+    "resources": 48,
+    "bonus": 0,
+    "rescue": 0,
+    "victoryReward": 65,
+    "total": 113,
+    "pearls": 0
+  },
+  "defeat": {
+    "night": "first-light",
+    "kills": 15,
+    "resources": 17,
+    "bonus": 0,
+    "rescue": 0,
+    "victoryReward": 0,
+    "total": 17,
+    "pearls": 0
+  },
+  "finale": {
+    "night": "fog-heart",
+    "kills": 82,
+    "resources": 108,
+    "bonus": 0,
+    "rescue": 0,
+    "victoryReward": 455,
+    "total": 563,
+    "pearls": 4
+  }
+}

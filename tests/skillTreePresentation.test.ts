@@ -41,7 +41,7 @@ describe('skill tree presentation regressions', () => {
     expect([...initial.matchAll(/data-skill="([^"]+)"/g)]).toHaveLength(200);
     const selected = screenContent(view, undefined, false, false, { ...createSkillTreeState(), selectedId: 'beam-power-1', inspectorOpen: true });
     expect(selected).not.toMatch(/<aside[^>]*class="skill-inspector"[^>]*hidden/);
-    expect(inspector(selected)).toContain('<h2>Мощность I</h2>');
+    expect(inspector(selected)).toContain('<h2><span class="skill-lettering" data-skill-lettering="Мощность I">');
   });
   it('indexes original and English labels independently of automatic display language', () => {
     const { view } = fixture();
@@ -78,7 +78,7 @@ describe('skill tree presentation regressions', () => {
         const html = render(view, category, node.id);
         const selected = buttons(html).find(button => button.includes(`data-skill="${node.id}"`))!;
         expect(selected).toContain('aria-pressed="true"');
-        expect(inspector(html)).toContain(`<h2>${node.name}</h2>`);
+        expect(inspector(html).match(/<h2>(.*?)<\/h2>/)?.[1]).toContain(node.name);
       }
     }
     expect(view.profile).toEqual(profile);

@@ -26,15 +26,16 @@ const CUES: Record<Cue, readonly [number, number, number, number, OscillatorType
 function eventCue(event: CombatEvent): Cue {
     switch (event.type) {
         case 'enemy-hit': case 'boss-hit': return 'hit';
-        case 'armor-broken': return 'break';
+        case 'armor-broken': case 'campaign-enemy-split': return 'break';
         case 'enemy-died': return 'death';
         case 'device-hit': case 'device-destroyed': case 'lighthouse-hit':
         case 'shield-broken': case 'charge-impact': case 'ship-lost': return 'danger';
-        case 'shield-hit': return 'shield';
+        case 'shield-hit': case 'campaign-cast-cancelled': return 'shield';
         case 'generator-residual': case 'barrier-slow': case 'bell-pulse': return 'shield';
         case 'generator-saved': case 'device-repaired': case 'shield-restored': return 'restore';
         case 'ability-used': case 'mortar-impact': case 'flash-used': case 'trap-triggered': case 'boss-stunned': return 'flash';
-        case 'wave-started': case 'charge-started': return 'wave';
+        case 'wave-started': case 'charge-started': case 'campaign-cast-started': return 'wave';
+        case 'campaign-cast-resolved': return 'danger';
         case 'wave-completed': case 'ship-rescued': case 'boss-died': return 'success';
     }
 }

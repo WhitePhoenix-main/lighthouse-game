@@ -10,6 +10,10 @@ const params=new URLSearchParams(location.search),save=emptySave();
 if(!params.has('new')){
  save.profile.resources=136;save.profile.bossMaterials=3;
  save.profile.wonNightIds=['first-light','broken-shore'];
+ if(params.has('clear-shore')){
+  save.profile.wonNightIds.push('winged-tide','abyss-warden','far-shore');
+  save.profile.bossLevel=2;
+ }
  save.profile.purchasedUpgrades=['unlock-cannon','unlock-barrier','unlock-flash'];
  save.profile.devices=[
   {id:1,kind:'cannon',health:35,consumed:false,position:{x:params.has('invalid')?100:-140,y:-140}},
@@ -21,8 +25,11 @@ if(!params.has('new')){
 }
 let raw:string|null=params.has('new')?null:JSON.stringify(save),writes=0,fail=false,identity=0;
 const settings={version:3,language:params.has('en')?'en':'ru',textSize:params.has('large')?'large':'normal',soundEnabled:false,musicVolume:0,effectsVolume:0};
-const app=new LighthouseApplication({read:()=>raw,write(value){if(fail)throw Error('fixture quota');raw=value;writes++;}},NIGHT_CONFIG,()=>({id:`preparation-fixture-${++identity}`,seed:42}),{read:()=>JSON.stringify(settings),write:()=>{}},NIGHT_CATALOG);
-app.openPreparation();
+const catalog = params.has('long-chapter') ? NIGHT_CATALOG.map(night => ['far-shore','armored-front'].includes(night.id)
+  ? {...night, chapter: NIGHT_CATALOG[0]!.chapter, optional:false} : night) : NIGHT_CATALOG;
+const app=new LighthouseApplication({read:()=>raw,write(value){if(fail)throw Error('fixture quota');raw=value;writes++;}},NIGHT_CONFIG,()=>({id:`preparation-fixture-${++identity}`,seed:42}),{read:()=>JSON.stringify(settings),write:()=>{}},catalog);
+if (params.has('game-menu')) app.openGameMenu();
+else app.openPreparation();
 const fixture={app,writes:()=>writes,raw:()=>raw,fail(value:boolean){fail=value;},assetsReady:false,worldPoint(x:number,y:number){
  const root=document.querySelector<HTMLElement>('.preparation-screen')!,field=root.querySelector<HTMLElement>('[data-prep-field]')!,b=root.getBoundingClientRect(),f=field.getBoundingClientRect();
  const devices=app.view.preparation.placements;

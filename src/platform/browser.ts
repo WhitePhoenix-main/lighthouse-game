@@ -1,15 +1,18 @@
 import type { GameApplication, SaveStore } from '../contracts';
 
 export const SAVE_KEY = 'lighthouse.save.v1';
+export const CAMPAIGN_SAVE_KEY = 'lighthouse.campaign.v1';
 export class BrowserSaveStore implements SaveStore {
-  read(): string | null { return localStorage.getItem(SAVE_KEY); }
-  write(value: string): void { localStorage.setItem(SAVE_KEY, value); }
+  constructor(private readonly key = SAVE_KEY) {}
+  read(): string | null { return localStorage.getItem(this.key); }
+  write(value: string): void { localStorage.setItem(this.key, value); }
 }
 
 export const SETTINGS_KEY = 'lighthouse.settings.v1';
 export class BrowserSettingsStore implements SaveStore {
-  read(): string | null { return localStorage.getItem(SETTINGS_KEY); }
-  write(value: string): void { localStorage.setItem(SETTINGS_KEY, value); }
+  constructor(private readonly key = SETTINGS_KEY) {}
+  read(): string | null { return localStorage.getItem(this.key); }
+  write(value: string): void { localStorage.setItem(this.key, value); }
 }
 
 export function bindLifecycle(application: GameApplication): () => void {

@@ -1,11 +1,12 @@
-import { landSpawnAngle } from '../content/terrain';
+import { isLandPath, landSpawnAngle } from '../content/terrain';
 import { damageLighthouse, healLighthouseAfterWave } from './lighthouse';
 import { finishingLightMultiplier } from './lightSupport';
-import type { BattleCommand, BattleState, DeviceDeployment, DevicePlacement, NightConfig, RandomSource } from '../contracts';
+import type { BattleCommand, BattleState, DeviceDeployment, DevicePlacement, EnemyKind, NightConfig, RandomSource, WaveDefinition } from '../contracts';
 import { angleDifference, selectBeamTargets } from './beam';
 import { advanceBeamTurn } from './beamTurning';
 import { damageEnemy, fireCannons, moveEnemies } from './devices';
 import { attackTentacles, createBoss, damageBoss, moveTentacles } from './boss';
+import { tickCampaignBoss } from './campaignBoss';
 import { emitCombatEvent } from './events';
 import { triggerTraps, useFlash } from './abilities';
 import { hitShield, isProtected, updateShield } from './shield';
@@ -17,6 +18,11 @@ import { damageDevice } from './deviceDamage';
 import { createSelectedAbility, useSelectedAbility } from './selectedAbility';
 import { overloadBeamMultipliers } from './abilityEffects';
 import { updateSeal } from './seal';
+import { applyTimedDeviceSuppression, conditionalBeamBonus } from './campaignGeneralEffects';
+import { selectGroundSpawn } from './groundRoutes';
+import { activeCampaignCast, campaignBeamDamageMultiplier, campaignEnemyDefeated,
+  resolveCampaignEnemyCasts, updateCampaignEnemies } from './campaignEnemies';
+
 
 const injectedRandom = new WeakMap<BattleState, RandomSource>();
 const EPSILON = 1e-9;
@@ -44,25 +50,50 @@ function startWave(state: BattleState, config: NightConfig, early: boolean): voi
   emitCombatEvent(state, { type: 'wave-started', waveIndex: index, bonus: wave.earlyBonus, early, x: 0, y: 0 });
 }
 
+function addEnemy(state: BattleState, config: NightConfig, kind: EnemyKind, waveIndex: number,
+    point: { x: number; y: number; waypoints?: readonly { x: number; y: number }[] }, reinforcement = false): void {
+  const enemy = config.enemies[kind];
+  state.enemies.push({ id: state.nextEnemyId++, kind, waveIndex, x: point.x, y: point.y,
+    ...(point.waypoints ? { groundWaypoints: point.waypoints, groundWaypointIndex: 0 } : {}),
+    health: enemy.health, armor: enemy.armor, attackCooldown: 0, ...(enemy.charge ? { chargePhase: 'ready' as const } : {}),
+    ...(reinforcement ? { reinforcement: true } : {}) });
+  if (!state.encountered.includes(kind)) state.encountered.push(kind);
+  const wave = state.waves[waveIndex];
+  if (reinforcement && wave) wave.reinforcements = (wave.reinforcements ?? 0) + 1;
+}
+
+function spawnPoint(config: NightConfig, kind: EnemyKind, sample: number, front?: NonNullable<WaveDefinition['fronts']>[number]) {
+  const enemy = config.enemies[kind], terrain = config.terrain;
+  const land = terrain && enemy.spawnSide === 'land';
+  const groundSpawn = land && selectGroundSpawn(terrain, config.spawnRadius, enemy.radius, sample, front);
+  if (groundSpawn) return groundSpawn;
+  const edge = land ? Math.acos(Math.max(-1, Math.min(1, (terrain.shoreX - enemy.radius) / config.spawnRadius))) : 0;
+  const south = front === 'south';
+  const north = front === 'north';
+  const angle = land && (terrain.shoreline || terrain.groundSpawn === 'dry-approach')
+    ? landSpawnAngle(terrain, config.spawnRadius, enemy.radius, south ? sample * .42 : north ? .58 + sample * .42 : sample)
+    : front && !land ? (south ? .72 : -.72) + (sample - .5) * .76 : edge + sample * (Math.PI * 2 - edge * 2);
+  return { x: Math.cos(angle) * config.spawnRadius, y: Math.sin(angle) * config.spawnRadius };
+}
+
+function addReinforcement(state: BattleState, config: NightConfig, kind: EnemyKind, x: number, y: number, waveIndex = -1): void {
+  const enemy = config.enemies[kind];
+  const point = enemy.movement === 'ground' && !isLandPath(config.terrain, { x, y }, { x: 0, y: 0 }, enemy.radius)
+    ? spawnPoint(config, kind, .5, y > 0 ? 'south' : 'north') : { x, y };
+  addEnemy(state, config, kind, waveIndex, point, true);
+}
+
 function spawnDue(state: BattleState, config: NightConfig): void {
   state.waves.forEach((wave, waveIndex) => {
     const definition = config.waves[waveIndex]!;
     while (wave.started && wave.spawned < definition.enemies.length && wave.nextSpawnAt <= state.elapsed + EPSILON) {
       const kind = definition.enemies[wave.spawned]!;
-      const enemy = config.enemies[kind];
-      const sample = nextRandom(state);
       // Uniform permitted arc, with the full ground body on land; no rejection loop.
-      const land = config.terrain && enemy.spawnSide === 'land';
-      const edge = land ? Math.acos(Math.max(-1, Math.min(1, (config.terrain!.shoreX - enemy.radius) / config.spawnRadius))) : 0;
-      const angle = land && config.terrain?.shoreline
-        ? landSpawnAngle(config.terrain, config.spawnRadius, enemy.radius, sample)
-        : edge + sample * (Math.PI * 2 - edge * 2);
-      state.enemies.push({ id: state.nextEnemyId++, kind, waveIndex,
-        x: Math.cos(angle) * config.spawnRadius, y: Math.sin(angle) * config.spawnRadius,
-        health: enemy.health, armor: enemy.armor, attackCooldown: 0, ...(enemy.charge ? { chargePhase: 'ready' as const } : {}) });
-      if (!state.encountered.includes(kind)) state.encountered.push(kind);
+      addEnemy(state, config, kind, waveIndex, spawnPoint(config, kind, nextRandom(state), definition.fronts?.[wave.spawned]));
       wave.spawned++;
-      wave.nextSpawnAt += definition.spawnInterval;
+      const offsets = definition.spawnOffsets;
+      wave.nextSpawnAt += offsets?.[wave.spawned] === undefined
+        ? definition.spawnInterval : offsets[wave.spawned]! - offsets[wave.spawned - 1]!;
     }
   });
 }
@@ -117,13 +148,14 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
       const cannon = state.devices.find(device => device.id === command.deviceId && (device.kind === 'cannon' || device.kind === 'harpoon' || device.kind === 'mortar') && device.health > 0 && !device.consumed);
       if (!cannon) continue;
       if (command.type === 'cannon-priority' && ['nearest', 'strongest', 'weakest'].includes(command.priority)) cannon.priority = command.priority;
-      if (command.type === 'cannon-target' && (command.enemyId === null || state.enemies.some(enemy => enemy.id === command.enemyId && enemy.health > 0 && (cannon.kind === 'harpoon' || enemy.kind !== 'bat')) || (state.boss && state.boss.health > 0 && state.boss.tentacles.some(zone => zone.id === command.enemyId)))) cannon.targetId = command.enemyId;
+      if (command.type === 'cannon-target' && (command.enemyId === null || state.enemies.some(enemy => enemy.id === command.enemyId && enemy.health > 0 && (cannon.kind === 'harpoon' || config.enemies[enemy.kind].movement !== 'flying')) || (state.boss && state.boss.health > 0 && state.boss.tentacles.some(zone => zone.id === command.enemyId)))) cannon.targetId = command.enemyId;
     }
   }
   if (state.elapsed + EPSILON >= state.nextWaveAt) startWave(state, config, false);
   spawnDue(state, config);
   const dt = config.stepSeconds;
   advanceBeamTurn(state, config);
+  updateCampaignEnemies(state, config);
   updateBells(state, config);
   updateSeal(state, config);
   const beforeMovement = selectBeamTargets(state.enemies, config, state.beamAngle, state.ship, state.boss);
@@ -163,36 +195,53 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   state.resonance.ticks = resonance && paired ? state.resonance.ticks + 1 : 0;
   const resonanceBonus = resonance && state.resonance.ticks > Math.ceil(resonance.seconds / dt - EPSILON) ? resonance.damageBonus : 0;
   const beamFactors = overloadBeamMultipliers(state, config, (paired ? 1 + (config.pairedDamageBonus ?? 0) : 1) + resonanceBonus);
-  const beamMultiplier = beamFactors.health * focusMultiplier;
-  const overloadArmorRatio = beamFactors.armor === beamFactors.health ? 1 : beamFactors.armor / beamFactors.health;
   for (const enemy of state.enemies) {
     if (selection.lit.includes(enemy.id)) {
-      damageEnemy(enemy, config.beam.damagePerSecond * dt * beamMultiplier * finishingLightMultiplier(config, enemy.health, config.enemies[enemy.kind].health), state,
-        ((config.lens?.armorMultiplier ?? 1) + (config.progression?.beamArmorBonus ?? 0)) * overloadArmorRatio);
+      const definition = config.enemies[enemy.kind];
+      const bonus = conditionalBeamBonus(config, enemy.chargePhase === 'windup' || !!activeCampaignCast(enemy),
+        definition.armor > 0 && enemy.armor === 0);
+      const healthFactor = beamFactors.health + bonus;
+      const beamMultiplier = healthFactor * focusMultiplier;
+      // Keep armor damage independent of the conditional HP bonus, including on overflow.
+      const armorRatio = beamFactors.armor === healthFactor ? 1 : beamFactors.armor / healthFactor;
+      damageEnemy(enemy, config.beam.damagePerSecond * dt * beamMultiplier * campaignBeamDamageMultiplier(enemy)
+        * finishingLightMultiplier(config, enemy.health, definition.health), state,
+        ((config.lens?.armorMultiplier ?? 1) + (config.progression?.beamArmorBonus ?? 0)) * armorRatio);
     }
   }
   const bossFinisher = state.boss && config.boss ? finishingLightMultiplier(config, state.boss.health, config.boss.health) : 1;
-  for (const zone of state.boss?.tentacles ?? []) {
-    if (selection.litTentacles?.includes(zone.id)) damageBoss(state, config.beam.damagePerSecond * dt * beamMultiplier * bossFinisher, zone);
+  const zones = state.boss?.tentacles ?? [];
+  // A direct hit can remove the selected zone before the shared boss burn is applied.
+  const litBossZone = zones.find(zone => selection.litTentacles?.includes(zone.id));
+  for (const zone of zones) {
+    if (selection.litTentacles?.includes(zone.id)) {
+      const bonus = conditionalBeamBonus(config, state.tick < (zone.telegraphedPreparationUntilTick ?? 0), false);
+      const beamMultiplier = (beamFactors.health + bonus) * focusMultiplier;
+      damageBoss(state, config.beam.damagePerSecond * dt * beamMultiplier * bossFinisher, zone);
+    }
   }
   for (const command of barrages) useSelectedAbility(state, config, command);
   fireCannons(state, config);
   updateMortars(state, config);
-  updateBurning(state, config);
+  updateBurning(state, config, litBossZone);
+  resolveCampaignEnemyCasts(state, config);
   for (const enemy of state.enemies) {
     const definition = config.enemies[enemy.kind];
     if (enemy.health <= 0) {
       state.kills++;
-      state.earnedResources += definition.reward;
-      state.waves[enemy.waveIndex]!.defeated++;
+      if (!enemy.reinforcement) state.earnedResources += definition.reward;
+      const wave = state.waves[enemy.waveIndex];
+      if (wave) wave.defeated++;
+      campaignEnemyDefeated(state, config, enemy, (kind, x, y) => addReinforcement(state, config, kind, x, y, enemy.waveIndex));
     }
   }
   state.enemies = state.enemies.filter(enemy => enemy.health > 0);
   for (const enemy of state.enemies) {
-    if (enemy.attackCooldown > EPSILON || state.tick < (enemy.stunnedUntilTick ?? 0) || enemy.chargePhase === 'windup') continue;
+    if (enemy.attackCooldown > EPSILON || state.tick < (enemy.stunnedUntilTick ?? 0) || enemy.chargePhase === 'windup' || activeCampaignCast(enemy)) continue;
     const definition = config.enemies[enemy.kind];
     const device = contacts.get(enemy.id);
     const charging = enemy.chargePhase === 'charging';
+    const protectedAtImpact = state.shield.current > 0;
     const attackDamage = definition.attackDamage * (charging && device ? definition.charge?.damageMultiplier ?? 1 : 1);
     if (device === 'shield') {
       // Another attacker may have exhausted the field earlier in this step.
@@ -202,19 +251,33 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
       if (device.health <= 0 || device.consumed) continue;
       if (state.shield.current > 0 && isProtected(device, config)) continue;
       damageDevice(state, config, device, attackDamage, charging);
+      const suppression = definition.campaignAttack?.suppressionSeconds;
+      if (suppression && !enemy.suppressionUsed && device.health > 0 && !device.consumed
+        && (device.kind === 'cannon' || device.kind === 'harpoon' || device.kind === 'mortar')) {
+        applyTimedDeviceSuppression(state, config, device, { kind: 'timed', durationSeconds: suppression });
+        enemy.suppressionUsed = true;
+      }
     } else if (Math.hypot(enemy.x, enemy.y) <= config.lighthouseRadius + definition.radius + EPSILON) {
       damageLighthouse(state, config, definition.attackDamage, charging);
     } else continue;
     if (charging) {
       enemy.chargePhase = 'spent';
+      const area = definition.campaignAttack?.impactArea;
+      if (area) for (const nearby of state.devices) {
+        if (nearby !== device && !(protectedAtImpact && isProtected(nearby, config))
+          && Math.hypot(nearby.x - enemy.x, nearby.y - enemy.y) <= area.radius) {
+          damageDevice(state, config, nearby, definition.attackDamage * area.damageMultiplier, false, true, 'area');
+        }
+      }
       emitCombatEvent(state, { type: 'charge-impact', enemyId: enemy.id, enemyKind: enemy.kind, x: enemy.x, y: enemy.y });
     }
     enemy.attackCooldown = definition.attackInterval;
   }
   attackTentacles(state, config, tentacleContacts);
+  tickCampaignBoss(state, config, (kind, x, y) => addReinforcement(state, config, kind, x, y));
   updateRepairLamps(state, config);
   state.waves.forEach((wave, index) => {
-    if (wave.started && !wave.completed && wave.defeated === config.waves[index]!.enemies.length) {
+    if (wave.started && !wave.completed && wave.defeated === config.waves[index]!.enemies.length + (wave.reinforcements ?? 0)) {
       wave.completed = true;
       healLighthouseAfterWave(state, config);
       state.earnedBonus += wave.earlyBonus;
@@ -224,7 +287,7 @@ export function stepBattle(state: BattleState, config: NightConfig, commands: re
   state.tick++;
   state.elapsed = state.tick * dt;
   if (state.lighthouseHealth <= 0) state.outcome = 'defeat';
-  else if ((!state.boss || state.boss.health <= 0) && state.waves.every(wave => wave.completed)) state.outcome = 'victory';
+  else if ((!state.boss || state.boss.health <= 0) && state.enemies.length === 0 && state.waves.every(wave => wave.completed)) state.outcome = 'victory';
   if (state.outcome !== 'playing' && state.ship?.status === 'waiting') {
     state.ship.status = 'lost'; state.ship.lit = false;
     emitCombatEvent(state, { type: 'ship-lost', x: state.ship.x, y: state.ship.y });

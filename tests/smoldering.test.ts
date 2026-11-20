@@ -3,6 +3,7 @@ import type { BattleState, EnemyState, LensUpgradeDefinition, SaveStore } from '
 import { NIGHT_CONFIG } from '../src/content/night';
 import { LENSES, LENS_UPGRADES } from '../src/content/lenses';
 import { getBossRules } from '../src/content/boss';
+import { getCampaignBoss } from '../src/content/campaignBosses';
 import { calculateNightConfig } from '../src/progression/upgrades';
 import { validateLensDefinitions } from '../src/progression/lenses';
 import { createBattle, stepBattle } from '../src/simulation/battle';
@@ -21,6 +22,20 @@ function setup() {
   return { config, state, target };
 }
 function away(state: BattleState): void { state.beamAngle = state.desiredBeamAngle = Math.PI; }
+
+function setupKeeper() {
+  const { config } = setup();
+  config.waves = [];
+  config.boss = getCampaignBoss(6)!;
+  const state = createBattle(config, 42);
+  const boss = state.boss!;
+  const campaign = boss.campaign!;
+  const blade = campaign.parts.find(part => part.id === 'north-blade')!;
+  const bladeZone = boss.tentacles.find(zone => zone.id === blade.zoneId)!;
+  const core = boss.tentacles.find(zone => zone.id === campaign.parts.find(part => part.id === 'core')!.zoneId)!;
+  state.beamAngle = state.desiredBeamAngle = Math.atan2(bladeZone.y, bladeZone.x);
+  return { config, state, boss, campaign, blade, bladeZone, core };
+}
 
 describe('smoldering lens', () => {
   it('uses preliminary balance and computes all four branches only for the selected lens', () => {
@@ -136,6 +151,95 @@ describe('smoldering lens', () => {
     expect(state.boss.health).toBeCloseTo(998.2);
     expect(state.boss.burn?.remainingTicks).toBe(59);
     expect(state.litTentacleIds).toEqual([]);
+  });
+
+  it('burns only the Keeper’s shared health through guarded and exposed stances', () => {
+    const { config, state, boss, campaign, blade, bladeZone, core } = setupKeeper();
+    const direct = config.beam.damagePerSecond * config.stepSeconds;
+    const burn = config.lens!.burn!.damagePerSecond * config.stepSeconds;
+    boss.health = config.boss!.health * .7 + direct + burn * 1.5;
+    const start = boss.health;
+    const bladeHealth = blade.health!;
+
+    stepBattle(state, config, []);
+    expect(state.litTentacleIds).toEqual([bladeZone.id]);
+    expect(campaign.stance).toBe('guarded');
+    expect(blade.health).toBeCloseTo(bladeHealth - direct);
+    expect(boss.health).toBeCloseTo(start - direct - burn);
+    expect(state.events.filter(event => event.type === 'boss-hit').at(-1)).toMatchObject({ x: bladeZone.x, y: bladeZone.y });
+
+    state.beamAngle = state.desiredBeamAngle = Math.PI / 2;
+    stepBattle(state, config, []);
+    expect(state.litTentacleIds).toEqual([]);
+    expect(campaign.stance).toBe('exposed');
+    expect(boss.health).toBeCloseTo(start - direct - 2 * burn);
+    expect(state.events.filter(event => event.type === 'boss-hit').at(-1)).toMatchObject({ x: core.x, y: core.y });
+
+    for (let i = 0; i < 59; i++) stepBattle(state, config, []);
+    expect(boss.health).toBeCloseTo(start - direct - 61 * burn);
+    expect(boss.burn).toBeUndefined();
+    expect(blade.health).toBeCloseTo(bladeHealth - direct);
+    const finalHealth = boss.health;
+    stepBattle(state, config, []);
+    expect(boss.health).toBe(finalHealth);
+  });
+
+  it.each([['ignites', false], ['refreshes', true]] as const)('%s boss burn when the beam destroys its only lit part', (_, burning) => {
+    const { config, state, boss, blade, bladeZone } = setupKeeper();
+    const direct = config.beam.damagePerSecond * config.stepSeconds;
+    const burn = config.lens!.burn!.damagePerSecond * config.stepSeconds;
+    const health = boss.health;
+    blade.health = direct / 2;
+    if (burning) boss.burn = { remainingTicks: 1 };
+
+    stepBattle(state, config, []);
+
+    expect(blade.health).toBe(0);
+    expect(state.litTentacleIds).toEqual([]);
+    expect(boss.tentacles).not.toContain(bladeZone);
+    expect(boss.health).toBeCloseTo(health - direct - burn);
+    expect(boss.burn?.remainingTicks).toBe(60);
+    expect(state.events.filter(event => event.type === 'boss-hit').at(-1)).toMatchObject({ x: bladeZone.x, y: bladeZone.y });
+  });
+
+  it('does not ignite a boss killed by direct light on a selected part', () => {
+    const { config, state, boss } = setupKeeper();
+    boss.health = .1;
+
+    stepBattle(state, config, []);
+
+    expect(boss.health).toBe(0);
+    expect(boss.burn).toBeUndefined();
+    expect(state.events.filter(event => event.type === 'boss-hit')).toHaveLength(1);
+  });
+
+  it('lets residual boss burn finish the night and clear the pending attack once', () => {
+    const { config, state, boss, campaign, bladeZone, core } = setupKeeper();
+    state.tick = campaign.readyTick;
+    state.elapsed = state.tick * config.stepSeconds;
+    stepBattle(state, config, []);
+    expect(campaign.telegraph?.sourceZoneId).toBe(bladeZone.id);
+    expect(bladeZone.telegraphedPreparationUntilTick).toBeDefined();
+    expect(boss.burn?.remainingTicks).toBe(60);
+
+    boss.health = .1;
+    state.beamAngle = state.desiredBeamAngle = Math.PI / 2;
+    const finalTick = state.tick;
+    stepBattle(state, config, []);
+    expect(state.outcome).toBe('victory');
+    expect(boss.health).toBe(0);
+    expect(boss.burn).toBeUndefined();
+    expect(campaign.telegraph).toBeUndefined();
+    expect(bladeZone.telegraphedPreparationUntilTick).toBeUndefined();
+    expect(boss.tentacles).toEqual([]);
+    expect(state.litTentacleIds).toEqual([]);
+    expect(state.blockedTentacleIds).toEqual([]);
+    expect(state.events.filter(event => event.tick === finalTick)).toMatchObject([
+      { type: 'boss-hit', healthDamage: .1, x: core.x, y: core.y },
+      { type: 'boss-died', x: core.x, y: core.y },
+    ]);
+    stepBattle(state, config, []);
+    expect(state.events.filter(event => event.type === 'boss-died')).toHaveLength(1);
   });
 
   it('residual boss burn does not suppress attacks or slow tentacles', () => {

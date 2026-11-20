@@ -6,10 +6,12 @@ import { contactFraction } from './geometry';
 import { hitShield, isProtected } from './shield';
 import { movementSlowMultiplier } from './slows';
 import { damageDevice } from './deviceDamage';
+import { campaignPartAt, clearCampaignTelegraph, createCampaignBoss } from './campaignBoss';
 
 export function createBoss(config: NightConfig): BossState | null {
   const rules = config.boss;
   if (!rules) return null;
+  if (rules.campaign) return { id: rules.id, health: rules.health, stunnedUntilTick: 0, ...createCampaignBoss(rules.campaign, config) };
   return { id: rules.id, health: rules.health, stunnedUntilTick: 0,
     tentacles: Array.from({ length: rules.tentacleCount }, (_, index) => {
       // Sea-facing arc is deterministic and independent of display coordinates.
@@ -18,26 +20,60 @@ export function createBoss(config: NightConfig): BossState | null {
         y: Math.sin(angle) * rules.spawnRadius, attackCooldown: 0 };
     }) };
 }
-export function damageBoss(state: BattleState, damage: number, position: { x: number; y: number }): void {
+export function damageBoss(state: BattleState, damage: number, position: { x: number; y: number; id?: number }): void {
+  const boss = state.boss;
+  if (!boss || boss.health <= 0) return;
+  const campaign = boss.campaign;
+  if (campaign) {
+    if (!Number.isFinite(damage) || damage <= 0) return;
+    const part = campaignPartAt(boss, position);
+    if (!part || part.health === 0) return;
+    if (part.health === null) damage *= campaign.coreDamageMultiplier;
+    else {
+      part.health = Math.max(0, part.health - damage);
+      if (part.health === 0) {
+        // Weapon passes over the old array keep their iteration order. Later
+        // passes see only living zones, and stale direct hits are rejected above.
+        if (campaign.telegraph?.sourceZoneId === part.zoneId) clearCampaignTelegraph(boss, campaign);
+        boss.tentacles = boss.tentacles.filter(zone => zone.id !== part.zoneId);
+        state.litTentacleIds = state.litTentacleIds.filter(id => id !== part.zoneId);
+        state.blockedTentacleIds = state.blockedTentacleIds.filter(id => id !== part.zoneId);
+      }
+    }
+  }
+  damageBossHealth(state, damage, position);
+}
+
+/** Applies damage to the boss as a whole. The position only locates combat events. */
+export function damageBossHealth(state: BattleState, damage: number, position: { x: number; y: number }): void {
   const boss = state.boss;
   if (!boss || boss.health <= 0) return;
   const before = boss.health;
   boss.health = Math.max(0, before - damage);
   if (before > boss.health) emitCombatEvent(state, { type: 'boss-hit', healthDamage: before - boss.health, ...position });
   if (boss.health === 0) {
+    if (boss.campaign) {
+      clearCampaignTelegraph(boss, boss.campaign);
+      boss.tentacles = [];
+    }
     state.litTentacleIds = []; state.blockedTentacleIds = [];
     emitCombatEvent(state, { type: 'boss-died', ...position });
   }
 }
 export function bossIntersects(state: BattleState, config: NightConfig, x: number, y: number, radius: number): boolean {
-  return !!config.boss && !!state.boss && state.boss.health > 0 && state.boss.tentacles.some(zone =>
-    Math.hypot(zone.x - x, zone.y - y) <= radius + config.boss!.radius + 1e-9);
+  const boss = state.boss, rules = config.boss;
+  return !!rules && !!boss && boss.health > 0 && boss.tentacles.some(zone =>
+    Math.hypot(zone.x - x, zone.y - y) <= radius + rules.radius + 1e-9);
 }
 export function moveTentacles(state: BattleState, config: NightConfig, litIds: readonly number[]): Map<number, DeviceState | 'shield'> {
   const contacts = new Map<number, DeviceState | 'shield'>();
   const boss = state.boss, rules = config.boss;
   if (!boss || !rules || boss.health <= 0 || state.tick < boss.stunnedUntilTick) return contacts;
   for (const zone of boss.tentacles) {
+    if (boss.campaign) {
+      const part = campaignPartAt(boss, zone);
+      if (!part?.moves || part.health === 0) continue;
+    }
     zone.attackCooldown = Math.max(0, zone.attackCooldown - config.stepSeconds);
     const distance = Math.hypot(zone.x, zone.y);
     const multiplier = Math.min(movementSlowMultiplier(zone, state.tick), sealSlowMultiplier(zone, state, config),
@@ -66,6 +102,7 @@ export function attackTentacles(state: BattleState, config: NightConfig, contact
   const boss = state.boss, rules = config.boss;
   if (!boss || !rules || boss.health <= 0 || state.tick < boss.stunnedUntilTick) return;
   for (const zone of boss.tentacles) {
+    if (boss.campaign && (!campaignPartAt(boss, zone)?.moves || boss.campaign.telegraph?.sourceZoneId === zone.id)) continue;
     if (zone.attackCooldown > 1e-9 || state.litTentacleIds.includes(zone.id)) continue;
     const target = contacts.get(zone.id);
     if (target === 'shield') {
